@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Rename Metis files to follow naming conventions
+
+# Horizontal logos
+mv "01. Metis Blue White Horizontal A.png" "metis-blue-white-horizontal-a.png"
+mv "01. Metis Blue White Horizontal A.svg" "metis-blue-white-horizontal-a.svg"
+mv "01. Metis Blue White Horizontal.png" "metis-blue-white-horizontal.png"
+mv "01. Metis Blue White Horizontal.svg" "metis-blue-white-horizontal.svg"
+mv "02. Metis Blue Black Horizontal.jpg" "metis-blue-black-horizontal.jpg"
+mv "02. Metis Blue Black Horizontal.png" "metis-blue-black-horizontal.png"
+mv "02. Metis Blue Black Horizontal.svg" "metis-blue-black-horizontal.svg"
+mv "03. Metis Black Horizontal.jpg" "metis-black-horizontal.jpg"
+mv "03. Metis Black Horizontal.png" "metis-black-horizontal.png"
+mv "03. Metis Black Horizontal.svg" "metis-black-horizontal.svg"
+mv "04. Metis Black White Horizontal.png" "metis-black-white-horizontal.png"
+mv "04. Metis Black White Horizontal.svg" "metis-black-white-horizontal.svg"
+mv "05. Metis White Horizontal.png" "metis-white-horizontal.png"
+mv "05. Metis White Horizontal.svg" "metis-white-horizontal.svg"
+mv "06. Metis Black Horizontal.jpg" "metis-black-horizontal-alt.jpg"
+mv "06. Metis Black Horizontal.png" "metis-black-horizontal-alt.png"
+mv "06. Metis Black Horizontal.svg" "metis-black-horizontal-alt.svg"
+
+# Vertical logos
+mv "01. Metis Blue White Vertical A.png" "metis-blue-white-vertical-a.png"
+mv "01. Metis Blue White Vertical A.svg" "metis-blue-white-vertical-a.svg"
+mv "01. Metis Blue White Vertical.png" "metis-blue-white-vertical.png"
+mv "01. Metis Blue White Vertical.svg" "metis-blue-white-vertical.svg"
+mv "02. Metis Blue Black Vertical.jpg" "metis-blue-black-vertical.jpg"
+mv "02. Metis Blue Black Vertical.png" "metis-blue-black-vertical.png"
+mv "02. Metis Blue Black Vertical.svg" "metis-blue-black-vertical.svg"
+mv "03. Metis Black Vertical.jpg" "metis-black-vertical.jpg"
+mv "03. Metis Black Vertical.png" "metis-black-vertical.png"
+mv "03. Metis Black Vertical.svg" "metis-black-vertical.svg"
+mv "04. Metis Black White Vertical.png" "metis-black-white-vertical.png"
+mv "04. Metis Black White Vertical.svg" "metis-black-white-vertical.svg"
+mv "Metis Black Vertical.jpg" "metis-black-vertical-alt.jpg"
+mv "Metis Black Vertical.png" "metis-black-vertical-alt.png"
+mv "Metis Black Vertical.svg" "metis-black-vertical-alt.svg"
+mv "Metis White Vertical.png" "metis-white-vertical.png"
+mv "Metis White Vertical.svg" "metis-white-vertical.svg"
+
+# Symbol logos
+mv "Symbol Black.jpg" "metis-symbol-black.jpg"
+mv "Symbol Black.png" "metis-symbol-black.png"
+mv "Symbol Black.svg" "metis-symbol-black.svg"
+mv "Symbol Blue Inverted.jpg" "metis-symbol-blue-inverted.jpg"
+mv "Symbol Blue Inverted.png" "metis-symbol-blue-inverted.png"
+mv "Symbol Blue Inverted.svg" "metis-symbol-blue-inverted.svg"
+mv "Symbol Blue White.png" "metis-symbol-blue-white.png"
+mv "Symbol Blue White.svg" "metis-symbol-blue-white.svg"
+mv "Symbol Blue.jpg" "metis-symbol-blue.jpg"
+mv "Symbol Blue.png" "metis-symbol-blue.png"
+mv "Symbol Blue.svg" "metis-symbol-blue.svg"
+mv "Symbol White.png" "metis-symbol-white.png"
+
+echo "Metis files renamed successfully!"
