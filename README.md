@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./public/JustineDevs_Banner.png" alt="JustineDevs Banner" width="800">
+<img src="public/Justinedevs_Banner.png" alt="JustineDevs Banner" width="800">
 
 </div>
 
@@ -87,7 +87,7 @@ Since 2022, I have been an active Web3 community moderator and professional mode
 Connect with me through:
 - **Portfolio Website**: [View Live Site](#)
 - **GitHub**: [@JustineDevs](https://github.com/JustineDevs)
-- **Email**: [JustineLupasi180@gmail.com](emailto:JustineLupasi180@gmail.com)
+- **Email**: [JustineLupasi180@gmail.com](mailto:JustineLupasi180@gmail.com)
 
 ---
 
