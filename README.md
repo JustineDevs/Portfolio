@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="/public/JustineDevs Banner.png" alt="JustineDevs Banne" width="800">
+<img src="/public/JustineDevs_Banner.png" alt="JustineDevs Banner" width="800">
 
 </div>
 
