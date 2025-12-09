@@ -63,7 +63,7 @@ Since 2022, I have been an active Web3 community moderator and professional mode
 
 ## Experience
 
-### Web3 Community Moderator (2022 - Present)
+### Web3 Community Moderator (2022)
 - Active community moderator since 2022
 - Evolved from volunteer roles to paid professional projects
 - Managed and engaged with Web3 communities
