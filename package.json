@@ -1,0 +1,24 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "Portfolio website project",
+  "private": true,
+  "scripts": {
+    "commit": "node version/parallel-commit.js",
+    "commit:dry": "node version/parallel-commit.js --dry-run",
+    "commit:sh": "bash version/parallel-commit.sh",
+    "commit:sh:dry": "bash version/parallel-commit.sh --dry-run",
+    "commit:all": "git add -A && git commit -m \"chore: update all changes\"",
+    "commit:auto": "bash version/parallel-commit.sh --max 3",
+    "status": "git status",
+    "changes": "git status --porcelain",
+    "staged": "git diff --cached --name-only"
+  },
+  "keywords": [
+    "portfolio",
+    "website"
+  ],
+  "author": "JustineDevs",
+  "license": "ISC"
+}
+
