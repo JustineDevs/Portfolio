@@ -1,6 +1,6 @@
 # Custom project ignores
-cursor/
-./rules
+.cursor/
+/cursor/rules/
 /reference/
 
 # Dependencies
