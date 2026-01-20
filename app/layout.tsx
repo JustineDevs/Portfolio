@@ -14,6 +14,9 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'JustineDevs Portfolio',
   description: 'Portfolio website showcasing projects, experience, and skills',
+  icons: {
+    icon: '/JSTN Logo/SVG/Abstract Symbol - irisdecent.svg',
+  },
 }
 
 export default function RootLayout({
