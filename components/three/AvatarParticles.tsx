@@ -12,7 +12,7 @@ type AvatarParticlesProps = {
 };
 
 export default function AvatarParticles({
-  density = 20, // Increased skip step (threshold) to reduce particle count and improve performance
+  density = 7, // Increased skip step (threshold) to reduce particle count and improve performance
   particleSize = 0.5, // Slightly larger to maintain volume with fewer particles
   hoverIntensity = 0.02,
 }: AvatarParticlesProps) {
