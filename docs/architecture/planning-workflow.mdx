@@ -1,0 +1,115 @@
+---
+title: Planning Workflow
+description: How we use persistent markdown planning (inspired by Manus) to manage the JSTN portfolio
+---
+
+# Planning Workflow
+
+This document explains how we use persistent markdown planning to manage the JSTN portfolio as a product.
+
+## Overview
+
+Inspired by the [planning-with-files](https://github.com/OthmanAdi/planning-with-files) skill and the workflow pattern behind Manus's $2B acquisition, we maintain a 3-file planning system for major portfolio epics.
+
+## The 3-File Pattern
+
+### 1. `task_plan.md`
+**Purpose**: High-level phases and tasks
+
+Contains:
+- Project phases
+- Task checklists
+- Current focus area
+- Next steps
+
+**Location**: `planning/{epic-name}/task_plan.md`
+
+### 2. `findings.md`
+**Purpose**: Research, benchmarks, and insights
+
+Contains:
+- Reference sites analyzed
+- Performance benchmarks
+- Technical findings
+- Issues encountered
+- Best practices applied
+
+**Location**: `planning/{epic-name}/findings.md`
+
+### 3. `progress.md`
+**Purpose**: Weekly progress log
+
+Contains:
+- Completed tasks
+- In-progress work
+- Errors encountered
+- Experiments tried
+- Next week goals
+
+**Location**: `planning/{epic-name}/progress.md`
+
+## How It Works
+
+### Starting a New Epic
+
+1. Create directory: `planning/{epic-name}/`
+2. Initialize three files:
+   - `task_plan.md` - Break down into phases
+   - `findings.md` - Start with research
+   - `progress.md` - Begin weekly log
+
+### During Development
+
+1. **Update `task_plan.md`** when:
+   - Completing phases
+   - Adding new tasks
+   - Changing focus
+
+2. **Update `findings.md`** when:
+   - Researching solutions
+   - Encountering issues
+   - Discovering patterns
+
+3. **Update `progress.md`** weekly:
+   - What was completed
+   - What's in progress
+   - Errors and solutions
+   - Experiments
+
+### Benefits
+
+- **Context Preservation**: AI agents can read planning files to understand current state
+- **Progress Tracking**: Clear visibility into what's done and what's next
+- **Knowledge Base**: Findings become reusable knowledge
+- **Alignment**: Keeps team (and AI) aligned on goals
+
+## Example: Portfolio V2
+
+See `planning/portfolio-v2/` for a complete example:
+
+- **task_plan.md**: 6 phases from Design System to Launch
+- **findings.md**: Design research, performance benchmarks, technical findings
+- **progress.md**: Weekly progress log with errors and experiments
+
+## Integration with AI Agents
+
+When working with Claude Code or Cursor:
+
+1. Agent reads planning files to understand context
+2. Agent updates files as work progresses
+3. Agent references findings to avoid repeating mistakes
+4. Agent uses task plan to stay focused
+
+## Best Practices
+
+1. **Keep files updated**: Don't let them get stale
+2. **Be specific**: Clear tasks and findings
+3. **Document errors**: Help future you (and AI)
+4. **Link resources**: Reference external docs
+5. **Review weekly**: Update progress regularly
+
+## Resources
+
+- [planning-with-files](https://github.com/OthmanAdi/planning-with-files)
+- [Manus Workflow Pattern](https://github.com/OthmanAdi/planning-with-files#readme)
+

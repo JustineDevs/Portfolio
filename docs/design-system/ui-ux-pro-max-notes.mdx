@@ -1,0 +1,138 @@
+---
+title: UI UX Pro Max - Design System Notes
+description: Design intelligence choices and rationale for JSTN portfolio
+---
+
+# UI UX Pro Max Design System
+
+This document records the design choices made for the JSTN portfolio using UI UX Pro Max design intelligence.
+
+## Core Style
+
+**Selected Style:** Minimalistic + Clean + ASCII
+
+### Rationale
+- Aligns with developer/technical brand identity
+- Clean aesthetic supports content focus
+- ASCII elements add character without clutter
+
+## Color Palette
+
+### Primary Palette
+```json
+{
+  "theme": "#F8F8F8",
+  "background": {
+    "dark": "#424242",
+    "light": "#FFFFFF",
+    "accent": "#1342FF"
+  },
+  "button": "#A8CEFF",
+  "icons": "#484848",
+  "fontColor": "#383838",
+  "footerFontColor": "#2A2A2A"
+}
+```
+
+### Color Usage
+- **Theme (#F8F8F8)**: Primary background, creates light, airy feel
+- **Dark (#424242)**: Contrast elements, navigation, buttons
+- **Accent (#1342FF)**: CTAs, links, highlights
+- **Button (#A8CEFF)**: Secondary actions, subtle highlights
+- **Icons (#484848)**: Icon color for consistency
+- **Font (#383838)**: Primary text for readability
+- **Footer Font (#2A2A2A)**: Footer text, slightly darker
+
+### Accessibility
+- WCAG AA compliant contrast ratios
+- Dark mode considerations with #424242
+- High contrast for text readability
+
+## Typography
+
+### Font Pairing
+**Primary:** Inter (from Vercel Font)
+**Logo:** Inter Bold + Custom
+
+### Usage
+- Headings: Inter Bold
+- Body: Inter Regular
+- Code/ASCII: Courier New, Monaco (monospace)
+
+### Font Sizes
+- H1: 4xl-7xl (responsive)
+- H2: 3xl
+- H3: 2xl
+- Body: base (16px)
+- Small: sm (14px)
+
+## Layout Patterns
+
+### Landing Page
+- Hero: Left-right split (avatar left, content right)
+- Tech Stack: Grid layout with icon cards
+- Projects: Dark cards with abstract backgrounds
+- Activity: Heatmap visualization
+
+### About Page
+- Sidebar navigation
+- Content sections with clear hierarchy
+- Story and responsibilities side-by-side
+
+### Experience Page
+- Timeline navigation
+- Interactive stage selection
+- Gallery and testimonials grid
+
+## Component Patterns
+
+### Buttons
+- Primary: `#1342FF` background, white text
+- Secondary: Border with `#424242`, hover states
+- Social: Black pill shape with white icons
+
+### Cards
+- Light cards: White background, subtle shadow
+- Dark cards: `#424242` gradient, abstract shapes
+- Hover: Scale and shadow transitions
+
+### Icons
+- Source: iconstack.io (solid colors)
+- Size: 24px standard, 32px for tech stack
+- Color: `#484848` default, white on dark backgrounds
+
+## UX Guidelines Applied
+
+### Spacing
+- Consistent 8px grid system
+- Section padding: 80px (py-20)
+- Component gaps: 16px-24px
+
+### Responsive Design
+- Mobile-first approach
+- Breakpoints: sm (640px), md (768px), lg (1024px)
+- Grid adapts: 1 col mobile, 2+ cols desktop
+
+### Interactions
+- Hover states on all interactive elements
+- Smooth transitions (0.2s ease)
+- Loading states for async content
+
+## Design Decisions Log
+
+### 2024-01-XX: Initial Design System
+- Selected minimalistic style
+- Implemented chromatic theme
+- Set up Inter font family
+
+### 2024-01-XX: Color Refinement
+- Adjusted contrast ratios
+- Refined accent color usage
+- Added button color variant
+
+## Resources
+
+- [UI UX Pro Max Skill](https://ui-ux-pro-max-skill.nextlevelbuilder.io/)
+- [Vercel Font (Inter)](https://vercel.com/font)
+- [Tailwind CSS](https://tailwindcss.com/)
+

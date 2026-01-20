@@ -1,0 +1,94 @@
+---
+title: React Best Practices - Performance Guidelines
+description: Performance rules for React/Next.js based on Vercel's React Best Practices
+---
+
+# React Best Practices
+
+This document summarizes the 40+ performance rules for React/Next.js applications, organized by impact level.
+
+## Performance Categories
+
+### 1. Eliminate Waterfalls (CRITICAL)
+- Avoid sequential `await` calls in components
+- Use parallel data fetching with `Promise.all()`
+- Prefetch data at the page level, not component level
+- Use React Server Components for data fetching
+
+### 2. Reduce Bundle Size (HIGH)
+- Code split at the route level
+- Lazy load heavy components
+- Remove unused dependencies
+- Use dynamic imports for large libraries
+- Tree-shake unused exports
+
+### 3. Server Performance (HIGH)
+- Use React Server Components by default
+- Minimize server-side computation
+- Cache API responses appropriately
+- Use Next.js Image component for optimization
+
+### 4. Client Fetching (MEDIUM)
+- Use SWR or React Query for client-side data
+- Implement proper loading states
+- Cache responses to reduce network calls
+- Use stale-while-revalidate pattern
+
+### 5. Re-renders (MEDIUM)
+- Memoize expensive computations with `useMemo`
+- Use `React.memo` for component memoization
+- Avoid creating new objects/functions in render
+- Use `useCallback` for stable function references
+
+### 6. Rendering Performance (MEDIUM)
+- Virtualize long lists
+- Debounce/throttle user interactions
+- Use CSS for animations when possible
+- Minimize DOM updates
+
+### 7. Advanced Patterns (LOW)
+- Use Suspense boundaries effectively
+- Implement error boundaries
+- Use concurrent features appropriately
+- Optimize context usage
+
+### 8. JavaScript Performance (LOW)
+- Minimize JavaScript execution time
+- Use Web Workers for heavy computations
+- Optimize event handlers
+- Profile with React DevTools Profiler
+
+## Pre-Ship Checklist
+
+Before deploying major changes, verify:
+
+- [ ] No sequential `await` calls in components
+- [ ] Bundle size analyzed and optimized
+- [ ] Images optimized with Next.js Image
+- [ ] Code splitting implemented for routes
+- [ ] Server Components used where appropriate
+- [ ] Unnecessary re-renders eliminated
+- [ ] Loading states implemented
+- [ ] Error boundaries in place
+- [ ] Performance tested with Lighthouse
+
+## Implementation in JSTN Portfolio
+
+### Current Optimizations
+- Using Next.js App Router with Server Components
+- Image optimization with Next.js Image component
+- Code splitting at route level
+- Framer Motion for animations (client-side only)
+
+### Planned Optimizations
+- [ ] Implement React Query for client-side data fetching
+- [ ] Add Suspense boundaries for async components
+- [ ] Optimize bundle size analysis
+- [ ] Add performance monitoring
+
+## Resources
+
+- [Vercel React Best Practices](https://vercel.com/blog/introducing-react-best-practices)
+- [Next.js Performance](https://nextjs.org/docs/app/building-your-application/optimizing)
+- [React Performance](https://react.dev/learn/render-and-commit)
+

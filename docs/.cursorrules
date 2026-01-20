@@ -1,0 +1,46 @@
+# JSTN Portfolio - Cursor Rules
+
+This file helps Cursor understand how to work with this codebase.
+
+## Project Context
+
+This is a Next.js 14 portfolio website for JustineDevs, built with TypeScript, Tailwind CSS, and Framer Motion.
+
+## Key Guidelines
+
+1. **Follow the JSTN Portfolio Skill**: See `skills/jstn-portfolio/SKILL.md` for detailed conventions
+2. **Use React Best Practices**: Reference `docs/performance/react-best-practices.mdx`
+3. **Follow Design System**: Use colors and styles from `docs/design-system/ui-ux-pro-max-notes.mdx`
+4. **Check Planning Files**: Review `planning/portfolio-v2/` for current tasks and progress
+
+## Code Style
+
+- TypeScript for all files
+- Functional components with hooks
+- Tailwind CSS for styling
+- Server Components by default
+- Use 'use client' only when needed
+
+## File Structure
+
+- Components: `components/`
+- Pages: `app/`
+- Documentation: `docs/`
+- Utilities: `lib/`
+- Planning: `planning/`
+
+## Important Files
+
+- Design tokens: `lib/colors.ts`
+- Design system: `docs/design-system/ui-ux-pro-max-notes.mdx`
+- Performance guide: `docs/performance/react-best-practices.mdx`
+- Skills: `skills/jstn-portfolio/SKILL.md`
+
+## When Adding Features
+
+1. Check if similar component exists
+2. Follow naming conventions
+3. Use design system colors
+4. Add proper TypeScript types
+5. Update relevant documentation
+

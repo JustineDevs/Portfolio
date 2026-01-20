@@ -1,0 +1,592 @@
+{
+  "author": {
+    "name": "Justine Lupasi",
+    "github_username": "JustineDevs",
+    "email": "JustineLupasi180@gmail.com",
+    "location": "Naic, Calabarzon, Philippines",
+    "social_links": {
+      "github": "https://github.com/JustineDevs",
+      "linkedin": "https://ph.linkedin.com/in/justine-lupasi-444608295",
+      "twitter": "Trader2G",
+      "portfolio": "https://justinedevs.vercel.app"
+    },
+    "education": "BS Information Technology (ongoing) - NU Dasmariñas",
+    "pronouns": "he/him",
+    "github_stats": {
+      "repositories": 37,
+      "stars": 95,
+      "followers": 13,
+      "contributions_last_year": 2513
+    }
+  },
+  "individual_projects": [
+    {
+      "id": 1,
+      "title": "MEVHunter-Advanced-Crypto-Trading-Automation",
+      "description": "Advanced crypto trading automation platform with MEV detection capabilities",
+      "category": "DeFi / Trading",
+      "github_url": "https://github.com/JustineDevs/MEVHunter-Advanced-Crypto-Trading-Automation",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Crypto",
+        "Trading",
+        "MEV",
+        "Automation",
+        "DeFi",
+        "Solidity"
+      ],
+      "technologies": [
+        "Python",
+        "TypeScript",
+        "Solidity"
+      ],
+      "networks": [],
+      "responsibilities": "Trading automation logic, MEV analysis, Smart contract development",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/MEVHunter-Advanced-Crypto-Trading-Automation"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 2,
+      "title": "VYNIX_PUBLIC",
+      "description": "Blockchain infrastructure project",
+      "category": "Blockchain / Infrastructure",
+      "github_url": "https://github.com/JustineDevs/VYNIX_PUBLIC",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Blockchain",
+        "Infrastructure",
+        "Solidity"
+      ],
+      "technologies": [
+        "Solidity"
+      ],
+      "networks": [],
+      "responsibilities": null,
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/VYNIX_PUBLIC"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 3,
+      "title": "pineapple-ai",
+      "description": "A comprehensive, SEO-optimized AI generator platform built with React and Tailwind CSS. Provides complete solution for managing AI-powered generators with focus on chatbots, content creation, visual design, and technical solutions",
+      "category": "AI / Web Development",
+      "github_url": "https://github.com/JustineDevs/pineapple-ai",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "AI",
+        "React",
+        "Tailwind CSS",
+        "SEO",
+        "Generator",
+        "Chatbot",
+        "Content Creation",
+        "TypeScript"
+      ],
+      "technologies": [
+        "React",
+        "Tailwind CSS",
+        "TypeScript",
+        "Next.js"
+      ],
+      "networks": [],
+      "responsibilities": "Frontend development, AI integration, UI/UX design, SEO optimization",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/pineapple-ai"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 4,
+      "title": "CompenseTracker",
+      "description": "Advanced compensation calculator providing transparent, detailed analysis of true cost-to-company calculations. Integrates multiple AI services to deliver personalized insights and automated email generation for compensation discussions",
+      "category": "HR / Finance / AI",
+      "github_url": "https://github.com/JustineDevs/CompenseTracker",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Compensation",
+        "AI",
+        "Finance",
+        "Calculator",
+        "HR",
+        "Automation",
+        "TypeScript"
+      ],
+      "technologies": [
+        "TypeScript",
+        "Node.js",
+        "AI APIs"
+      ],
+      "networks": [],
+      "responsibilities": "Full-stack development, AI service integration, Email automation, Calculation engine",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/CompenseTracker"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 5,
+      "title": "MetaWalletGen-CLI",
+      "description": "Secure command-line tool that automates generating Ethereum-compatible wallets using BIP-39 mnemonics and EIP-55 addresses. Supports batch creation, encrypted storage with AES-256 encryption and PBKDF2 key derivation, and flexible exports (JSON, CSV, YAML formats)",
+      "category": "Blockchain / Developer Tools",
+      "github_url": "https://github.com/JustineDevs/MetaWalletGen-CLI",
+      "website": null,
+      "cover_image": null,
+      "date_created": "2025-08",
+      "date_released": "August 2025",
+      "date_updated": null,
+      "tags": [
+        "Ethereum",
+        "Wallet",
+        "BIP-39",
+        "EIP-55",
+        "CLI",
+        "Security",
+        "AES-256",
+        "Developer Tools",
+        "Node.js"
+      ],
+      "technologies": [
+        "Node.js",
+        "TypeScript",
+        "Cryptography",
+        "CLI"
+      ],
+      "networks": [
+        "Ethereum"
+      ],
+      "responsibilities": "CLI development, Wallet generation logic, Security implementation, Encryption, Testing",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/MetaWalletGen-CLI",
+        "linkedin_announcement": "https://www.linkedin.com/posts/justine-devs-444608295_ethereum-blockchain-crypto-activity-7366029702819405824-ILYG"
+      },
+      "status": "Released"
+    },
+    {
+      "id": 6,
+      "title": "MyPortfolio",
+      "description": "Portfolio repository showcasing diverse blockchain and Web3 projects and professional work",
+      "category": "Portfolio",
+      "github_url": "https://github.com/JustineDevs/MyPortfolio",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Portfolio",
+        "Projects",
+        "Showcase"
+      ],
+      "technologies": [],
+      "networks": [],
+      "responsibilities": "Project documentation, Portfolio management",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/MyPortfolio"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 7,
+      "title": "CampusHub",
+      "description": "Unified platform that integrates micro-scholarships, team building, announcements, ideas, feedback, skill swaps, trivia, study groups, and governance in one wallet-based interface on Base blockchain. Each feature is a modular component. All actions are on-chain or provably tracked",
+      "category": "Blockchain / Community / Education",
+      "github_url": "https://github.com/JustineDevs/CampusHub",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Scholarships",
+        "Community",
+        "Governance",
+        "Web3",
+        "Base",
+        "Wallet",
+        "On-Chain",
+        "Education",
+        "Modular"
+      ],
+      "technologies": [
+        "Solidity",
+        "React",
+        "TypeScript",
+        "Base Blockchain"
+      ],
+      "networks": [
+        "Base"
+      ],
+      "responsibilities": "Smart contract development, Frontend development, Module architecture, On-chain integration, Product design",
+      "hackathons": [
+        {
+          "name": "Base Build BLOKCSPACE",
+          "full_name": "Base Build BLOKCSPACE - Base Mini App Challenge",
+          "location": "Makati, Philippines",
+          "date": "2025-08-27",
+          "organizer": "Base Philippines",
+          "status": "Participated",
+          "proof_source": "Facebook event - Base Philippines",
+          "proof_url": "https://www.facebook.com/basepilipinas/posts/..."
+        }
+      ],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/CampusHub"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 8,
+      "title": "Portfolio V2",
+      "description": "Second version of portfolio website showcasing projects and professional work. Built with modern web technologies for optimal performance and user experience",
+      "category": "Portfolio / Web Development",
+      "github_url": "https://github.com/JustineDevs/Portfolio",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Portfolio",
+        "Web",
+        "Tailwind CSS",
+        "Next.js",
+        "React"
+      ],
+      "technologies": [
+        "React",
+        "Next.js",
+        "Tailwind CSS",
+        "Node.js",
+        "TypeScript"
+      ],
+      "networks": [],
+      "responsibilities": "Frontend development, Web design, Portfolio showcase, UI/UX design",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/Portfolio"
+      },
+      "status": "Active"
+    },
+    {
+      "id": 9,
+      "title": "starter-pack",
+      "description": "Starter Pack Template that synthesizes end-to-end execution playbooks, frameworks, and blueprints from practitioners who have generated measurable ROI. Comprehensive resource for project initialization and best practices in blockchain and Web3 development",
+      "category": "Development / Templates / Resources",
+      "github_url": "https://github.com/JustineDevs/starter-pack",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": null,
+      "tags": [
+        "Starter Kit",
+        "Template",
+        "Framework",
+        "Best Practices",
+        "Boilerplate",
+        "Documentation",
+        "Blockchain"
+      ],
+      "technologies": [
+        "TypeScript",
+        "Node.js",
+        "Markdown"
+      ],
+      "networks": [],
+      "responsibilities": "Documentation, Framework design, Best practices compilation, Community resource",
+      "hackathons": [],
+      "social_links": {
+        "github": "https://github.com/JustineDevs/starter-pack"
+      },
+      "status": "Active",
+      "notes": "Project planning starter pack with viral marketing effort (Jan 2026)"
+    }
+  ],
+  "company_projects": [
+    {
+      "id": 1,
+      "title": "HyperKit",
+      "company": "Hyperkit Labs",
+      "role": "Co-Founder, CTO",
+      "description": "Open-source developer platform for full-stack decentralized application development across multiple EVM blockchain networks. Combines AI-powered smart contract generation, integrated security auditing, and modular infrastructure primitives to accelerate development from concept to production",
+      "category": "Blockchain Infrastructure / Developer Platform / AI",
+      "status": "Production Development (50% refactoring in progress)",
+      "github_organization": "https://github.com/HyperionKit",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "launch_date": null,
+      "tags": [
+        "Blockchain",
+        "Smart Contracts",
+        "Developer Tools",
+        "Multi-chain",
+        "DeFi",
+        "Infrastructure",
+        "AI",
+        "Open Source",
+        "MIT License"
+      ],
+      "technologies": [
+        "Solidity",
+        "TypeScript",
+        "JavaScript",
+        "Python",
+        "Node.js",
+        "React",
+        "Next.js 15",
+        "Docker",
+        "Wagmi",
+        "Viem"
+      ],
+      "networks": [
+        "Hyperion",
+        "Metis",
+        "Mantle L2",
+        "EVM Compatible"
+      ],
+      "responsibilities": "Architecture design, SDK development, Smart contract generation engine, Multi-chain orchestration, Team leadership, Technical strategy",
+      "features": [
+        "AI-powered smart contract generation using LLMs (Gemini, OpenAI, Anthropic)",
+        "Natural language specification to production-ready Solidity code",
+        "Batch contract auditing and security analysis (Beta)",
+        "Automated test suite generation and execution",
+        "Intelligent deployment orchestration across networks",
+        "Cross-network transaction coordination",
+        "Proactive monitoring and alerting",
+        "React component library (npm)",
+        "CLI tools for scaffolding and deployment",
+        "Dashboard interface for contract management"
+      ],
+      "hackathons": [
+        {
+          "name": "Mantle Global Hackathon 2025",
+          "status": "Submitted / Ongoing",
+          "start_date": "2025-12",
+          "end_date": "2026-03",
+          "prize_pool": "$150,000",
+          "registrations": "900+",
+          "tracks": 6,
+          "judges": 17,
+          "organizer": "Mantle",
+          "platform": "HackQuest",
+          "proof_url": "https://hackquest.io/en/projects/Mantle-Global-Hackathon-2025-Hyperkit",
+          "announcement_url": "https://chainwire.org/2025/12/16/mantle-ecosystem-accelerates-rapidly-as-global-hackathon-surpasses-900-developer-registrations/"
+        }
+      ],
+      "deployment_status": {
+        "hyperion_l2": "Verified contracts live on explorer",
+        "metis": "Active",
+        "mantle_testnet": "Recent deployments verified",
+        "mantle_mainnet": "Q1 2026 target"
+      },
+      "development_activity": {
+        "smc_repo_commits": 275,
+        "fe_repo_commits": 425,
+        "hyperagent_commits": 12,
+        "total_commits_recent": 712,
+        "snapshot_date": "November 2025"
+      },
+      "future_roadmap": [
+        "Advanced HyperAgent capabilities (automated remediation, predictive security analysis)",
+        "Smart Wallets & Social Authentication",
+        "x402 Multi-Chain Ready integration",
+        "Enterprise-grade monitoring",
+        "Governance transition to community stewardship"
+      ],
+      "social_links": {
+        "github_organization": "https://github.com/HyperionKit",
+        "hackquest_project": "https://hackquest.io/en/projects/Mantle-Global-Hackathon-2025-Hyperkit",
+        "link3_profile": "https://link3.to/koVGSksZ"
+      }
+    },
+    {
+      "id": 2,
+      "title": "HyperAgent",
+      "company": "Hyperkit Labs",
+      "parent_project": "HyperKit",
+      "role": "Lead Developer / Core Contributor",
+      "description": "AI-powered autonomous agent system for comprehensive smart contract lifecycle management. Handles intelligent smart contract generation, batch auditing, automated deployment, cross-network bridging, and upgrade automation. Operates natively within GitHub version control for seamless developer integration",
+      "category": "Blockchain / AI / Developer Tools / Automation",
+      "status": "Development (50% refactoring from monolithic to SOA architecture)",
+      "github_url": "https://github.com/HyperionKit/HypertAgent",
+      "github_repo_name": "Hyperkit-Agent",
+      "website": null,
+      "cover_image": null,
+      "date_created": null,
+      "date_updated": "December 2025",
+      "tags": [
+        "AI Agent",
+        "Smart Contracts",
+        "Automation",
+        "Security Auditing",
+        "Deployment",
+        "Multi-chain",
+        "LLM",
+        "Python",
+        "GitHub Integration"
+      ],
+      "technologies": [
+        "Python",
+        "LLM/AI APIs",
+        "Solidity",
+        "TypeScript",
+        "GitHub API",
+        "Docker"
+      ],
+      "networks": [
+        "Hyperion",
+        "Metis",
+        "Mantle",
+        "EigenDA",
+        "EVM Compatible"
+      ],
+      "responsibilities": "Agent architecture design, Smart contract code generation, Security audit implementation, Deployment automation, Error handling, Integration orchestration",
+      "capabilities": [
+        "Natural language smart contract specification processing",
+        "Automated code generation from high-level requirements",
+        "Batch contract auditing with multiple analysis engines",
+        "Automated test suite generation and execution",
+        "Intelligent deployment orchestration",
+        "Cross-network transaction coordination",
+        "Proactive monitoring and alerting",
+        "GitHub workflow integration",
+        "Automated remediation (planned)",
+        "Predictive security analysis (planned)"
+      ],
+      "analysis_capabilities": {
+        "pattern_analysis": "Detects known vulnerability patterns and antipatterns",
+        "semantic_analysis": "Identifies logical inconsistencies and state management issues",
+        "simulation": "Executes contracts against test scenarios to detect runtime failures",
+        "static_analysis": "Code structure and dependency analysis"
+      },
+      "hackathons": [
+        {
+          "name": "Mantle Global Hackathon 2025",
+          "status": "Submitted",
+          "organizer": "Mantle",
+          "platform": "HackQuest",
+          "proof_url": "https://www.hackquest.io/projects/Hyperkit"
+        }
+      ],
+      "deployment_status": {
+        "hyperion_l2": "Verified contracts deployed",
+        "mantle_testnet": "Recent deployments verified",
+        "mantle_mainnet": "Q1 2026 target"
+      },
+      "recent_commits": {
+        "total": 12,
+        "date": "November 2025",
+        "repo_size": "7.11 MB",
+        "language": "Python",
+        "stars": 0,
+        "forks": 1
+      },
+      "social_links": {
+        "github_repository": "https://github.com/HyperionKit/HypertAgent",
+        "hackquest_project": "https://www.hackquest.io/projects/Hyperkit"
+      }
+    }
+  ],
+  "unconfirmed_projects": [
+    {
+      "id": 1,
+      "name": "ASTRA",
+      "type": "Blockchain Infrastructure / Protocol",
+      "status": "N/A - Insufficient proof of direct JustineDevs involvement",
+      "note": "Multiple ASTRA projects exist in blockchain ecosystem (Astra Protocol for KYC/AML, Astra Blockchain for tokenization, etc.). No confirmed GitHub repository or direct association with JustineDevs found. Possible research areas but cannot confirm without additional evidence.",
+      "related_technologies": [
+        "x402 Protocol",
+        "Multi-chain payments",
+        "AI agents"
+      ]
+    }
+  ],
+  "unconfirmed_hackathons": [
+    {
+      "name": "Hack2Build",
+      "status": "N/A - No proof found"
+    },
+    {
+      "name": "Avalanche Hackathon",
+      "status": "N/A - No proof found"
+    },
+    {
+      "name": "Ignyte Hackathon",
+      "status": "N/A - No proof found"
+    },
+    {
+      "name": "Open Economy Hackathon",
+      "status": "N/A - No proof found"
+    }
+  ],
+  "confirmed_hackathons_summary": [
+    {
+      "rank": 1,
+      "name": "Base Build BLOKCSPACE - Base Mini App Challenge",
+      "date": "2025-08-27",
+      "location": "Makati, Philippines",
+      "project": "CampusHub",
+      "organizer": "Base Philippines",
+      "proof_type": "Facebook event confirmation",
+      "status": "Participated"
+    },
+    {
+      "rank": 2,
+      "name": "Mantle Global Hackathon 2025",
+      "date_range": "2025-12 to 2026-03",
+      "project": "HyperKit / HyperAgent",
+      "organizer": "Mantle",
+      "platform": "HackQuest",
+      "prize_pool": "$150,000",
+      "registrations": "900+",
+      "proof_type": "Official HackQuest project page + Chainwire press release",
+      "status": "Submitted"
+    }
+  ],
+  "summary": {
+    "total_individual_projects": 9,
+    "total_company_projects": 2,
+    "total_project_components": 11,
+    "github_repositories": 37,
+    "primary_technologies": [
+      "Solidity",
+      "TypeScript/JavaScript",
+      "React/Next.js",
+      "Node.js",
+      "Python",
+      "Tailwind CSS"
+    ],
+    "primary_networks": [
+      "Ethereum",
+      "Base",
+      "Mantle L2",
+      "Hyperion",
+      "Metis",
+      "EigenDA"
+    ],
+    "confirmed_hackathon_participations": 2,
+    "unconfirmed_hackathon_participations": 4,
+    "data_extraction_date": "2026-01-20",
+    "extraction_confidence": "High - Multiple sources cross-verified",
+    "last_updated": "2026-01-20 13:52 UTC+8"
+  }
+}
