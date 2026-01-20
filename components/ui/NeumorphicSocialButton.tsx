@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from 'framer-motion'
+import type { ComponentType } from 'react'
 import { 
   Instagram, 
   Linkedin, 
@@ -11,7 +12,8 @@ import {
 interface SocialLink {
   platform: 'instagram' | 'x' | 'linkedin' | 'github' | 'telegram'
   url: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  // Lucide icons accept `size?: string | number`, so our type must match that.
+  icon: ComponentType<{ size?: number | string; className?: string }>
 }
 
 // GitHub Icon Component
