@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart } from 'lucide-react'
+import { getVisitorId } from '@/lib/visitor-id'
 
 interface HeartButtonProps {
   className?: string
@@ -15,12 +16,14 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
   const [hasInteracted, setHasInteracted] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const [visitorId, setVisitorId] = useState<string | null>(null)
 
-  const fetchHeartCount = useCallback(async () => {
+  const fetchHeartCount = useCallback(async (vid: string) => {
     try {
-      const response = await fetch('/api/hearts')
+      const response = await fetch(`/api/hearts?visitorId=${encodeURIComponent(vid)}`)
       const data = await response.json()
       setHeartCount(data.likes || 0)
+      setIsLiked(data.hasLiked || false)
     } catch (error) {
       console.error('Failed to fetch heart count:', error)
     } finally {
@@ -30,10 +33,10 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const liked = localStorage.getItem('portfolio-liked') === 'true'
-      setIsLiked(liked)
+      const vid = getVisitorId()
+      setVisitorId(vid)
+      fetchHeartCount(vid)
     }
-    fetchHeartCount()
   }, [fetchHeartCount])
 
   useEffect(() => {
@@ -50,37 +53,39 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
   }, [isLiked, hasInteracted, isLoading])
 
   const handleClick = async () => {
-    if (isUpdating) return
+    if (isUpdating || !visitorId) return
     
     setIsUpdating(true)
     const newLikedState = !isLiked
-    setIsLiked(newLikedState)
     setHasInteracted(true)
     setShowReminder(false)
 
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('portfolio-liked', newLikedState.toString())
-    }
-
+    // Optimistic update
+    setIsLiked(newLikedState)
     setHeartCount(prev => newLikedState ? prev + 1 : Math.max(0, prev - 1))
 
     try {
       const response = await fetch('/api/hearts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: newLikedState ? 'like' : 'unlike' }),
+        body: JSON.stringify({ 
+          action: newLikedState ? 'like' : 'unlike',
+          visitorId,
+        }),
       })
       const data = await response.json()
+      
       if (data.likes !== undefined) {
         setHeartCount(data.likes)
       }
+      if (data.hasLiked !== undefined) {
+        setIsLiked(data.hasLiked)
+      }
     } catch (error) {
       console.error('Failed to update heart count:', error)
+      // Revert optimistic update on error
       setHeartCount(prev => newLikedState ? Math.max(0, prev - 1) : prev + 1)
       setIsLiked(!newLikedState)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('portfolio-liked', (!newLikedState).toString())
-      }
     }
     
     setIsUpdating(false)
