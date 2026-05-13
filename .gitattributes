@@ -1,0 +1,2 @@
+# Hooks must stay LF so shebang works on macOS/Linux.
+githooks/* text eol=lf
