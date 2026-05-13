@@ -2,7 +2,6 @@
 
 import React from 'react'
 import CornerDot from '@/components/ui/CornerDot'
-import SocialLinksBar from '@/components/ui/SocialLinksBar'
 
 export default function ProjectsHero() {
   return (
