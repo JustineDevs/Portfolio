@@ -44,6 +44,18 @@ export default async function AdminLoginPage({ searchParams }: Props) {
           </p>
         ) : null}
 
+        {config.authUrlLooksInvalid ? (
+          <p
+            className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900"
+            role="alert"
+          >
+            `AUTH_URL` looks invalid for Auth.js. Set it to the site origin
+            only, such as `https://jstn.site`, or remove it and let Auth.js
+            infer the host. Do not use `/api/auth/callback/google` or a
+            comma-separated list there.
+          </p>
+        ) : null}
+
         {!hasAdminUser ? (
           <p
             className="mt-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900"
