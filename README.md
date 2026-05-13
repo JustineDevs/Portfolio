@@ -6,11 +6,11 @@
 
 ## Overview
 
-I am Justine, a software developer specializing in blockchain and web technologies with a strong portfolio of projects. As a Solidity developer in a 3-member team, I contributed to building **HyperionKit** - a developer infrastructure toolkit. Despite being a beginner in smart contracts, I learned through collaborative coding and helped achieve our first hackathon victory!
+Software developer building across blockchain, Web3, and modern web technologies. Experience includes front-end development, responsive web apps, authentication systems, crypto automation, and decentralized tools.
 
-My experience covers front-end projects, responsive web apps, user authentication systems, advanced crypto trading automation, and decentralized governance tools.
+Co-Founder of HyperKit Labs, focused on developer infrastructure, AI-native tooling, and multi-chain product development connected to the Web3 ecosystem.
 
-Since 2022, I have been an active Web3 community moderator and professional moderator, evolving from volunteer roles to paid projects. I'm a strong problem solver and communicator, aiming to expand client-facing and IT infrastructure skills.
+Alongside building products, also active in Web3 community moderation, with experience spanning volunteer and paid roles across onboarding, support, and community operations. Strong in problem-solving, communication, and technical execution, with growing interest in client-facing delivery and infrastructure work.
 
 ## Table of Contents
 
@@ -38,6 +38,8 @@ This portfolio is built with Next.js 14, TypeScript, and Tailwind CSS.
    ```bash
    npm install
    ```
+
+   Turso / Drizzle setup and repair scripts: [`docs/DATABASE.md`](docs/DATABASE.md).
 
 2. **Run development server**
    ```bash
