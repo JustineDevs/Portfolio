@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1778553524894,
+      "tag": "0000_warm_rafael_vega",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1778648034885,
+      "tag": "0001_portfolio_engagement",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1778661000000,
+      "tag": "0002_admin_users",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1778654149000,
+      "tag": "0003_admin_google_oauth",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1778656898000,
+      "tag": "0004_admin_google_only",
+      "breakpoints": true
+    }
+  ]
+}
