@@ -1,79 +1,24 @@
-'use client'
+import dynamic from 'next/dynamic'
+import { getPublishedAwards, getPublishedProjects } from '@/lib/content/public'
+import { getPublicLegalLinks } from '@/lib/legal-links'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import Hero from '@/components/Hero'
-import TechAndDescriptionSection from '@/components/sections/TechAndDescriptionSection'
-import BrandBadgeProjectsSection from '@/components/sections/BrandBadgeProjectsSection'
-import ActivitySection from '@/components/sections/ActivitySection'
-import AsciiBackground from '@/components/ui/AsciiBackground'
-import PixelCursor from '@/components/ui/PixelCursor'
-import SocialLinksBar from '@/components/ui/SocialLinksBar'
-import ScrollToTop from '@/components/ui/ScrollToTop'
-import PreLoading from '@/components/PreLoading'
-import { useMode } from '@/components/providers/ModeProvider'
-import { animations } from '@/lib/design-tokens'
+const HomePageClient = dynamic(() => import('@/components/HomePageClient'), {
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#F8F8F8]" />,
+})
 
-import ResumePage from '@/components/sections/professional/ResumePage'
-
-export default function Home() {
-  const [isLoading, setIsLoading] = useState(true)
-  const { mode } = useMode()
-
-  useEffect(() => {
-    const hasSeenPreloading = sessionStorage.getItem('has-seen-preloading') === 'true'
-    
-    if (hasSeenPreloading) {
-      setIsLoading(false)
-    } else {
-      setTimeout(() => {
-        setIsLoading(false)
-        sessionStorage.setItem('has-seen-preloading', 'true')
-      }, 3500)
-    }
-  }, [])
+export default async function Home() {
+  const [projects, awards, legalLinks] = await Promise.all([
+    getPublishedProjects(),
+    getPublishedAwards(),
+    getPublicLegalLinks(),
+  ])
 
   return (
-    <>
-      {isLoading && <PreLoading />}
-      {!isLoading && (
-        <div className="min-h-screen bg-[#F8F8F8] relative overflow-x-hidden">
-          <PixelCursor />
-          <AsciiBackground />
-          
-          <SocialLinksBar />
-          <Navbar />
-
-          <main id="main-content" className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto pb-4 xs:pb-6 sm:pb-8 relative z-10 overflow-x-hidden">
-            <AnimatePresence mode="wait">
-              {mode === 'personal' ? (
-                <motion.div
-                  key="personal"
-                  {...animations.modeSwitch}
-                >
-                  <Hero />
-                  <TechAndDescriptionSection />
-                  <BrandBadgeProjectsSection />
-                  <ActivitySection />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="professional"
-                  {...animations.modeSwitch}
-                >
-                  <ResumePage />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <Footer />
-          </main>
-          
-          <ScrollToTop />
-        </div>
-      )}
-    </>
+    <HomePageClient
+      featuredProjects={projects.slice(0, 2)}
+      featuredAwards={awards.slice(0, 2)}
+      legalLinks={legalLinks}
+    />
   )
 }
