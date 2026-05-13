@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
+import { getRenderableImageUrl, isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
 
 interface LiquidImageProps {
   src: string
@@ -167,6 +167,7 @@ export default function LiquidImage({
   const [hasError, setHasError] = useState(false)
   const [isTextureReady, setIsTextureReady] = useState(false)
   const normalizedSrc = useMemo(() => normalizeAssetUrl(src), [src])
+  const renderableSrc = useMemo(() => getRenderableImageUrl(normalizedSrc), [normalizedSrc])
   const fallbackSrc = '/v2/showcase/banner.png'
   const shouldUseCanvas = isClient && !hasError && isTextureReady && !isSvgAssetUrl(normalizedSrc)
 
@@ -204,20 +205,20 @@ export default function LiquidImage({
         setHasError(true)
       }
     }
-    image.src = normalizedSrc
+    image.src = renderableSrc
 
     return () => {
       cancelled = true
       image.onload = null
       image.onerror = null
     }
-  }, [isClient, normalizedSrc])
+  }, [isClient, normalizedSrc, renderableSrc])
 
   if (!shouldUseCanvas) {
     return (
       <div className={`relative w-full h-full overflow-hidden ${className}`}>
         <img
-          src={hasError ? fallbackSrc : normalizedSrc}
+          src={hasError ? fallbackSrc : renderableSrc}
           alt={alt}
           className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
           onError={(event) => {
@@ -240,7 +241,7 @@ export default function LiquidImage({
         onError={() => setHasError(true)}
       >
         <React.Suspense fallback={null}>
-          <LiquidScene src={normalizedSrc} strength={strength} speed={speed} size={size} />
+          <LiquidScene src={renderableSrc} strength={strength} speed={speed} size={size} />
         </React.Suspense>
       </Canvas>
     </div>

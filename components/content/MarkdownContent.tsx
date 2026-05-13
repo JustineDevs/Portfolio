@@ -6,7 +6,7 @@ import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import { rehypeGithubAlerts } from "rehype-github-alerts";
 
-import { normalizeAssetUrl } from "@/lib/asset-urls";
+import { getRenderableImageUrl, normalizeAssetUrl } from "@/lib/asset-urls";
 import { cn } from "@/lib/utils";
 
 type Variant = "page" | "admin";
@@ -83,7 +83,7 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
       );
     },
     img: ({ src, alt }) => {
-      const resolvedSrc = src ? normalizeAssetUrl(src) : "";
+      const resolvedSrc = src ? getRenderableImageUrl(src) : "";
       if (!resolvedSrc) return null;
 
       return (

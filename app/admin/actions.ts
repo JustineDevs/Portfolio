@@ -12,6 +12,7 @@ import {
   revalidateProjects,
 } from "@/lib/content/revalidate";
 import {
+  awards,
   highlights,
   pageSections,
   posts,
@@ -22,10 +23,11 @@ import {
   projectTechnologies,
   projects,
   siteSettings,
+  testimonials,
 } from "@/db/schema";
 import { and, eq, ne } from "drizzle-orm";
 import { fetchGithubActivityForYear, saveGithubActivitySnapshot } from "@/lib/github/activity";
-import { normalizeOptionalAssetUrl } from "@/lib/asset-urls";
+import { normalizeAssetFieldsInObjectAsync, normalizeOptionalImageAssetUrl } from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 
 function stringValue(formData: FormData, key: string) {
@@ -207,8 +209,8 @@ function validateOptionalUrl(value: string | null, returnTo: string, label: stri
   return value
 }
 
-function validateOptionalImageUrl(value: string | null, returnTo: string, label: string) {
-  return normalizeOptionalAssetUrl(validateOptionalUrl(value, returnTo, label))
+async function validateOptionalImageUrl(value: string | null, returnTo: string, label: string) {
+  return normalizeOptionalImageAssetUrl(validateOptionalUrl(value, returnTo, label))
 }
 
 export async function signOutAdminAction() {
@@ -222,6 +224,8 @@ export async function saveProjectAction(formData: FormData) {
   const fallbackReturnTo = id ? `/admin/projects/${id}` : "/admin/projects/new";
   const returnTo = normalizeReturnTo(stringValue(formData, "returnTo") || fallbackReturnTo, fallbackReturnTo);
   const slug = stringValue(formData, "slug");
+  const coverImageUrl = await validateOptionalImageUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL");
+  const bannerImageUrl = await validateOptionalImageUrl(optionalString(formData, "bannerImageUrl"), returnTo, "Banner Image URL");
   const payload = {
     slug,
     title: stringValue(formData, "title"),
@@ -231,8 +235,8 @@ export async function saveProjectAction(formData: FormData) {
     status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
     publishedAt: normalizePublishedAt(optionalString(formData, "publishedAt"), returnTo),
     featured: parseBoolean(formData, "featured"),
-    coverImageUrl: validateOptionalImageUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL"),
-    bannerImageUrl: validateOptionalImageUrl(optionalString(formData, "bannerImageUrl"), returnTo, "Banner Image URL"),
+    coverImageUrl,
+    bannerImageUrl,
     authorName: stringValue(formData, "authorName"),
     authorUrl: validateOptionalUrl(optionalString(formData, "authorUrl"), returnTo, "Author URL"),
     websiteUrl: validateOptionalUrl(optionalString(formData, "websiteUrl"), returnTo, "Website URL"),
@@ -328,6 +332,7 @@ export async function savePostAction(formData: FormData) {
   const fallbackReturnTo = id ? `/admin/writing/${id}` : "/admin/writing/new";
   const returnTo = normalizeReturnTo(stringValue(formData, "returnTo") || fallbackReturnTo, fallbackReturnTo);
   const slug = stringValue(formData, "slug");
+  const coverImageUrl = await validateOptionalImageUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL");
   const payload = {
     slug,
     title: stringValue(formData, "title"),
@@ -336,7 +341,7 @@ export async function savePostAction(formData: FormData) {
     postType: parsePostType(stringValue(formData, "postType") || "native", returnTo),
     sourcePlatform: optionalString(formData, "sourcePlatform"),
     canonicalUrl: validateOptionalUrl(optionalString(formData, "canonicalUrl"), returnTo, "Canonical URL", false),
-    coverImageUrl: validateOptionalImageUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL"),
+    coverImageUrl,
     status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
     publishedAt: normalizePublishedAt(optionalString(formData, "publishedAt"), returnTo),
     featured: parseBoolean(formData, "featured"),
@@ -379,17 +384,20 @@ export async function savePostAction(formData: FormData) {
 export async function savePageSectionAction(formData: FormData) {
   await requireAdminSession();
   const id = Number.parseInt(stringValue(formData, "id"), 10);
-  const metaJson = optionalString(formData, "metaJson");
+  const returnTo = normalizeReturnTo(stringValue(formData, "returnTo") || "/admin/about", "/admin/about");
+  let metaJson = optionalString(formData, "metaJson");
   if (metaJson) {
     try {
-      JSON.parse(metaJson);
+      const parsed = JSON.parse(metaJson);
+      metaJson = JSON.stringify(await normalizeAssetFieldsInObjectAsync(parsed));
     } catch {
-      redirectWithError("/admin/about", "Meta JSON must be valid JSON.");
+      redirectWithError(returnTo, "Meta JSON must be valid JSON.");
     }
   }
   const pageKey = stringValue(formData, "pageKey");
   const rawSectionKey = stringValue(formData, "sectionKey");
   const sectionKey = pageKey === "about" ? canonicalizeAboutSectionKey(rawSectionKey) : rawSectionKey;
+  const sortOrder = Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0
   const payload = {
     pageKey,
     sectionKey,
@@ -397,41 +405,83 @@ export async function savePageSectionAction(formData: FormData) {
     subtitle: optionalString(formData, "subtitle"),
     bodyMd: optionalString(formData, "bodyMd"),
     metaJson,
-    status: parseStatus(stringValue(formData, "status") || "draft", "/admin/about"),
+    status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
     sortOrder:
       pageKey === "about"
-        ? getAboutSectionSortOrder(sectionKey, Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0)
-        : Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
+        ? getAboutSectionSortOrder(sectionKey, sortOrder)
+        : sortOrder,
     updatedAt: new Date().toISOString(),
   };
+
+  const existingSection = await db
+    .select({ id: pageSections.id })
+    .from(pageSections)
+    .where(and(eq(pageSections.pageKey, payload.pageKey), eq(pageSections.sectionKey, payload.sectionKey)))
+    .limit(1);
+
+  if (existingSection[0] && existingSection[0].id !== id) {
+    redirectWithError(returnTo, "That About section slot already exists.");
+  }
 
   if (id) {
     await db.update(pageSections).set(payload).where(eq(pageSections.id, id));
   } else {
-    await db.insert(pageSections).values(payload);
+    const created = await db.insert(pageSections).values(payload).returning({ id: pageSections.id });
+
+    if (payload.pageKey === "about") {
+      revalidateAbout();
+    }
+    revalidateHome();
+    redirect(`/admin/about/${created[0]?.id ?? ""}`);
   }
 
   if (payload.pageKey === "about") {
     revalidateAbout();
   }
   revalidateHome();
+  redirect(returnTo);
 }
 
 export async function saveHighlightAction(formData: FormData) {
   await requireAdminSession();
   const id = Number.parseInt(stringValue(formData, "id"), 10);
+  const imageUrlOverride = await validateOptionalImageUrl(optionalString(formData, "imageUrlOverride"), "/admin/highlights", "Image Override");
+  const highlightType = parseHighlightType(stringValue(formData, "highlightType") || "custom", "/admin/highlights");
+  const rawTargetId = Number.parseInt(stringValue(formData, "targetId"), 10);
+  const targetId = Number.isFinite(rawTargetId) && rawTargetId > 0 ? rawTargetId : null;
   const payload = {
-    highlightType: parseHighlightType(stringValue(formData, "highlightType") || "custom", "/admin/highlights"),
-    targetId: Number.parseInt(stringValue(formData, "targetId"), 10) || null,
+    highlightType,
+    targetId,
     titleOverride: optionalString(formData, "titleOverride"),
     summaryOverride: optionalString(formData, "summaryOverride"),
-    imageUrlOverride: validateOptionalImageUrl(optionalString(formData, "imageUrlOverride"), "/admin/highlights", "Image Override"),
+    imageUrlOverride,
     linkOverride: validateOptionalUrl(optionalString(formData, "linkOverride"), "/admin/highlights", "Link Override"),
     pinned: parseBoolean(formData, "pinned"),
     status: parseStatus(stringValue(formData, "status") || "draft", "/admin/highlights"),
     sortOrder: Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
     updatedAt: new Date().toISOString(),
   };
+
+  if (payload.highlightType === "custom") {
+    if (!payload.titleOverride && !payload.summaryOverride && !payload.imageUrlOverride && !payload.linkOverride) {
+      redirectWithError("/admin/highlights", "Custom highlights need at least one override field.");
+    }
+  } else if (!payload.targetId) {
+    redirectWithError("/admin/highlights", `${payload.highlightType} highlights require a target.`);
+  } else {
+    const targetLookup =
+      payload.highlightType === "project"
+        ? await db.select({ id: projects.id }).from(projects).where(and(eq(projects.id, payload.targetId), eq(projects.status, "published"))).limit(1)
+        : payload.highlightType === "post"
+          ? await db.select({ id: posts.id }).from(posts).where(and(eq(posts.id, payload.targetId), eq(posts.status, "published"))).limit(1)
+          : payload.highlightType === "testimonial"
+            ? await db.select({ id: testimonials.id }).from(testimonials).where(and(eq(testimonials.id, payload.targetId), eq(testimonials.status, "published"))).limit(1)
+            : await db.select({ id: awards.id }).from(awards).where(and(eq(awards.id, payload.targetId), eq(awards.status, "published"))).limit(1);
+
+    if (!targetLookup[0]) {
+      redirectWithError("/admin/highlights", `Selected target is not a published ${payload.highlightType}.`);
+    }
+  }
 
   if (id) {
     await db.update(highlights).set(payload).where(eq(highlights.id, id));

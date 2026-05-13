@@ -12,7 +12,7 @@ import Modal from '@/components/ui/Modal'
 import { useToast } from '@/components/providers/ToastProvider'
 import GithubActivitySection from '@/components/sections/GithubActivitySection'
 import type { PublicProject } from '@/lib/content/types'
-import { isSvgAssetUrl } from '@/lib/asset-urls'
+import { getRenderableImageUrl, isSvgAssetUrl } from '@/lib/asset-urls'
 
 interface CellData {
   level: number
@@ -541,11 +541,14 @@ export default function ResumePage({
                       <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
                         <div className="relative w-8 h-8">
                           <Image 
-                            src={award.logoUrl || "/v2/showcase/banner.png"} 
+                            src={getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png")}
                             alt={award.title} 
                             fill 
                             className="object-contain" 
-                            unoptimized={isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png")}
+                            unoptimized={
+                              isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png") ||
+                              getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png").startsWith("/api/image/resolve")
+                            }
                           />
                         </div>
                         <div className="flex flex-col leading-tight">

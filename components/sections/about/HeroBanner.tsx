@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import CornerDot from '@/components/ui/CornerDot'
-import { isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
+import { getRenderableImageUrl, isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
 
 interface HeroBannerProps {
   title?: string
@@ -17,6 +17,7 @@ export default function HeroBanner({
   imageUrl = "/Justinedevs_Banner.png",
 }: HeroBannerProps) {
   const normalizedImageUrl = normalizeAssetUrl(imageUrl)
+  const renderableImageUrl = getRenderableImageUrl(normalizedImageUrl)
   const [isScanning, setIsScanning] = useState(true)
   const [scanComplete, setScanComplete] = useState(false)
 
@@ -56,13 +57,13 @@ export default function HeroBanner({
             className={`absolute inset-0 transition-opacity duration-1000 ${scanComplete ? 'opacity-100' : 'opacity-0'}`}
           >
             <Image
-              src={normalizedImageUrl}
+              src={renderableImageUrl}
               alt="Justine Devs Banner"
               fill
               className="object-cover"
               priority
               sizes="(max-width: 375px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 90vw, 1500px"
-              unoptimized={isSvgAssetUrl(normalizedImageUrl)}
+              unoptimized={isSvgAssetUrl(normalizedImageUrl) || renderableImageUrl.startsWith("/api/image/resolve")}
             />
           </div>
 

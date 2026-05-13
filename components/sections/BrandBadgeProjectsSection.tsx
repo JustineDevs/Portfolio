@@ -9,7 +9,7 @@ import { ScrambleTextOnHover } from '@/components/ui/scramble-text';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import Modal from '@/components/ui/Modal';
 import type { PublicProject } from '@/lib/content/types';
-import { isSvgAssetUrl } from '@/lib/asset-urls';
+import { getRenderableImageUrl, isSvgAssetUrl } from '@/lib/asset-urls';
 
 type Theme = 'black' | 'white' | 'iridescent';
 
@@ -223,11 +223,14 @@ export default function BrandBadgeProjectsSection({
                     <div className="bg-[#424242] rounded-lg px-3 xs:px-4 py-2 xs:py-2.5 flex items-center gap-2 xs:gap-3 shadow-sm">
                       <div className="relative w-6 h-6 xs:w-8 xs:h-8">
                         <Image 
-                          src={award.logoUrl || "/v2/showcase/banner.png"} 
+                          src={getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png")}
                           alt={award.title} 
                           fill 
                           className="object-contain" 
-                          unoptimized={isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png")}
+                          unoptimized={
+                            isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png") ||
+                            getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png").startsWith("/api/image/resolve")
+                          }
                         />
                       </div>
                       <div className="flex flex-col leading-tight">

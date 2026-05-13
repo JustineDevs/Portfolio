@@ -2,7 +2,9 @@ import { asc, count, desc, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { requireAdminSession } from "@/lib/auth";
+import { ABOUT_SECTION_KEYS } from "@/lib/about-section-config";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
+import type { SelectOption } from "@/components/admin/FormPrimitives";
 import {
   awards,
   githubActivitySnapshots,
@@ -91,6 +93,48 @@ export async function listHighlightsForAdmin() {
   return db.select().from(highlights).orderBy(desc(highlights.pinned), asc(highlights.sortOrder));
 }
 
+export async function listHighlightTargetOptionsForAdmin(): Promise<{
+  project: SelectOption[];
+  post: SelectOption[];
+  testimonial: SelectOption[];
+  award: SelectOption[];
+}> {
+  await requireAdminSession();
+
+  const [projectRows, postRows, testimonialRows, awardRows] = await Promise.all([
+    db
+      .select({ id: projects.id, title: projects.title, slug: projects.slug })
+      .from(projects)
+      .where(eq(projects.status, "published"))
+      .orderBy(asc(projects.sortOrder), asc(projects.title)),
+    db
+      .select({ id: posts.id, title: posts.title, slug: posts.slug })
+      .from(posts)
+      .where(eq(posts.status, "published"))
+      .orderBy(desc(posts.publishedAt), asc(posts.title)),
+    db
+      .select({ id: testimonials.id, name: testimonials.name, role: testimonials.role })
+      .from(testimonials)
+      .where(eq(testimonials.status, "published"))
+      .orderBy(desc(testimonials.featured), asc(testimonials.sortOrder), asc(testimonials.name)),
+    db
+      .select({ id: awards.id, title: awards.title, year: awards.year })
+      .from(awards)
+      .where(eq(awards.status, "published"))
+      .orderBy(desc(awards.featured), asc(awards.sortOrder), asc(awards.title)),
+  ]);
+
+  return {
+    project: projectRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.slug})` })),
+    post: postRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.slug})` })),
+    testimonial: testimonialRows.map((row) => ({
+      value: String(row.id),
+      label: row.role ? `${row.name} (${row.role})` : row.name,
+    })),
+    award: awardRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.year})` })),
+  };
+}
+
 export async function getHighlightForAdmin(id: number) {
   await requireAdminSession();
   const rows = await db.select().from(highlights).where(eq(highlights.id, id)).limit(1);
@@ -144,6 +188,18 @@ export async function getPageSectionForAdmin(id: number) {
     sectionKey: canonicalizeAboutSectionKey(section.sectionKey),
     sortOrder: getAboutSectionSortOrder(section.sectionKey, section.sortOrder),
   };
+}
+
+export async function listAvailableAboutSectionKeysForAdmin() {
+  await requireAdminSession();
+
+  const rows = await db
+    .select({ sectionKey: pageSections.sectionKey })
+    .from(pageSections)
+    .where(eq(pageSections.pageKey, "about"));
+
+  const usedKeys = new Set(rows.map((row) => canonicalizeAboutSectionKey(row.sectionKey)));
+  return ABOUT_SECTION_KEYS.filter((sectionKey) => !usedKeys.has(sectionKey));
 }
 
 export async function listSiteSettingsForAdmin() {

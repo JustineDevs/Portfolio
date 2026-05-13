@@ -2,7 +2,10 @@ import { and, asc, desc, eq, inArray } from "drizzle-orm";
 
 import type { PublicPost, PublicProject } from "@/lib/content/types";
 import { db } from "@/db/client";
-import { normalizeAssetFieldsInObject, normalizeOptionalAssetUrl } from "@/lib/asset-urls";
+import {
+  normalizeAssetFieldsInObjectAsync,
+  normalizeOptionalImageAssetUrl,
+} from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 import {
   awards,
@@ -68,19 +71,21 @@ export async function getPublishedPosts() {
       .where(eq(posts.status, "published"))
       .orderBy(desc(posts.featured), desc(posts.publishedAt), desc(posts.updatedAt));
 
-    return postRows.map((post) => ({
-      id: post.id,
-      slug: post.slug,
-      title: post.title,
-      summary: post.summary,
-      bodyMd: post.bodyMd,
-      postType: post.postType,
-      sourcePlatform: post.sourcePlatform,
-      canonicalUrl: post.canonicalUrl,
-      coverImageUrl: normalizeOptionalAssetUrl(post.coverImageUrl),
-      featured: post.featured,
-      publishedAt: post.publishedAt,
-    }));
+    return Promise.all(
+      postRows.map(async (post) => ({
+        id: post.id,
+        slug: post.slug,
+        title: post.title,
+        summary: post.summary,
+        bodyMd: post.bodyMd,
+        postType: post.postType,
+        sourcePlatform: post.sourcePlatform,
+        canonicalUrl: post.canonicalUrl,
+        coverImageUrl: await normalizeOptionalImageAssetUrl(post.coverImageUrl),
+        featured: post.featured,
+        publishedAt: post.publishedAt,
+      })),
+    );
   } catch {
     return [];
   }
@@ -108,7 +113,7 @@ export async function getPublishedPostBySlug(slug: string) {
       postType: post.postType,
       sourcePlatform: post.sourcePlatform,
       canonicalUrl: post.canonicalUrl,
-      coverImageUrl: normalizeOptionalAssetUrl(post.coverImageUrl),
+      coverImageUrl: await normalizeOptionalImageAssetUrl(post.coverImageUrl),
       featured: post.featured,
       publishedAt: post.publishedAt,
     };
@@ -137,10 +142,12 @@ export async function getPublishedAwards() {
       .where(eq(awards.status, "published"))
       .orderBy(desc(awards.featured), asc(awards.sortOrder), desc(awards.updatedAt));
 
-    return rows.map((award) => ({
-      ...award,
-      logoUrl: normalizeOptionalAssetUrl(award.logoUrl),
-    }));
+    return Promise.all(
+      rows.map(async (award) => ({
+        ...award,
+        logoUrl: await normalizeOptionalImageAssetUrl(award.logoUrl),
+      })),
+    );
   } catch {
     return [];
   }
@@ -154,7 +161,7 @@ export async function getPublishedPageSections(pageKey: string) {
       .where(and(eq(pageSections.pageKey, pageKey), eq(pageSections.status, "published")))
       .orderBy(asc(pageSections.sortOrder), asc(pageSections.sectionKey));
 
-    const normalizedRows = rows.map((section) => {
+    const normalizedRows = await Promise.all(rows.map(async (section) => {
       const normalized = {
         ...section,
         sectionKey:
@@ -169,12 +176,12 @@ export async function getPublishedPageSections(pageKey: string) {
         const parsed = JSON.parse(section.metaJson);
         return {
           ...normalized,
-          metaJson: JSON.stringify(normalizeAssetFieldsInObject(parsed)),
+          metaJson: JSON.stringify(await normalizeAssetFieldsInObjectAsync(parsed)),
         };
       } catch {
         return normalized;
       }
-    });
+    }));
 
     return pageKey === "about"
       ? normalizedRows.sort((a, b) => a.sortOrder - b.sortOrder)
@@ -192,10 +199,12 @@ export async function getPublishedHighlights() {
       .where(eq(highlights.status, "published"))
       .orderBy(desc(highlights.pinned), asc(highlights.sortOrder), desc(highlights.updatedAt));
 
-    return rows.map((highlight) => ({
-      ...highlight,
-      imageUrlOverride: normalizeOptionalAssetUrl(highlight.imageUrlOverride),
-    }));
+    return Promise.all(
+      rows.map(async (highlight) => ({
+        ...highlight,
+        imageUrlOverride: await normalizeOptionalImageAssetUrl(highlight.imageUrlOverride),
+      })),
+    );
   } catch {
     return [];
   }
@@ -284,31 +293,35 @@ async function hydrateProjects(
         .orderBy(asc(projectLinks.sortOrder)),
     ]);
 
-  return projectRows.map((project) => ({
-    id: project.id,
-    slug: project.slug,
-    title: project.title,
-    summary: project.summary,
-    bodyMd: project.bodyMd,
-    category: project.category,
-    publishedAt: project.publishedAt,
-    featured: project.featured,
-    coverImageUrl: normalizeOptionalAssetUrl(project.coverImageUrl),
-    bannerImageUrl: normalizeOptionalAssetUrl(project.bannerImageUrl),
-    authorName: project.authorName,
-    authorUrl: project.authorUrl,
-    websiteUrl: project.websiteUrl,
-    sortOrder: project.sortOrder,
-    tags: tagRows.filter((row) => row.projectId === project.id).map((row) => row.tag),
-    technologies: technologyRows
-      .filter((row) => row.projectId === project.id)
-      .map((row) => row.technology),
-    responsibilities: responsibilityRows
-      .filter((row) => row.projectId === project.id)
-      .map((row) => row.responsibility),
-    networks: networkRows.filter((row) => row.projectId === project.id).map((row) => row.network),
-    links: linkRows
-      .filter((row) => row.projectId === project.id)
-      .map((row) => ({ type: row.type, label: row.label, url: row.url })),
-  })) satisfies PublicProject[];
+  const projects = await Promise.all(
+    projectRows.map(async (project) => ({
+      id: project.id,
+      slug: project.slug,
+      title: project.title,
+      summary: project.summary,
+      bodyMd: project.bodyMd,
+      category: project.category,
+      publishedAt: project.publishedAt,
+      featured: project.featured,
+      coverImageUrl: await normalizeOptionalImageAssetUrl(project.coverImageUrl),
+      bannerImageUrl: await normalizeOptionalImageAssetUrl(project.bannerImageUrl),
+      authorName: project.authorName,
+      authorUrl: project.authorUrl,
+      websiteUrl: project.websiteUrl,
+      sortOrder: project.sortOrder,
+      tags: tagRows.filter((row) => row.projectId === project.id).map((row) => row.tag),
+      technologies: technologyRows
+        .filter((row) => row.projectId === project.id)
+        .map((row) => row.technology),
+      responsibilities: responsibilityRows
+        .filter((row) => row.projectId === project.id)
+        .map((row) => row.responsibility),
+      networks: networkRows.filter((row) => row.projectId === project.id).map((row) => row.network),
+      links: linkRows
+        .filter((row) => row.projectId === project.id)
+        .map((row) => ({ type: row.type, label: row.label, url: row.url })),
+    })),
+  );
+
+  return projects satisfies PublicProject[];
 }
