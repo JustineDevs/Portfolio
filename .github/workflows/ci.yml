@@ -1,0 +1,56 @@
+# Continuous integration: lint, unit tests, production build.
+# Add repository secrets if the build starts requiring real Turso/OAuth values.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint, test, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      # Satisfy Next.js / Auth.js during `next build` without committing secrets.
+      AUTH_SECRET: ci-placeholder-auth-secret-must-be-at-least-32-chars
+      NODE_ENV: production
+      # Optional: point CI at Turso by setting repo secrets TURSO_DATABASE_URL / TURSO_AUTH_TOKEN.
+      # If unset, db/client falls back to file:./db/local.db (empty DB is fine; queries return []).
+      CI: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint
+        run: pnpm run lint
+
+      - name: Unit tests
+        run: pnpm run test
+
+      - name: Production build
+        run: pnpm run build

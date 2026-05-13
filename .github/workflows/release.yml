@@ -1,0 +1,35 @@
+# When you push an annotated tag like v0.1.0, publish a GitHub Release with
+# auto-generated notes (merged PRs, contributors) from GitHub's API.
+#
+# Prerequisite: create the tag locally after updating package.json, then:
+#   git push origin v0.1.0
+#
+# Or use: pnpm run release:git-tag  (then push the tag).
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release-notes:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create release with auto-generated notes
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
