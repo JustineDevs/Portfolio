@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   icons: {
     icon: '/JSTN Logo/SVG/Abstract Symbol - irisdecent.svg',
   },
+  verification: {
+    google: 'Fh8-b3sHLQjvG_9EwOkXGj-JB1bZNaRWSalGGTyGB6Q',
+  },
 }
 
 export default function RootLayout({
