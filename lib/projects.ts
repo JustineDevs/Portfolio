@@ -426,16 +426,3 @@ export const projects: Record<string, Project> = {
   },
 }
 
-export function getProjectBySlug(slug: string): Project | undefined {
-  return projects[slug]
-}
-
-export function getAllProjects(): Project[] {
-  return Object.values(projects)
-}
-
-export function getOtherProjects(currentSlug: string, limit: number = 2): Project[] {
-  return Object.values(projects)
-    .filter((p) => p.slug !== currentSlug)
-    .slice(0, limit)
-}
