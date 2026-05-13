@@ -2,21 +2,51 @@ import assert from "node:assert/strict";
 import { mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import { pathToFileURL } from "node:url";
 
-import { createClient } from "@libsql/client";
+function integrationTempBase() {
+  if (process.platform === "win32" && process.env.LOCALAPPDATA) {
+    return join(process.env.LOCALAPPDATA, "Temp");
+  }
+  return tmpdir();
+}
+
+function delay(ms: number) {
+  return new Promise<void>((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+async function rmDirWithRetries(dir: string, maxAttempts = 8) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      rmSync(dir, { recursive: true, force: true });
+      return;
+    } catch (error) {
+      const code = error instanceof Error && "code" in error ? (error as NodeJS.ErrnoException).code : "";
+      const retryable = code === "EBUSY" || code === "EPERM";
+      if (!retryable || attempt === maxAttempts) {
+        throw error;
+      }
+      await delay(25 * attempt);
+    }
+  }
+}
 
 async function main() {
-  const tempDir = mkdtempSync(join(tmpdir(), "portfolio-google-admin-"));
+  const tempDir = mkdtempSync(join(integrationTempBase(), "portfolio-google-admin-"));
   const dbPath = join(tempDir, "verify.db");
 
-  process.env.TURSO_DATABASE_URL = `file:${dbPath}`;
+  // RFC 8089 `file:///…` URLs work reliably on Linux CI; a single DB client avoids Windows file locks.
+  process.env.TURSO_DATABASE_URL = pathToFileURL(dbPath).href;
   process.env.AUTH_SECRET = "verify-auth-secret-1234567890";
   process.env.ADMIN_EMAIL = "owner@example.com";
 
-  const client = createClient({ url: process.env.TURSO_DATABASE_URL });
+  const { db } = await import("../db/client");
+  const sql = db.$client;
 
   try {
-    await client.execute(`
+    await sql.execute(`
       CREATE TABLE admin_users (
         id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
         email_hash text NOT NULL,
@@ -29,22 +59,22 @@ async function main() {
         updated_at text DEFAULT CURRENT_TIMESTAMP NOT NULL
       )
     `);
-    await client.execute(`
+    await sql.execute(`
       CREATE UNIQUE INDEX admin_users_email_hash_unique
       ON admin_users (email_hash)
     `);
-    await client.execute(`
+    await sql.execute(`
       CREATE UNIQUE INDEX admin_users_provider_subject_unique
       ON admin_users (provider_subject)
     `);
-    await client.execute(`
+    await sql.execute(`
       CREATE INDEX admin_users_status_idx
       ON admin_users (status)
     `);
 
     const adminUsers = await import("../lib/admin-users");
     const emailHash = adminUsers.computeAdminEmailHash("owner@example.com");
-    await client.execute({
+    await sql.execute({
       sql: `
         INSERT INTO admin_users (
           email_hash,
@@ -84,7 +114,7 @@ async function main() {
     });
     assert.equal(wrongEmailLogin, null);
 
-    await client.execute({
+    await sql.execute({
       sql: "UPDATE admin_users SET status = 'disabled' WHERE id = ?",
       args: [firstGoogleLogin.id],
     });
@@ -97,8 +127,23 @@ async function main() {
     console.log("admin-users.integration: ok");
   } finally {
     delete process.env.ADMIN_EMAIL;
-    client.close();
-    rmSync(tempDir, { recursive: true, force: true });
+    sql.close();
+    const g = globalThis as typeof globalThis & { __portfolioDb?: unknown };
+    delete g.__portfolioDb;
+    try {
+      await rmDirWithRetries(tempDir);
+    } catch (error) {
+      const code =
+        error instanceof Error && "code" in error ? (error as NodeJS.ErrnoException).code : "";
+      if (code === "EBUSY" || code === "EPERM") {
+        console.warn(
+          "admin-users.integration: skipped removing temp DB (still locked). Assertions already passed.",
+          tempDir,
+        );
+        return;
+      }
+      throw error;
+    }
   }
 }
 
