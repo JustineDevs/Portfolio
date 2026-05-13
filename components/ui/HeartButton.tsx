@@ -96,9 +96,9 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
       <motion.button
         onClick={handleClick}
         disabled={isUpdating}
-        className="relative flex items-center justify-center disabled:opacity-50"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
+        className="relative flex items-center gap-1 justify-center disabled:opacity-50"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         transition={{ duration: 0.2 }}
         aria-label={isLiked ? 'Unlike this portfolio' : 'Like this portfolio'}
       >
@@ -117,6 +117,13 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
             }`}
           />
         </motion.div>
+        <span
+          className={`text-[11px] font-medium select-none ${
+            isLiked ? 'text-[#ff6b6b]' : 'text-[#666666]'
+          }`}
+        >
+          Like
+        </span>
       </motion.button>
       
       <span className="text-[11px] text-[#666666] font-medium min-w-[20px]">
