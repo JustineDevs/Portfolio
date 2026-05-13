@@ -13,11 +13,11 @@ import {
 } from "@/components/admin/FormPrimitives";
 
 const HIGHLIGHT_TYPE_OPTIONS: SelectOption[] = [
-  { value: "custom", label: "Custom" },
   { value: "project", label: "Project" },
   { value: "post", label: "Post" },
   { value: "testimonial", label: "Testimonial" },
   { value: "award", label: "Award" },
+  { value: "custom", label: "Certificate" },
 ];
 
 const STATUS_OPTIONS: SelectOption[] = [
@@ -66,7 +66,7 @@ export function HighlightForm({
 
   const targetDescription =
     highlightType === "custom"
-      ? "Custom highlights are manual cards and do not require a linked content item."
+      ? "Certificates are manual cards and do not require a linked content item."
       : `Choose the published ${highlightType} this highlight should be strictly bound to.`;
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export function HighlightForm({
         rows={4}
       />
       <p className="text-sm text-[#666666]">
-        Type rules: `award` uses `Logo | Title Override | Summary Override`; `post` feeds Writing; `testimonial` feeds Testimonials; `project` and `custom` stay in Proof of Work.
+        Type rules: `project` feeds Proof of Work; `post` feeds Writing; `testimonial` feeds Testimonials; `award` feeds Awards; `custom` is reserved for Certificates.
       </p>
       <CheckboxField label="Pinned" name="pinned" defaultChecked={value?.pinned} />
       <AdminFormSubmitButton>{value ? "Save highlight" : "Create highlight"}</AdminFormSubmitButton>

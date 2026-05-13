@@ -18,8 +18,8 @@ export default async function AdminHighlightsPage({
       <section className="rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold tracking-tight text-[#424242]">Highlights</h1>
         <p className="mt-2 text-sm text-[#666666]">
-          Curate support cards across Experience. Types `project`, `post`, `testimonial`, and `custom` render in Proof of Work.
-          Type `award` renders in the Awards lane.
+          Curate support cards across Experience. `project` renders in Proof of Work, `post` in Writing, `testimonial` in Testimonials,
+          `award` in Awards, and `custom` is reserved for Certificates.
         </p>
         <AdminErrorBanner message={errorMessage} />
       </section>

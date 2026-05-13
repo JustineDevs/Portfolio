@@ -1,11 +1,12 @@
-import { getPublishedAwards, getPublishedProjects } from '@/lib/content/public'
+import { getFeaturedAwardCards, getFeaturedCertificateCards, getPublishedProjects } from '@/lib/content/public'
 import { getPublicLegalLinks } from '@/lib/legal-links'
 import HomePageClient from '@/components/HomePageClient'
 
 export default async function Home() {
-  const [projects, awards, legalLinks] = await Promise.all([
+  const [projects, awards, certificates, legalLinks] = await Promise.all([
     getPublishedProjects(),
-    getPublishedAwards(),
+    getFeaturedAwardCards(2),
+    getFeaturedCertificateCards(3),
     getPublicLegalLinks(),
   ])
 
@@ -13,6 +14,7 @@ export default async function Home() {
     <HomePageClient
       featuredProjects={projects.slice(0, 2)}
       featuredAwards={awards.slice(0, 2)}
+      featuredCertificates={certificates}
       legalLinks={legalLinks}
     />
   )

@@ -463,8 +463,8 @@ export async function saveHighlightAction(formData: FormData) {
   };
 
   if (payload.highlightType === "custom") {
-    if (!payload.titleOverride && !payload.summaryOverride && !payload.imageUrlOverride && !payload.linkOverride) {
-      redirectWithError("/admin/highlights", "Custom highlights need at least one override field.");
+    if (!payload.titleOverride || !payload.summaryOverride) {
+      redirectWithError("/admin/highlights", "Certificates require both Title Override and Summary Override.");
     }
   } else if (!payload.targetId) {
     redirectWithError("/admin/highlights", `${payload.highlightType} highlights require a target.`);

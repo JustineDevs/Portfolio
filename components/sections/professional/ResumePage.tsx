@@ -30,12 +30,22 @@ interface AwardLike {
   logoUrl?: string | null
 }
 
+interface CertificateLike {
+  slug: string
+  title: string
+  description: string
+  proofUrl?: string | null
+  logoUrl?: string | null
+}
+
 export default function ResumePage({
   featuredProjects = [],
   featuredAwards = [],
+  featuredCertificates = [],
 }: {
   featuredProjects?: PublicProject[]
   featuredAwards?: AwardLike[]
+  featuredCertificates?: CertificateLike[]
 }) {
   const { info } = useToast()
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null)
@@ -54,16 +64,16 @@ export default function ResumePage({
           link: award.proofUrl || '',
         },
       ]),
-      [
-        'certificate',
+      ...featuredCertificates.map((certificate) => [
+        certificate.slug,
         {
-          title: 'Certificates',
+          title: certificate.title,
           event: 'CERTIFICATES',
-          description: 'Various certifications and achievements in blockchain development, web technologies, and software engineering.',
-          date: '2023-2024',
-          link: '',
+          description: certificate.description,
+          date: '',
+          link: certificate.proofUrl || '',
         },
-      ],
+      ]),
     ]
   )
 
@@ -254,7 +264,7 @@ export default function ResumePage({
 
   const handleCellHover = (cell: CellData, event: React.MouseEvent<HTMLDivElement>) => {
     if (cell.contributions === 0) return
-    
+
     const rect = event.currentTarget.getBoundingClientRect()
     setHoveredCell({
       date: cell.date,
@@ -269,8 +279,8 @@ export default function ResumePage({
   }
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
       day: 'numeric',
       year: 'numeric'
     })
@@ -319,7 +329,7 @@ export default function ResumePage({
                 </div>
                 <div className="flex items-center gap-3">
                   <a
-                    href="https://cal.com/justinedevs" 
+                    href="https://cal.com/justinedevs"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2 bg-[#424242] text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
@@ -328,7 +338,7 @@ export default function ResumePage({
                     Schedule a Call
                   </a>
                   <a
-                    href="https://t.me/TraderGOfficial" 
+                    href="https://t.me/TraderGOfficial"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2 border border-[#d5d5d5] text-[#424242] text-[13px] font-medium rounded-lg hover:bg-[#f5f5f5] transition-colors focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
@@ -420,11 +430,11 @@ export default function ResumePage({
               ))}
               <div className="pt-6 space-y-3 text-[15px] leading-[1.7] text-[#555555]">
                 <p>
-                  Committed to continuous learning and staying current with industry trends. Proficient in using 
+                  Committed to continuous learning and staying current with industry trends. Proficient in using
                   AI-powered development tools to enhance productivity and code quality.
                 </p>
                 <p>
-                  Proven track record of delivering high-quality projects both independently and as part of 
+                  Proven track record of delivering high-quality projects both independently and as part of
                   collaborative teams, with a focus on clean code, best practices, and user experience.
                 </p>
               </div>
@@ -532,7 +542,7 @@ export default function ResumePage({
                 <h2 className="text-[clamp(18px,2vw,20px)] font-bold text-[#424242] mb-1 tracking-[-0.01em]">Featured Badge & Certificates</h2>
                 <p className="text-[clamp(11px,1.2vw,12px)] text-[#666666]">Badges earned from hackathon wins</p>
               </div>
-              
+
               <div className="space-y-5">
                 {awardsData.map((award) => (
                   <div key={award.slug}>
@@ -540,11 +550,11 @@ export default function ResumePage({
                     <div className="flex items-center justify-between mt-2.5 pb-4 border-b border-[#E5E5E5]">
                       <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
                         <div className="relative w-8 h-8">
-                          <Image 
+                          <Image
                             src={getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png")}
-                            alt={award.title} 
-                            fill 
-                            className="object-contain" 
+                            alt={award.title}
+                            fill
+                            className="object-contain"
                             unoptimized={
                               isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png") ||
                               getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png").startsWith("/api/image/resolve")
@@ -556,7 +566,7 @@ export default function ResumePage({
                           <span className="text-[12px] font-bold text-white">{award.title}</span>
                         </div>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleBadgeClick(award.slug)}
                         className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
                         aria-label={`View ${award.title} badge details`}
@@ -568,24 +578,44 @@ export default function ResumePage({
                 ))}
 
                 {/* Certificates */}
-                <div>
-                  <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">CERTIFICATES</span>
-                  <div className="flex items-center justify-between mt-2.5">
-                    <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                      <div className="flex flex-col leading-tight">
-                        <span className="text-[10px] text-white/60">Featured on</span>
-                        <span className="text-[12px] font-bold text-white">N/A</span>
-                      </div>
+                {featuredCertificates.length > 0 ? (
+                  <div>
+                    <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">CERTIFICATES</span>
+                    <div className="space-y-3 mt-2.5">
+                      {featuredCertificates.map((certificate) => (
+                        <div key={certificate.slug} className="flex items-center justify-between">
+                          <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
+                            {certificate.logoUrl ? (
+                              <div className="relative w-8 h-8">
+                                <Image
+                                  src={getRenderableImageUrl(certificate.logoUrl)}
+                                  alt={certificate.title}
+                                  fill
+                                  className="object-contain"
+                                  unoptimized={
+                                    isSvgAssetUrl(certificate.logoUrl) ||
+                                    getRenderableImageUrl(certificate.logoUrl).startsWith("/api/image/resolve")
+                                  }
+                                />
+                              </div>
+                            ) : null}
+                            <div className="flex flex-col leading-tight">
+                              <span className="text-[10px] text-white/60">Featured on</span>
+                              <span className="text-[12px] font-bold text-white">{certificate.title}</span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleBadgeClick(certificate.slug)}
+                            className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
+                            aria-label={`View ${certificate.title} certificate details`}
+                          >
+                            Details
+                          </button>
+                        </div>
+                      ))}
                     </div>
-                    <button 
-                      onClick={() => handleBadgeClick('certificate')}
-                      className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                      aria-label="View certificate details"
-                    >
-                      Details
-                    </button>
                   </div>
-                </div>
+                ) : null}
               </div>
             </div>
           </div>

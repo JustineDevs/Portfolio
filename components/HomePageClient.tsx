@@ -78,13 +78,23 @@ interface AwardLike {
   logoUrl?: string | null
 }
 
+interface CertificateLike {
+  slug: string
+  title: string
+  description: string
+  proofUrl?: string | null
+  logoUrl?: string | null
+}
+
 export default function HomePageClient({
   featuredProjects,
   featuredAwards,
+  featuredCertificates,
   legalLinks,
 }: {
   featuredProjects: PublicProject[]
   featuredAwards: AwardLike[]
+  featuredCertificates: CertificateLike[]
   legalLinks: PublicLegalLinks
 }) {
   /** Desktop-only intro overlay; mobile always sees content (Speed Insights / LCP). */
@@ -134,7 +144,11 @@ export default function HomePageClient({
             </motion.div>
           ) : (
             <motion.div key="professional" {...animations.modeSwitch}>
-              <ResumePage featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
+              <ResumePage
+                featuredProjects={featuredProjects}
+                featuredAwards={featuredAwards}
+                featuredCertificates={featuredCertificates}
+              />
             </motion.div>
           )}
         </AnimatePresence>

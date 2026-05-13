@@ -89,7 +89,7 @@ function AssetThumb({ src, alt }: { src?: string | null; alt: string }) {
   const unoptimized = isSvgAssetUrl(src) || renderableSrc.startsWith("/api/image/resolve");
 
   return (
-    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#d5d5d5] bg-[#f8f8f8]">
+    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-[#f8f8f8]">
       <Image
         src={renderableSrc}
         alt={alt}
@@ -120,7 +120,7 @@ export default function ProofOfWorkSection() {
   }, []);
 
   const proofHighlights = payload.highlights.filter(
-    (highlight) => highlight.highlightType === "project" || highlight.highlightType === "custom",
+    (highlight) => highlight.highlightType === "project",
   );
   const postHighlights = payload.highlights.filter((highlight) => highlight.highlightType === "post");
   const testimonialHighlights = payload.highlights.filter((highlight) => highlight.highlightType === "testimonial");
