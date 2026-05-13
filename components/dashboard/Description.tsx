@@ -10,14 +10,20 @@ export default function Description() {
         <h3 className="text-xl font-medium text-[#111111] mb-6">Description</h3>
         <div className="space-y-6 text-[#666666] font-sans leading-relaxed text-[13px]">
           <p>
-            My experience also covers front-end projects, responsive web apps, user authentication systems, 
-            advanced crypto trading automation, and decentralized governance tools.
+            I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
+            development, responsive web apps, authentication systems, developer tooling, crypto automation, and
+            decentralized systems.
           </p>
           <p>
-            <span className="font-semibold text-[#111111]">Co-Founder HyperKit Labs at Hyperion</span> - Building innovative developer infrastructure tools and contributing to the Mantle Layer 2 ecosystem.
+            As <span className="font-semibold text-[#111111]">Co-Founder of HyperKit Labs</span>, I work on developer
+            infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart
+            contract workflows and product experimentation.
           </p>
           <p>
-            Since 2022, I have been an active Web3 community moderator and professional moderator, evolving from volunteer roles to paid projects. <span className="font-semibold text-[#111111]">Strong problem solver and communicator</span>, aiming to expand client-facing and IT infrastructure skills.
+            I also bring community experience from <span className="font-semibold text-[#111111]">Web3 moderation</span>,
+            where I&apos;ve supported onboarding, discussions, and technical guidance across Discord communities since 2023.
+            I&apos;m especially interested in product architecture, systems thinking, and building tools that are practical,
+            usable, and technically grounded.
           </p>
         </div>
       </div>
