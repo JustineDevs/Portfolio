@@ -1,0 +1,146 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { motion, AnimatePresence } from 'framer-motion'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import Hero from '@/components/Hero'
+import AsciiBackground from '@/components/ui/AsciiBackground'
+import SocialLinksBar from '@/components/ui/SocialLinksBar'
+import ScrollToTop from '@/components/ui/ScrollToTop'
+import PreLoading from '@/components/PreLoading'
+import { useMode } from '@/components/providers/ModeProvider'
+import { animations } from '@/lib/design-tokens'
+
+import type { PublicProject } from '@/lib/content/types'
+import type { PublicLegalLinks } from '@/lib/legal-links'
+
+const TechAndDescriptionSection = dynamic(
+  () => import('@/components/sections/TechAndDescriptionSection'),
+  {
+    loading: () => (
+      <div
+        className="min-h-[240px] w-full border-l border-r border-b border-[#d5d5d5] bg-white"
+        aria-busy
+        aria-label="Loading section"
+      />
+    ),
+  }
+)
+
+const BrandBadgeProjectsSection = dynamic(
+  () => import('@/components/sections/BrandBadgeProjectsSection'),
+  {
+    loading: () => (
+      <div
+        className="min-h-[320px] w-full border-l border-r border-b border-[#d5d5d5] bg-white"
+        aria-busy
+        aria-label="Loading section"
+      />
+    ),
+  }
+)
+
+const GithubActivitySection = dynamic(
+  () => import('@/components/sections/GithubActivitySection'),
+  {
+    loading: () => (
+      <div
+        className="min-h-[200px] w-full border-l border-r border-b border-[#d5d5d5] bg-white"
+        aria-busy
+        aria-label="Loading section"
+      />
+    ),
+  }
+)
+
+const ResumePage = dynamic(
+  () => import('@/components/sections/professional/ResumePage'),
+  {
+    loading: () => (
+      <div
+        className="min-h-[70vh] w-full border border-[#d5d5d5] bg-white rounded-t-lg"
+        aria-busy
+        aria-label="Loading resume"
+      />
+    ),
+  }
+)
+
+interface AwardLike {
+  slug: string
+  title: string
+  eventName: string
+  description: string
+  year: string
+  proofUrl?: string | null
+  logoUrl?: string | null
+}
+
+export default function HomePageClient({
+  featuredProjects,
+  featuredAwards,
+  legalLinks,
+}: {
+  featuredProjects: PublicProject[]
+  featuredAwards: AwardLike[]
+  legalLinks: PublicLegalLinks
+}) {
+  const [isLoading, setIsLoading] = useState(true)
+  const { mode } = useMode()
+
+  useEffect(() => {
+    const hasSeenPreloading = sessionStorage.getItem('has-seen-preloading') === 'true'
+    
+    if (hasSeenPreloading) {
+      setIsLoading(false)
+    } else {
+      setTimeout(() => {
+        setIsLoading(false)
+        sessionStorage.setItem('has-seen-preloading', 'true')
+      }, 3500)
+    }
+  }, [])
+
+  return (
+    <>
+      {isLoading && <PreLoading />}
+      {!isLoading && (
+        <div className="min-h-screen bg-[#F8F8F8] relative overflow-x-hidden">
+          <AsciiBackground />
+          
+          <SocialLinksBar />
+          <Navbar />
+
+          <main id="main-content" className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto pb-4 xs:pb-6 sm:pb-8 relative z-10 overflow-x-hidden">
+            <AnimatePresence mode="wait">
+              {mode === 'personal' ? (
+                <motion.div
+                  key="personal"
+                  {...animations.modeSwitch}
+                >
+                  <Hero />
+                  <TechAndDescriptionSection />
+                  <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
+                  <GithubActivitySection />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="professional"
+                  {...animations.modeSwitch}
+                >
+                  <ResumePage featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <Footer legalLinks={legalLinks} />
+          </main>
+          
+          <ScrollToTop />
+        </div>
+      )}
+    </>
+  )
+}
