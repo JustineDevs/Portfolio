@@ -52,6 +52,8 @@ export const JSTNLogo: React.FC<JSTNLogoProps> = ({
         height={height}
         className={className}
         priority={priority}
+        loading={priority ? 'eager' : 'lazy'}
+        unoptimized
       />
     );
   }
@@ -64,6 +66,9 @@ export const JSTNLogo: React.FC<JSTNLogoProps> = ({
         fill
         className="object-contain"
         priority={priority}
+        loading={priority ? 'eager' : 'lazy'}
+        sizes="(max-width: 768px) 50vw, 200px"
+        unoptimized
       />
     </div>
   );
