@@ -1,0 +1,31 @@
+# Ralph Context Snapshot
+
+- task statement: Remove obsolete legacy components/data paths, tighten admin validation further, and reduce client-only wrappers where they are no longer necessary.
+- desired outcome: Keep the new CMS/admin/blog/activity architecture, but reduce fallback sprawl, harden mutations, and keep the build green with fewer compatibility shims.
+- known facts/evidence:
+  - CMS/data/auth/admin foundations are implemented.
+  - `npm run build` was green immediately before this cleanup pass.
+  - Remaining explicit `lib/projects.ts` runtime consumers were already removed from active routes.
+  - Legacy-only files still exist as fallback/source material.
+  - Admin actions have basic validation but still rely on redirect-based error strings and unstructured parsing.
+  - Client-only wrappers were introduced to stabilize static export on `/` and `/experience`.
+- constraints:
+  - Do not break the green production build.
+  - Keep diffs focused on cleanup/hardening, not new feature expansion.
+  - No new dependencies unless clearly required.
+  - Preserve the working CMS/admin routes and seeded DB workflow.
+- unknowns/open questions:
+  - Which legacy components are now fully dead versus still used as seed/fallback sources?
+  - Which client-only wrappers can be removed safely without reintroducing export/runtime failures?
+  - Whether the remaining admin validation gaps can be tightened without adding a full validation library.
+- likely codebase touchpoints:
+  - `lib/legacy-content.ts`
+  - `lib/content/public.ts`
+  - `app/admin/actions.ts`
+  - `app/admin/*`
+  - `app/page.tsx`
+  - `app/experience/page.tsx`
+  - `components/HomePageClient.tsx`
+  - `components/ExperiencePageClient.tsx`
+  - `components/sections/LazyGithubActivitySection.tsx`
+  - old experience/gallery/activity components
