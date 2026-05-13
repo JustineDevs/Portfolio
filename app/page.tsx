@@ -1,11 +1,6 @@
-import dynamic from 'next/dynamic'
 import { getPublishedAwards, getPublishedProjects } from '@/lib/content/public'
 import { getPublicLegalLinks } from '@/lib/legal-links'
-
-const HomePageClient = dynamic(() => import('@/components/HomePageClient'), {
-  ssr: false,
-  loading: () => <div className="min-h-screen bg-[#F8F8F8]" />,
-})
+import HomePageClient from '@/components/HomePageClient'
 
 export default async function Home() {
   const [projects, awards, legalLinks] = await Promise.all([
