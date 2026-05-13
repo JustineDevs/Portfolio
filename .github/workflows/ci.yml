@@ -23,10 +23,11 @@ jobs:
     env:
       # Satisfy Next.js / Auth.js during `next build` without committing secrets.
       AUTH_SECRET: ci-placeholder-auth-secret-must-be-at-least-32-chars
-      NODE_ENV: production
       # Optional: point CI at Turso by setting repo secrets TURSO_DATABASE_URL / TURSO_AUTH_TOKEN.
       # If unset, db/client falls back to file:./db/local.db (empty DB is fine; queries return []).
       CI: "true"
+      # Keep NODE_ENV off the lint/test steps so `next lint` TypeScript setup matches local dev.
+      # Production build sets NODE_ENV only for that step (see below).
 
     steps:
       - name: Checkout
@@ -53,4 +54,6 @@ jobs:
         run: pnpm run test
 
       - name: Production build
+        env:
+          NODE_ENV: production
         run: pnpm run build
