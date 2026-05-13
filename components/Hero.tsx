@@ -12,7 +12,10 @@ import { ScrambleTextOnHover } from './ui/scramble-text';
 const AvatarParticlesCanvas = dynamic(() => import('./three/AvatarParticlesCanvas'), {
   ssr: false,
   loading: () => (
-    <div className="relative z-20 w-full h-full min-h-[200px] bg-[#424242]" aria-hidden />
+    <div
+      className="relative z-20 w-full h-full min-h-[250px] xs:min-h-[300px] sm:min-h-[350px] md:min-h-0 bg-[#424242]"
+      aria-hidden
+    />
   ),
 });
 
