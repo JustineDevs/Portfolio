@@ -98,20 +98,23 @@ const TechStack = () => {
                    <h3 className="font-serif text-3xl font-medium text-[#111111] italic mb-8">Description</h3>
                    
                    <p className="font-sans text-sm leading-7 text-gray-500 max-w-2xl mb-6">
-                     My experience also covers front-end projects, responsive web apps, user authentication systems, 
-                     advanced crypto trading automation, and decentralized governance tools.
+                     I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
+                     development, responsive web apps, authentication systems, developer tooling, crypto automation, and
+                     decentralized systems.
                    </p>
-                   
+
                    <div className="pl-4 border-l-2 border-black mb-8">
                       <p className="font-sans text-sm font-medium text-black leading-6">
-                        <span className="font-bold">Co-Founder HyperKit Labs</span> — Building innovative developer infrastructure 
-                        tools and contributing to the Mantle Layer 2 ecosystem.
+                        As <span className="font-bold">Co-Founder of HyperKit Labs</span>, I work on developer infrastructure and
+                        AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart contract workflows
+                        and product experimentation.
                       </p>
                    </div>
 
                    <p className="font-sans text-xs leading-6 text-gray-400 max-w-xl">
-                     Since 2022, I have been an active Web3 community moderator and professional moderator, 
-                     evolving from volunteer roles to paid projects. Strong problem solver and communicator.
+                     I also bring community experience from Web3 moderation, where I&apos;ve supported onboarding, discussions, and
+                     technical guidance across Discord communities since 2023. I&apos;m especially interested in product architecture,
+                     systems thinking, and building tools that are practical, usable, and technically grounded.
                    </p>
                </div>
 
