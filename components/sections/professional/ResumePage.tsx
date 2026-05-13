@@ -97,7 +97,7 @@ export default function ResumePage({
       role: 'Web3 Community Moderator',
       period: '2023-2026',
       description: 'Moderated and managed Web3 community discussions, supporting member engagement and conflict resolution.',
-      website: 'https://oneproject.one',
+      website: 'https://projectonepercent.io/',
     },
   ]
 
