@@ -3,7 +3,8 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useCallback } from "react";
+import { setAvatarCursorHover } from "@/lib/cursor-avatar";
 
 type AvatarParticlesProps = {
   density?: number;
@@ -84,9 +85,30 @@ export default function AvatarParticles({
   // Velocities state (CPU physics)
   const velocitiesRef = useRef(new Float32Array(origins.length));
   
+  const hitSphere = useMemo(() => {
+    if (origins.length === 0) return null;
+    const box = new THREE.Box3();
+    const v = new THREE.Vector3();
+    for (let i = 0; i < origins.length; i += 3) {
+      v.set(origins[i], origins[i + 1], origins[i + 2]);
+      box.expandByPoint(v);
+    }
+    const sp = new THREE.Sphere();
+    box.getBoundingSphere(sp);
+    const radius = Math.max(sp.radius * 1.25, 0.45);
+    return { center: sp.center.clone(), radius };
+  }, [origins]);
+
   useEffect(() => {
     velocitiesRef.current = new Float32Array(origins.length);
   }, [origins]);
+
+  const onAvatarOver = useCallback(() => setAvatarCursorHover(true), []);
+  const onAvatarOut = useCallback(() => setAvatarCursorHover(false), []);
+
+  useEffect(() => {
+    return () => setAvatarCursorHover(false);
+  }, []);
 
   useFrame((state) => {
     if (!pointsRef.current) return;
@@ -99,7 +121,7 @@ export default function AvatarParticles({
     const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
     const intersection = new THREE.Vector3();
     raycaster.ray.intersectPlane(plane, intersection);
-    mouse3D.current.lerp(intersection, 0.1);
+    mouse3D.current.lerp(intersection, 0.32);
 
     // CPU Physics Update
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
@@ -197,16 +219,34 @@ export default function AvatarParticles({
   `;
 
   return (
-    <points ref={pointsRef} geometry={geometry}>
-      <shaderMaterial
-        transparent
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-        uniforms={uniforms}
-        vertexShader={vertexShader}
-        fragmentShader={fragmentShader}
-      />
-    </points>
+    <group>
+      {hitSphere && (
+        <mesh
+          position={hitSphere.center}
+          onPointerOver={(e) => {
+            e.stopPropagation();
+            onAvatarOver();
+          }}
+          onPointerOut={(e) => {
+            e.stopPropagation();
+            onAvatarOut();
+          }}
+        >
+          <sphereGeometry args={[hitSphere.radius, 28, 28]} />
+          <meshBasicMaterial transparent opacity={0} depthWrite={false} />
+        </mesh>
+      )}
+      <points ref={pointsRef} geometry={geometry}>
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          uniforms={uniforms}
+          vertexShader={vertexShader}
+          fragmentShader={fragmentShader}
+        />
+      </points>
+    </group>
   );
 }
 
