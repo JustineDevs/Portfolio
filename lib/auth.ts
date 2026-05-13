@@ -64,12 +64,30 @@ function getGoogleAuthConfigStatus() {
   const clientId = readEnvString("AUTH_GOOGLE_ID");
   const clientSecret = readEnvString("AUTH_GOOGLE_SECRET");
   const adminEmail = readEnvString("ADMIN_EMAIL");
+  const authUrl = readEnvString("AUTH_URL") ?? readEnvString("NEXTAUTH_URL");
+  const hasMultipleUrls = authUrl?.includes(",") ?? false;
+
+  let authUrlObject: URL | null = null;
+  if (authUrl && !hasMultipleUrls) {
+    try {
+      authUrlObject = new URL(authUrl);
+    } catch {
+      authUrlObject = null;
+    }
+  }
+
+  const authUrlPath = authUrlObject?.pathname.replace(/\/+$/, "") ?? "";
+  const authUrlLooksInvalid = Boolean(
+    authUrl &&
+      (hasMultipleUrls || !authUrlObject || authUrlPath.startsWith("/api/auth")),
+  );
 
   return {
     hasClientId: !!clientId,
     hasClientSecret: !!clientSecret,
     hasAdminEmail: !!adminEmail,
     isConfigured: !!clientId && !!clientSecret && !!adminEmail,
+    authUrlLooksInvalid,
   } as const;
 }
 
