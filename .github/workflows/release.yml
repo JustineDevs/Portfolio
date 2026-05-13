@@ -1,10 +1,11 @@
-# When you push an annotated tag like v0.1.0, publish a GitHub Release with
-# auto-generated notes (merged PRs, contributors) from GitHub's API.
+# On push of tag v*, publish a GitHub Release.
 #
-# Prerequisite: create the tag locally after updating package.json, then:
-#   git push origin v0.1.0
+# Standard (required): docs/releases/<tag>.md must exist (e.g. docs/releases/v0.1.1.md).
+# The release body is loaded from that file; GitHub auto-generated notes are appended after it.
 #
-# Or use: pnpm run release:git-tag  (then push the tag).
+# Before tagging: bump package.json version, add docs/releases/v<version>.md, then:
+#   pnpm run release:git-tag
+#   git push origin v<version>
 name: Release
 
 on:
@@ -25,11 +26,24 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Create release with auto-generated notes
+      - name: Require curated release notes
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          NOTES="docs/releases/${TAG}.md"
+          if [ ! -f "$NOTES" ]; then
+            echo "::error title=Missing release notes::Required file missing: $NOTES"
+            echo "Add docs/releases/${TAG}.md before pushing this tag. See docs/releases/README.md."
+            exit 1
+          fi
+          echo "Release body: $NOTES"
+
+      - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
+          body_path: docs/releases/${{ github.ref_name }}.md
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
