@@ -5,6 +5,8 @@
 Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` in `.env` or `.env.local` (local overrides). `drizzle.config.ts` loads `.env` first, then `.env.local`.
 
 Admin sign-in also needs `AUTH_SECRET`, `ADMIN_EMAIL`, and Google OAuth vars as in `.env.example`.
+If you set `AUTH_URL` / `NEXTAUTH_URL`, use the site origin only, for example `http://localhost:3000` or `https://jstn.site`.
+Do not put `/api/auth/callback/google` or multiple URLs in that variable; Google callback URLs belong in Google Cloud Console, not in `AUTH_URL`.
 
 ## Day-to-day
 
