@@ -6,7 +6,7 @@ import TimelineNavigationSection from "@/components/sections/experience/Timeline
 import GithubActivitySection from "@/components/sections/GithubActivitySection";
 import ProofOfWorkSection from "@/components/sections/experience/ProofOfWorkSection";
 import PixeledCursorTrail from "@/components/ui/PixeledCursorTrail";
-import type { PublicLegalLinks } from "@/lib/legal-links";
+import type { PublicLegalLinks } from "@/lib/legal-links-shared";
 
 export default function ExperiencePageClient({ legalLinks }: { legalLinks: PublicLegalLinks }) {
   return (
