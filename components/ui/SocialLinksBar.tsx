@@ -15,9 +15,16 @@ import {
   Eye,
   Star,
   Mail,
+  Activity,
 } from 'lucide-react'
 
 const PORTFOLIO_REPO_URL = 'https://github.com/JustineDevs/portfolio'
+
+/** Public uptime / status page (Instatus, Better Stack, etc.). Falls back to Vercel platform status if unset. */
+const statusPageUrl =
+  (typeof process.env.NEXT_PUBLIC_STATUS_PAGE_URL === 'string' &&
+    process.env.NEXT_PUBLIC_STATUS_PAGE_URL.trim()) ||
+  'https://www.vercel-status.com/'
 
 interface SocialLink {
   platform: 'instagram' | 'x' | 'linkedin' | 'github' | 'tiktok' | 'threads' | 'telegram' | 'email'
@@ -186,7 +193,20 @@ export default function SocialLinksBar({
   return (
     <>
       <div className="h-[32px] xs:h-[36px] border-b border-[#d5d5d5] bg-white relative overflow-visible z-[100]">
-        <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-full flex justify-end items-center gap-2 xs:gap-3 flex-wrap relative overflow-visible px-2 xs:px-0">
+        <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-full flex items-center justify-between gap-2 xs:gap-3 flex-wrap relative overflow-visible px-2 xs:px-0">
+          <a
+            href={statusPageUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-md py-0.5 pr-1 text-gray-400 transition-colors hover:text-[#424242] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
+            title="Uptime and incident status (opens in a new tab)"
+            aria-label="Server status (opens in a new tab)"
+          >
+            <Activity size={14} className="shrink-0" aria-hidden />
+            <span className="text-[11px] font-medium tabular-nums leading-none sm:hidden">Status</span>
+            <span className="hidden text-[11px] font-medium leading-none sm:inline">Server status</span>
+          </a>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-2 xs:gap-2.5">
           <div className="flex items-center gap-2 xs:gap-2.5 pr-1.5 xs:pr-2 border-r border-[#e5e5e5] mr-1.5 xs:mr-2">
             <div
               className="flex items-center gap-1.5 text-gray-400"
@@ -277,6 +297,7 @@ export default function SocialLinksBar({
               </motion.a>
             )
           })}
+          </div>
         </div>
       </div>
       
