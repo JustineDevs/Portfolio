@@ -1,4 +1,5 @@
 # On push of tag v*, run the same quality gate as CI, then publish a GitHub Release.
+# Existing tags can be backfilled with a manual workflow run by providing the tag name.
 #
 # Standard (required): docs/releases/<tag>.md must exist (e.g. docs/releases/v0.1.1.md).
 # The release body is loaded from that file; GitHub auto-generated notes are appended after it.
@@ -12,12 +13,55 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing git tag to publish a GitHub Release for (for example `v0.1.0`)
+        required: true
+        type: string
 
 permissions: {}
 
 jobs:
+  resolve-tag:
+    name: Resolve release tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.resolve.outputs.tag }}
+
+    steps:
+      - name: Resolve tag name
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            TAG="$(printf '%s' "$INPUT_TAG" | tr -d '[:space:]')"
+          else
+            TAG="$REF_NAME"
+          fi
+
+          if [ -z "$TAG" ]; then
+            echo "::error title=Missing tag::No release tag was provided."
+            exit 1
+          fi
+
+          case "$TAG" in
+            v*) ;;
+            *)
+              echo "::error title=Invalid tag::Release tags must start with 'v' (received: $TAG)."
+              exit 1
+              ;;
+          esac
+
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
   verify:
     name: Lint, test, and build
+    if: github.event_name == 'push'
+    needs: resolve-tag
     runs-on: ubuntu-latest
     timeout-minutes: 25
     permissions:
@@ -57,7 +101,8 @@ jobs:
 
   release-notes:
     name: Publish GitHub Release
-    needs: verify
+    if: github.event_name == 'push'
+    needs: [resolve-tag, verify]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -70,7 +115,7 @@ jobs:
 
       - name: Require curated release notes
         env:
-          TAG: ${{ github.ref_name }}
+          TAG: ${{ needs.resolve-tag.outputs.tag }}
         run: |
           NOTES="docs/releases/${TAG}.md"
           if [ ! -f "$NOTES" ]; then
@@ -83,9 +128,54 @@ jobs:
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
-          body_path: docs/releases/${{ github.ref_name }}.md
+          tag_name: ${{ needs.resolve-tag.outputs.tag }}
+          name: Release ${{ needs.resolve-tag.outputs.tag }}
+          body_path: docs/releases/${{ needs.resolve-tag.outputs.tag }}.md
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-notes-backfill:
+    name: Publish GitHub Release (manual backfill)
+    if: github.event_name == 'workflow_dispatch'
+    needs: resolve-tag
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Require existing git tag
+        env:
+          TAG: ${{ needs.resolve-tag.outputs.tag }}
+        run: |
+          if ! git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
+            echo "::error title=Missing git tag::Tag not found: ${TAG}"
+            exit 1
+          fi
+
+      - name: Require curated release notes
+        env:
+          TAG: ${{ needs.resolve-tag.outputs.tag }}
+        run: |
+          NOTES="docs/releases/${TAG}.md"
+          if [ ! -f "$NOTES" ]; then
+            echo "::error title=Missing release notes::Required file missing: $NOTES"
+            echo "Add docs/releases/${TAG}.md before running this workflow. See docs/releases/README.md."
+            exit 1
+          fi
+          echo "Release body: $NOTES"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.resolve-tag.outputs.tag }}
+          name: Release ${{ needs.resolve-tag.outputs.tag }}
+          body_path: docs/releases/${{ needs.resolve-tag.outputs.tag }}.md
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

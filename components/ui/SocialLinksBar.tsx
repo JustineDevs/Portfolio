@@ -18,7 +18,10 @@ import {
   Activity,
 } from 'lucide-react'
 
-const PORTFOLIO_REPO_URL = 'https://github.com/JustineDevs/portfolio'
+const PORTFOLIO_REPO_URL = 'https://github.com/JustineDevs/Portfolio'
+const PORTFOLIO_RELEASES_URL = `${PORTFOLIO_REPO_URL}/releases`
+const PORTFOLIO_TAGS_URL = `${PORTFOLIO_REPO_URL}/tags`
+const PORTFOLIO_STARGAZERS_URL = 'https://github.com/JustineDevs/portfolio/stargazers'
 
 type BackendHealth = 'loading' | 'up' | 'down'
 
@@ -199,15 +202,6 @@ export default function SocialLinksBar({
   const socialLinks = links || defaultLinks
   const enabledLinks = socialLinks.filter(link => link.enabled)
 
-  const releaseTag =
-    typeof process.env.NEXT_PUBLIC_APP_VERSION_TAG === 'string'
-      ? process.env.NEXT_PUBLIC_APP_VERSION_TAG
-      : ''
-
-  const portfolioReleaseNotesHref = releaseTag
-    ? `${PORTFOLIO_REPO_URL}/releases/tag/${encodeURIComponent(releaseTag)}`
-    : `${PORTFOLIO_REPO_URL}/releases`
-
   const handleMouseEnter = (index: number, event: React.MouseEvent<HTMLAnchorElement>) => {
     setHoveredIndex(index)
     const rect = event.currentTarget.getBoundingClientRect()
@@ -276,30 +270,31 @@ export default function SocialLinksBar({
           <div className="flex items-center gap-2 xs:gap-2.5 pr-1.5 xs:pr-2 border-r border-[#e5e5e5] mr-1.5 xs:mr-2">
             <div
               className="flex items-center gap-1.5 text-gray-400"
-              title={
-                releaseTag
-                  ? `Release ${releaseTag}. Site visit count.`
-                  : 'Total visits to this site'
-              }
+              title="GitHub releases and tags. Site visit count."
             >
-              <a
-                href={portfolioReleaseNotesHref}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-[14px] min-h-[14px] items-center justify-center text-[8px] xs:text-[9px] font-semibold text-gray-400 tabular-nums leading-none shrink-0 rounded hover:text-[#424242] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
-                title={
-                  releaseTag
-                    ? `Open GitHub release notes for ${releaseTag}`
-                    : 'View GitHub releases'
-                }
-                aria-label={
-                  releaseTag
-                    ? `Release notes for ${releaseTag} on GitHub (opens in a new tab)`
-                    : 'Portfolio releases on GitHub (opens in a new tab)'
-                }
-              >
-                @latest
-              </a>
+              <span className="inline-flex items-center gap-1 text-[8px] xs:text-[9px] font-semibold text-gray-400 leading-none">
+                <a
+                  href={PORTFOLIO_RELEASES_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-[14px] min-h-[14px] items-center justify-center rounded tabular-nums transition-colors hover:text-[#424242] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
+                  title="View GitHub releases"
+                  aria-label="Portfolio releases on GitHub (opens in a new tab)"
+                >
+                  releases
+                </a>
+                <span aria-hidden>/</span>
+                <a
+                  href={PORTFOLIO_TAGS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-[14px] min-h-[14px] items-center justify-center rounded tabular-nums transition-colors hover:text-[#424242] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
+                  title="View GitHub tags"
+                  aria-label="Portfolio tags on GitHub (opens in a new tab)"
+                >
+                  tags
+                </a>
+              </span>
               <Eye size={14} className="shrink-0 text-gray-400" aria-hidden />
               <span
                 className="inline-flex h-[14px] min-h-[14px] items-center text-[11px] text-[#666666] font-medium tabular-nums leading-none min-w-[1.25rem]"
@@ -312,12 +307,12 @@ export default function SocialLinksBar({
             <HeartButton />
             <div className="hidden xs:block w-px h-3.5 bg-[#e5e5e5]" aria-hidden />
             <a
-              href={PORTFOLIO_REPO_URL}
+              href={PORTFOLIO_STARGAZERS_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 rounded-md px-0.5 py-0.5 text-gray-400 transition-colors hover:text-[#424242] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
-              title="Star this repo on GitHub"
-              aria-label={`Portfolio source on GitHub${repoStars !== null ? `, ${repoStars} stargazers` : ''}`}
+              title="View repo stargazers on GitHub"
+              aria-label={`Portfolio stargazers on GitHub${repoStars !== null ? `, ${repoStars} stargazers` : ''}`}
             >
               <Star size={14} className="shrink-0" aria-hidden />
               <span className="text-[11px] text-[#666666] font-medium tabular-nums min-w-[1rem]">

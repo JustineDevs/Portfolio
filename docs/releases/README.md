@@ -7,3 +7,4 @@ Every Git tag that triggers [`.github/workflows/release.yml`](../../.github/work
 - **Before** you push a new tag: bump `package.json` `version`, add `docs/releases/v<version>.md` (use an existing file as a template), then run `pnpm run release:git-tag` and push the tag.
 - The GitHub Release body **always** loads from that file; GitHub’s auto-generated notes are **appended** after your markdown.
 - If the file is missing, the workflow **fails** and no release is created.
+- If a tag already exists and never produced a release, open GitHub Actions, run the `Release` workflow manually, and pass the existing tag name (for example `v0.1.0`) to backfill the release.
