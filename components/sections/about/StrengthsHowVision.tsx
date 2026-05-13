@@ -1,24 +1,24 @@
 "use client"
 
-import React from 'react'
 import CornerDot from '@/components/ui/CornerDot'
+import MarkdownContent from '@/components/content/MarkdownContent'
 
 interface StrengthsHowVisionProps {
   strengthsTitle?: string
-  strengthsBody?: string[]
+  strengthsMarkdown?: string
   thinkingTitle?: string
-  thinkingBody?: string[]
+  thinkingMarkdown?: string
   visionTitle?: string
-  visionBody?: string[]
+  visionMarkdown?: string
 }
 
 export default function StrengthsHowVision({
   strengthsTitle = "",
-  strengthsBody = [],
+  strengthsMarkdown = "",
   thinkingTitle = "",
-  thinkingBody = [],
+  thinkingMarkdown = "",
   visionTitle = "",
-  visionBody = [],
+  visionMarkdown = "",
 }: StrengthsHowVisionProps) {
   return (
     <section className="relative border-l border-r border-b border-[#d5d5d5] bg-white">
@@ -31,9 +31,7 @@ export default function StrengthsHowVision({
               {strengthsTitle}
             </h2>
             <div className="space-y-3 xs:space-y-4 text-[12px] xs:text-[13px] sm:text-[14px] leading-[1.7] text-[#555555]">
-              {strengthsBody.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              <MarkdownContent markdown={strengthsMarkdown} />
             </div>
           </div>
 
@@ -42,9 +40,7 @@ export default function StrengthsHowVision({
               {thinkingTitle}
             </h2>
             <div className="space-y-3 xs:space-y-4 text-[12px] xs:text-[13px] sm:text-[14px] leading-[1.7] text-[#555555]">
-              {thinkingBody.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              <MarkdownContent markdown={thinkingMarkdown} />
             </div>
           </div>
 
@@ -53,9 +49,7 @@ export default function StrengthsHowVision({
               {visionTitle}
             </h2>
             <div className="text-[12px] xs:text-[13px] sm:text-[14px] leading-[1.7] text-[#555555]">
-              {visionBody.map((paragraph, index) => (
-                <p key={index}>{paragraph}</p>
-              ))}
+              <MarkdownContent markdown={visionMarkdown} />
             </div>
           </div>
         </div>

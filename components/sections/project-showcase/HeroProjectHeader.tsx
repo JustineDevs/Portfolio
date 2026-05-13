@@ -7,6 +7,7 @@ import { Github, Twitter, Globe, Share2, ExternalLink, ChevronDown, Calendar } f
 import LiquidImage from '@/components/ui/LiquidImage'
 import CornerDot from '@/components/ui/CornerDot'
 import type { PublicProject } from '@/lib/content/types'
+import { isSvgAssetUrl } from '@/lib/asset-urls'
 
 interface HeroProjectHeaderProps {
   project: PublicProject
@@ -93,6 +94,7 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
                 fill
                 className="object-cover"
                 priority
+                unoptimized={isSvgAssetUrl(project.coverImageUrl)}
               />
             ) : null}
           </div>

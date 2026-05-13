@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import MarkdownContent from "@/components/content/MarkdownContent";
 import PageLayout from "@/components/layouts/PageLayout";
 import { getPublishedPostBySlug } from "@/lib/content/public";
 import { getPublicLegalLinks } from "@/lib/legal-links";
@@ -45,13 +46,8 @@ export default async function BlogPostPage({
             {post.summary}
           </p>
 
-          <div className="mt-10 max-w-3xl space-y-5 text-[14px] sm:text-[16px] leading-[1.9] text-[#424242]">
-            {(post.bodyMd || "")
-              .split(/\n\n+/)
-              .filter(Boolean)
-              .map((paragraph, index) => (
-                <p key={index}>{paragraph.replace(/^##\s*/, "")}</p>
-              ))}
+          <div className="mt-10 max-w-3xl">
+            <MarkdownContent markdown={post.bodyMd || ""} />
           </div>
         </div>
       </article>

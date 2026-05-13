@@ -2,6 +2,8 @@ import { and, asc, desc, eq, inArray } from "drizzle-orm";
 
 import type { PublicPost, PublicProject } from "@/lib/content/types";
 import { db } from "@/db/client";
+import { normalizeAssetFieldsInObject, normalizeOptionalAssetUrl } from "@/lib/asset-urls";
+import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 import {
   awards,
   githubActivitySnapshots,
@@ -75,7 +77,7 @@ export async function getPublishedPosts() {
       postType: post.postType,
       sourcePlatform: post.sourcePlatform,
       canonicalUrl: post.canonicalUrl,
-      coverImageUrl: post.coverImageUrl,
+      coverImageUrl: normalizeOptionalAssetUrl(post.coverImageUrl),
       featured: post.featured,
       publishedAt: post.publishedAt,
     }));
@@ -106,7 +108,7 @@ export async function getPublishedPostBySlug(slug: string) {
       postType: post.postType,
       sourcePlatform: post.sourcePlatform,
       canonicalUrl: post.canonicalUrl,
-      coverImageUrl: post.coverImageUrl,
+      coverImageUrl: normalizeOptionalAssetUrl(post.coverImageUrl),
       featured: post.featured,
       publishedAt: post.publishedAt,
     };
@@ -129,11 +131,16 @@ export async function getPublishedTestimonials() {
 
 export async function getPublishedAwards() {
   try {
-    return await db
+    const rows = await db
       .select()
       .from(awards)
       .where(eq(awards.status, "published"))
       .orderBy(desc(awards.featured), asc(awards.sortOrder), desc(awards.updatedAt));
+
+    return rows.map((award) => ({
+      ...award,
+      logoUrl: normalizeOptionalAssetUrl(award.logoUrl),
+    }));
   } catch {
     return [];
   }
@@ -141,11 +148,37 @@ export async function getPublishedAwards() {
 
 export async function getPublishedPageSections(pageKey: string) {
   try {
-    return await db
+    const rows = await db
       .select()
       .from(pageSections)
       .where(and(eq(pageSections.pageKey, pageKey), eq(pageSections.status, "published")))
       .orderBy(asc(pageSections.sortOrder), asc(pageSections.sectionKey));
+
+    const normalizedRows = rows.map((section) => {
+      const normalized = {
+        ...section,
+        sectionKey:
+          pageKey === "about" ? canonicalizeAboutSectionKey(section.sectionKey) : section.sectionKey,
+        sortOrder:
+          pageKey === "about"
+            ? getAboutSectionSortOrder(section.sectionKey, section.sortOrder)
+            : section.sortOrder,
+      };
+      if (!section.metaJson) return normalized;
+      try {
+        const parsed = JSON.parse(section.metaJson);
+        return {
+          ...normalized,
+          metaJson: JSON.stringify(normalizeAssetFieldsInObject(parsed)),
+        };
+      } catch {
+        return normalized;
+      }
+    });
+
+    return pageKey === "about"
+      ? normalizedRows.sort((a, b) => a.sortOrder - b.sortOrder)
+      : normalizedRows;
   } catch {
     return [];
   }
@@ -153,11 +186,16 @@ export async function getPublishedPageSections(pageKey: string) {
 
 export async function getPublishedHighlights() {
   try {
-    return await db
+    const rows = await db
       .select()
       .from(highlights)
       .where(eq(highlights.status, "published"))
       .orderBy(desc(highlights.pinned), asc(highlights.sortOrder), desc(highlights.updatedAt));
+
+    return rows.map((highlight) => ({
+      ...highlight,
+      imageUrlOverride: normalizeOptionalAssetUrl(highlight.imageUrlOverride),
+    }));
   } catch {
     return [];
   }
@@ -255,8 +293,8 @@ async function hydrateProjects(
     category: project.category,
     publishedAt: project.publishedAt,
     featured: project.featured,
-    coverImageUrl: project.coverImageUrl,
-    bannerImageUrl: project.bannerImageUrl,
+    coverImageUrl: normalizeOptionalAssetUrl(project.coverImageUrl),
+    bannerImageUrl: normalizeOptionalAssetUrl(project.bannerImageUrl),
     authorName: project.authorName,
     authorUrl: project.authorUrl,
     websiteUrl: project.websiteUrl,

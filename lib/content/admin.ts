@@ -2,6 +2,7 @@ import { asc, count, desc, eq, inArray } from "drizzle-orm";
 
 import { db } from "@/db/client";
 import { requireAdminSession } from "@/lib/auth";
+import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 import {
   awards,
   githubActivitySnapshots,
@@ -100,20 +101,49 @@ export async function listPageSectionsForAdmin(pageKey?: string) {
   await requireAdminSession();
 
   if (!pageKey) {
-    return db.select().from(pageSections).orderBy(asc(pageSections.pageKey), asc(pageSections.sortOrder));
+    const rows = await db.select().from(pageSections).orderBy(asc(pageSections.pageKey), asc(pageSections.sortOrder));
+    return rows.map((section) =>
+      section.pageKey === "about"
+        ? {
+            ...section,
+            sectionKey: canonicalizeAboutSectionKey(section.sectionKey),
+            sortOrder: getAboutSectionSortOrder(section.sectionKey, section.sortOrder),
+          }
+        : section,
+    );
   }
 
-  return db
+  const rows = await db
     .select()
     .from(pageSections)
     .where(eq(pageSections.pageKey, pageKey))
     .orderBy(asc(pageSections.sortOrder));
+
+  if (pageKey !== "about") {
+    return rows;
+  }
+
+  return rows
+    .map((section) => ({
+      ...section,
+      sectionKey: canonicalizeAboutSectionKey(section.sectionKey),
+      sortOrder: getAboutSectionSortOrder(section.sectionKey, section.sortOrder),
+    }))
+    .sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
 export async function getPageSectionForAdmin(id: number) {
   await requireAdminSession();
   const rows = await db.select().from(pageSections).where(eq(pageSections.id, id)).limit(1);
-  return rows[0] ?? null;
+  const section = rows[0] ?? null;
+  if (!section) return null;
+  if (section.pageKey !== "about") return section;
+
+  return {
+    ...section,
+    sectionKey: canonicalizeAboutSectionKey(section.sectionKey),
+    sortOrder: getAboutSectionSortOrder(section.sectionKey, section.sortOrder),
+  };
 }
 
 export async function listSiteSettingsForAdmin() {

@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
+import { isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
 
 interface LiquidImageProps {
   src: string
@@ -164,19 +165,67 @@ export default function LiquidImage({
 }: LiquidImageProps) {
   const [isClient, setIsClient] = useState(false)
   const [hasError, setHasError] = useState(false)
+  const [isTextureReady, setIsTextureReady] = useState(false)
+  const normalizedSrc = useMemo(() => normalizeAssetUrl(src), [src])
+  const fallbackSrc = '/v2/showcase/banner.png'
+  const shouldUseCanvas = isClient && !hasError && isTextureReady && !isSvgAssetUrl(normalizedSrc)
 
   useEffect(() => {
     setIsClient(true)
   }, [])
 
-  if (!isClient || hasError) {
+  useEffect(() => {
+    if (!isClient) return
+
+    setHasError(false)
+    setIsTextureReady(false)
+
+    if (!normalizedSrc) {
+      setHasError(true)
+      return
+    }
+
+    if (isSvgAssetUrl(normalizedSrc)) {
+      setIsTextureReady(true)
+      return
+    }
+
+    let cancelled = false
+    const image = new Image()
+    image.crossOrigin = 'anonymous'
+    image.decoding = 'async'
+    image.onload = () => {
+      if (!cancelled) {
+        setIsTextureReady(true)
+      }
+    }
+    image.onerror = () => {
+      if (!cancelled) {
+        setHasError(true)
+      }
+    }
+    image.src = normalizedSrc
+
+    return () => {
+      cancelled = true
+      image.onload = null
+      image.onerror = null
+    }
+  }, [isClient, normalizedSrc])
+
+  if (!shouldUseCanvas) {
     return (
       <div className={`relative w-full h-full overflow-hidden ${className}`}>
         <img
-          src={src}
+          src={hasError ? fallbackSrc : normalizedSrc}
           alt={alt}
           className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-500"
-          onError={() => setHasError(true)}
+          onError={(event) => {
+            if (event.currentTarget.src !== new URL(fallbackSrc, window.location.origin).toString()) {
+              event.currentTarget.src = fallbackSrc
+            }
+            setHasError(true)
+          }}
         />
       </div>
     )
@@ -191,7 +240,7 @@ export default function LiquidImage({
         onError={() => setHasError(true)}
       >
         <React.Suspense fallback={null}>
-          <LiquidScene src={src} strength={strength} speed={speed} size={size} />
+          <LiquidScene src={normalizedSrc} strength={strength} speed={speed} size={size} />
         </React.Suspense>
       </Canvas>
     </div>

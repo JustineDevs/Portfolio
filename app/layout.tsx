@@ -28,6 +28,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const enableVercelAnalytics =
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PUBLIC_ENABLE_VERCEL_ANALYTICS === "true";
+  const enableVercelSpeedInsights =
+    process.env.NODE_ENV === "production" &&
+    process.env.NEXT_PUBLIC_ENABLE_VERCEL_SPEED_INSIGHTS === "true";
+
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="font-sans antialiased cursor-none">
@@ -44,8 +51,8 @@ export default function RootLayout({
             </SmoothScrollProvider>
           </ModeProvider>
         </ErrorBoundary>
-        <Analytics />
-        <SpeedInsights />
+        {enableVercelAnalytics ? <Analytics /> : null}
+        {enableVercelSpeedInsights ? <SpeedInsights /> : null}
       </body>
     </html>
   );

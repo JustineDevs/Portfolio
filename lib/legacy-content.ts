@@ -66,36 +66,36 @@ export const legacyAboutSections = {
     subtitle: "Who Is Justine? The Quiet Architect Behind the Screens",
     imageUrl: "/Justinedevs_Banner.png",
   },
-  sidebarIntro: {
+  readingMap: {
     dateLabel: "January 20, 2026",
     heading: "About",
     subheading: "Beyond Engineer Invisible Systems",
     panels: legacyAboutPanels,
   },
-  story: {
-    title: "Story",
+  narrative: {
+    title: "Who I Am",
     body:
       "I'm a builder who lives at the intersection of code, markets, and communities.\n\nI treat the browser as a control panel for complex systems. My journey started with user interfaces, but I quickly moved to infrastructure—designing workflows that help teams ship faster and safer.",
   },
-  responsibilities: {
-    title: "Responsibilities",
+  principles: {
+    title: "Principles & Methodology",
     body:
-      "I Don't Wait for Permission. I Build the Whole Stack.\n\nEnd-to-end accountability. From whiteboard to production in 72 hours. I build SDKs, design APIs, and ship features that work. I prioritize security and system design over superficial aesthetics.\n\nEnd-to-end accountability. From whiteboard to production in 72 hours. I build SDKs, design APIs, and ship features that work. I prioritize security and system design over superficial aesthetics.",
+      "I don't treat work as disconnected tasks. I think in systems, feedback loops, and leverage.\n\nMy methodology is usually: map the constraint, sketch the shape, ship the smallest honest version, then tighten the system with tests, iteration, and better abstractions.\n\nThis section is intentionally personal and flexible. It can hold principles, methodology, under-the-hood process, or how I learn through building.",
   },
-  strengths: {
-    title: "Strengths & Weaknesses",
+  learning: {
+    title: "What I'm Learning",
     body:
-      "Systems thinking: I see patterns across domains. I break complex problems into small, testable moves. Bias toward action: I ship fast, learn faster. I'm comfortable with ambiguity and willing to learn in public. Consistency: I show up. I've been a Web3 community moderator since 2022, evolving from volunteer to paid projects.\n\nWeaknesses: I overthink. I struggle to delegate. I have finite social energy. I'm working on these.",
+      "I learn by building through ambiguity, not by waiting for a perfect map.\n\nLately that means sharpening system design, technical writing, product judgment, and the discipline to turn intuition into repeatable methodology.",
   },
-  thinking: {
-    title: "How am I think?",
+  underTheHood: {
+    title: "Under the Hood",
     body:
-      "My mental model is a graph. I break problems into small, testable moves. I have a pattern-seeking instinct—I encode solutions into tools. I prefer building over talking.",
+      "My mental model is a graph. I look for structure, dependencies, failure points, and leverage.\n\nWhen something repeats, I want to turn it into a tool, a system, or a better interface.",
   },
-  vision: {
-    title: "What my vision?",
+  northStar: {
+    title: "What I Care About",
     body:
-      "I want complex digital systems to feel natural and transparent. I want people to interact with programmable money, automation, and governance without needing to see the underlying machinery. I'm building interfaces that feel calm over powerful engines.",
+      "I care about building software that makes complex systems feel legible and calm.\n\nWhether it's interfaces, infrastructure, or developer tooling, I want the machinery underneath to be powerful while the experience above it feels human.",
   },
 } as const;
 

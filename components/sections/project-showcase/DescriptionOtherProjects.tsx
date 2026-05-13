@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import MarkdownContent from '@/components/content/MarkdownContent'
 import LiquidImage from '@/components/ui/LiquidImage'
 import type { PublicProject } from '@/lib/content/types'
 
@@ -21,13 +22,7 @@ export default function DescriptionOtherProjects({ project, otherProjects }: Des
               </div>
               <div className="p-4 sm:p-6">
                 {project.bodyMd ? (
-                  <div className="space-y-3 sm:space-y-4">
-                    {project.bodyMd.split(/\n\n+/).filter(Boolean).map((paragraph, index) => (
-                      <p key={index} className="text-sm sm:text-base text-[#666666] leading-relaxed">
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
+                  <MarkdownContent markdown={project.bodyMd} />
                 ) : (
                   <p className="text-sm sm:text-base text-[#666666] leading-relaxed">{project.summary}</p>
                 )}

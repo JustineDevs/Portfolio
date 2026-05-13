@@ -25,6 +25,8 @@ import {
 } from "@/db/schema";
 import { and, eq, ne } from "drizzle-orm";
 import { fetchGithubActivityForYear, saveGithubActivitySnapshot } from "@/lib/github/activity";
+import { normalizeOptionalAssetUrl } from "@/lib/asset-urls";
+import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 
 function stringValue(formData: FormData, key: string) {
   return formData.get(key)?.toString().trim() ?? "";
@@ -205,6 +207,10 @@ function validateOptionalUrl(value: string | null, returnTo: string, label: stri
   return value
 }
 
+function validateOptionalImageUrl(value: string | null, returnTo: string, label: string) {
+  return normalizeOptionalAssetUrl(validateOptionalUrl(value, returnTo, label))
+}
+
 export async function signOutAdminAction() {
   await signOut({ redirectTo: "/admin/login" });
 }
@@ -225,8 +231,8 @@ export async function saveProjectAction(formData: FormData) {
     status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
     publishedAt: normalizePublishedAt(optionalString(formData, "publishedAt"), returnTo),
     featured: parseBoolean(formData, "featured"),
-    coverImageUrl: validateOptionalUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL"),
-    bannerImageUrl: validateOptionalUrl(optionalString(formData, "bannerImageUrl"), returnTo, "Banner Image URL"),
+    coverImageUrl: validateOptionalImageUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL"),
+    bannerImageUrl: validateOptionalImageUrl(optionalString(formData, "bannerImageUrl"), returnTo, "Banner Image URL"),
     authorName: stringValue(formData, "authorName"),
     authorUrl: validateOptionalUrl(optionalString(formData, "authorUrl"), returnTo, "Author URL"),
     websiteUrl: validateOptionalUrl(optionalString(formData, "websiteUrl"), returnTo, "Website URL"),
@@ -330,7 +336,7 @@ export async function savePostAction(formData: FormData) {
     postType: parsePostType(stringValue(formData, "postType") || "native", returnTo),
     sourcePlatform: optionalString(formData, "sourcePlatform"),
     canonicalUrl: validateOptionalUrl(optionalString(formData, "canonicalUrl"), returnTo, "Canonical URL", false),
-    coverImageUrl: validateOptionalUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL"),
+    coverImageUrl: validateOptionalImageUrl(optionalString(formData, "coverImageUrl"), returnTo, "Cover Image URL"),
     status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
     publishedAt: normalizePublishedAt(optionalString(formData, "publishedAt"), returnTo),
     featured: parseBoolean(formData, "featured"),
@@ -381,15 +387,21 @@ export async function savePageSectionAction(formData: FormData) {
       redirectWithError("/admin/about", "Meta JSON must be valid JSON.");
     }
   }
+  const pageKey = stringValue(formData, "pageKey");
+  const rawSectionKey = stringValue(formData, "sectionKey");
+  const sectionKey = pageKey === "about" ? canonicalizeAboutSectionKey(rawSectionKey) : rawSectionKey;
   const payload = {
-    pageKey: stringValue(formData, "pageKey"),
-    sectionKey: stringValue(formData, "sectionKey"),
+    pageKey,
+    sectionKey,
     title: optionalString(formData, "title"),
     subtitle: optionalString(formData, "subtitle"),
     bodyMd: optionalString(formData, "bodyMd"),
     metaJson,
     status: parseStatus(stringValue(formData, "status") || "draft", "/admin/about"),
-    sortOrder: Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
+    sortOrder:
+      pageKey === "about"
+        ? getAboutSectionSortOrder(sectionKey, Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0)
+        : Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
     updatedAt: new Date().toISOString(),
   };
 
@@ -413,7 +425,7 @@ export async function saveHighlightAction(formData: FormData) {
     targetId: Number.parseInt(stringValue(formData, "targetId"), 10) || null,
     titleOverride: optionalString(formData, "titleOverride"),
     summaryOverride: optionalString(formData, "summaryOverride"),
-    imageUrlOverride: validateOptionalUrl(optionalString(formData, "imageUrlOverride"), "/admin/highlights", "Image Override"),
+    imageUrlOverride: validateOptionalImageUrl(optionalString(formData, "imageUrlOverride"), "/admin/highlights", "Image Override"),
     linkOverride: validateOptionalUrl(optionalString(formData, "linkOverride"), "/admin/highlights", "Link Override"),
     pinned: parseBoolean(formData, "pinned"),
     status: parseStatus(stringValue(formData, "status") || "draft", "/admin/highlights"),

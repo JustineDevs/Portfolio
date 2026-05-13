@@ -12,6 +12,7 @@ import Modal from '@/components/ui/Modal'
 import { useToast } from '@/components/providers/ToastProvider'
 import GithubActivitySection from '@/components/sections/GithubActivitySection'
 import type { PublicProject } from '@/lib/content/types'
+import { isSvgAssetUrl } from '@/lib/asset-urls'
 
 interface CellData {
   level: number
@@ -544,6 +545,7 @@ export default function ResumePage({
                             alt={award.title} 
                             fill 
                             className="object-contain" 
+                            unoptimized={isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png")}
                           />
                         </div>
                         <div className="flex flex-col leading-tight">

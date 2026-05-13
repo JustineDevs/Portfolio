@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import type { PublicProject } from '@/lib/content/types'
 
 interface ResponsibilitiesNetworksProps {
@@ -17,6 +16,42 @@ export default function ResponsibilitiesNetworks({ project }: ResponsibilitiesNe
               <h2 className="text-lg sm:text-xl font-bold text-[#424242]">Responsibilities</h2>
             </div>
             <div className="p-4 sm:p-6">
+              {(project.tags.length > 0 || project.technologies.length > 0) && (
+                <div className="mb-6 space-y-5 sm:mb-8">
+                  {project.tags.length > 0 && (
+                    <div>
+                      <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#666666]">Tags</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {project.tags.map((tag, index) => (
+                          <span
+                            key={`${tag}-${index}`}
+                            className="inline-flex min-h-[36px] items-center rounded-full border border-[#d5d5d5] bg-white px-3 py-1.5 text-xs font-semibold text-[#424242]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {project.technologies.length > 0 && (
+                    <div>
+                      <h3 className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#666666]">Technologies</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {project.technologies.map((technology, index) => (
+                          <span
+                            key={`${technology}-${index}`}
+                            className="inline-flex min-h-[36px] items-center rounded-full border border-[#d5d5d5] bg-[#424242] px-3 py-1.5 text-xs font-semibold text-white"
+                          >
+                            {technology}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <h3 className="text-base sm:text-lg font-semibold text-[#424242] mb-3 sm:mb-4">My Responsibilities</h3>
               {project.responsibilities && (
                 <ul className="space-y-2 sm:space-y-3">

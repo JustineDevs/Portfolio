@@ -13,22 +13,16 @@ export default async function AboutPage() {
   ])
   const byKey = Object.fromEntries(sections.map((section) => [section.sectionKey, section]))
   const heroMeta = byKey.hero?.metaJson ? JSON.parse(byKey.hero.metaJson) : {}
-  const sidebarMeta = byKey.sidebar_intro?.metaJson ? JSON.parse(byKey.sidebar_intro.metaJson) : {}
-  const storyParagraphs = byKey.story?.bodyMd?.split(/\n\n+/).filter(Boolean) ?? []
-  const responsibilitiesParagraphs =
-    byKey.responsibilities?.bodyMd?.split(/\n\n+/).filter(Boolean) ?? []
-  const strengthsBody = byKey.strengths?.bodyMd?.split(/\n\n+/).filter(Boolean) ?? []
-  const thinkingBody = byKey.thinking?.bodyMd?.split(/\n\n+/).filter(Boolean) ?? []
-  const visionBody = byKey.vision?.bodyMd?.split(/\n\n+/).filter(Boolean) ?? []
+  const sidebarMeta = byKey.reading_map?.metaJson ? JSON.parse(byKey.reading_map.metaJson) : {}
 
   return (
     <PageLayout legalLinks={legalLinks}>
       <div className="flex flex-col lg:flex-row border-l border-[#d5d5d5]">
         {/* Left Sidebar - Hidden on mobile, visible on desktop */}
         <Sidebar
-          dateLabel={byKey.sidebar_intro?.bodyMd || undefined}
-          heading={byKey.sidebar_intro?.title || undefined}
-          subheading={byKey.sidebar_intro?.subtitle || undefined}
+          dateLabel={byKey.reading_map?.bodyMd || undefined}
+          heading={byKey.reading_map?.title || undefined}
+          subheading={byKey.reading_map?.subtitle || undefined}
           navSections={sidebarMeta.panels || []}
         />
 
@@ -40,19 +34,18 @@ export default async function AboutPage() {
             imageUrl={heroMeta.imageUrl}
           />
           <StoryResponsibilities
-            storyTitle={byKey.story?.title || undefined}
-            storyParagraphs={storyParagraphs}
-            responsibilitiesTitle={byKey.responsibilities?.title || undefined}
-            responsibilitiesHeading={responsibilitiesParagraphs[0] || undefined}
-            responsibilitiesParagraphs={responsibilitiesParagraphs.slice(1)}
+            storyTitle={byKey.narrative?.title || undefined}
+            storyMarkdown={byKey.narrative?.bodyMd || ""}
+            responsibilitiesTitle={byKey.principles?.title || undefined}
+            responsibilitiesMarkdown={byKey.principles?.bodyMd || ""}
           />
           <StrengthsHowVision
-            strengthsTitle={byKey.strengths?.title || undefined}
-            strengthsBody={strengthsBody}
-            thinkingTitle={byKey.thinking?.title || undefined}
-            thinkingBody={thinkingBody}
-            visionTitle={byKey.vision?.title || undefined}
-            visionBody={visionBody}
+            strengthsTitle={byKey.learning?.title || undefined}
+            strengthsMarkdown={byKey.learning?.bodyMd || ""}
+            thinkingTitle={byKey.under_the_hood?.title || undefined}
+            thinkingMarkdown={byKey.under_the_hood?.bodyMd || ""}
+            visionTitle={byKey.north_star?.title || undefined}
+            visionMarkdown={byKey.north_star?.bodyMd || ""}
           />
         </div>
       </div>
