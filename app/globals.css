@@ -48,9 +48,13 @@ html, body {
   font-family: 'Courier New', monospace;
 }
 
-/* Smooth transitions */
-* {
-  transition: color 0.2s ease, background-color 0.2s ease;
+/* Smooth transitions on interactive elements only (global * transitions harm CLS/INP) */
+@media (prefers-reduced-motion: no-preference) {
+  a,
+  button,
+  [role="button"] {
+    transition: color 0.2s ease, background-color 0.2s ease;
+  }
 }
 
 /* Enhanced focus indicators for accessibility */
@@ -75,7 +79,7 @@ html, body {
 
 .sr-only:focus,
 .focus\:not-sr-only:focus {
-  position: static;
+  /* Do not force position: static — it overrides skip-link focus positioning and can spike CLS. */
   width: auto;
   height: auto;
   padding: inherit;
