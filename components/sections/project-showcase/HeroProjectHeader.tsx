@@ -3,24 +3,23 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getProjectBySlug, projects } from '@/lib/projects'
 import { Github, Twitter, Globe, Share2, ExternalLink, ChevronDown, Calendar } from 'lucide-react'
 import LiquidImage from '@/components/ui/LiquidImage'
 import CornerDot from '@/components/ui/CornerDot'
+import type { PublicProject } from '@/lib/content/types'
 
 interface HeroProjectHeaderProps {
-  slug: string
+  project: PublicProject
 }
 
-export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
-  const project = getProjectBySlug(slug) || projects.hyperkit
+export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
   const detailsRef = useRef<HTMLDivElement>(null)
 
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
         title: project.title,
-        text: project.description,
+        text: project.summary,
         url: window.location.href,
       })
     } else {
@@ -51,9 +50,9 @@ export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
             <div className="flex items-center gap-2 sm:gap-3">
               <span className="text-xs sm:text-sm text-[#666666] hidden sm:inline">Project Socials:</span>
               <div className="flex items-center gap-1">
-                {project.socialLinks?.github && (
+                {project.links.find((link) => link.type === "github")?.url && (
                   <a
-                    href={project.socialLinks.github}
+                    href={project.links.find((link) => link.type === "github")?.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 hover:bg-[#F8FAFC] rounded-lg transition border border-transparent hover:border-[#d5d5d5] min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -61,9 +60,9 @@ export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
                     <Github className="w-5 h-5 text-[#424242]" />
                   </a>
                 )}
-                {project.socialLinks?.twitter && (
+                {project.links.find((link) => link.type === "twitter")?.url && (
                   <a
-                    href={project.socialLinks.twitter}
+                    href={project.links.find((link) => link.type === "twitter")?.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 hover:bg-[#F8FAFC] rounded-lg transition border border-transparent hover:border-[#d5d5d5] min-h-[44px] min-w-[44px] flex items-center justify-center"
@@ -79,17 +78,17 @@ export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
         {/* Banner Image Area */}
         <div className="border-l border-r border-b border-[#d5d5d5] bg-white relative overflow-hidden">
           <div className="relative h-[280px] sm:h-[350px] md:h-[450px] lg:h-[600px] bg-gray-50">
-            {project.bannerImage ? (
+            {project.bannerImageUrl ? (
               <LiquidImage
-                src={project.bannerImage}
+                src={project.bannerImageUrl}
                 alt={project.title}
                 strength={0.3}
                 speed={0.5}
                 size={0.6}
               />
-            ) : project.coverImage ? (
+            ) : project.coverImageUrl ? (
               <Image
-                src={project.coverImage}
+                src={project.coverImageUrl}
                 alt={project.title}
                 fill
                 className="object-cover"
@@ -104,7 +103,7 @@ export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
           <div className="p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#1342FF]"></span>
-              <span className="text-xs sm:text-sm text-[#666666] font-bold uppercase tracking-widest">{project.date}</span>
+              <span className="text-xs sm:text-sm text-[#666666] font-bold uppercase tracking-widest">{project.publishedAt ?? ""}</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-bold text-[#424242] mb-4 sm:mb-6 md:mb-8 tracking-tight leading-[0.95]">
@@ -112,7 +111,7 @@ export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
             </h1>
             
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-[#666666] leading-relaxed max-w-4xl mb-6 sm:mb-8 md:mb-12">
-              {project.description}
+              {project.summary}
             </p>
 
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
@@ -175,21 +174,21 @@ export default function HeroProjectHeader({ slug }: HeroProjectHeaderProps) {
               <span className="text-[10px] text-[#666666] uppercase tracking-[0.2em] font-black block mb-3 sm:mb-4">Author</span>
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-7 sm:w-8 h-7 sm:h-8 rounded-full bg-[#1342FF] flex items-center justify-center text-white text-[11px] sm:text-[12px] font-bold flex-shrink-0">
-                  {project.author.charAt(0)}
+                  {project.authorName.charAt(0)}
                 </div>
-                <span className="text-[#424242] font-bold text-base sm:text-lg truncate">{project.author}</span>
+                <span className="text-[#424242] font-bold text-base sm:text-lg truncate">{project.authorName}</span>
               </div>
             </div>
 
             <div className="p-4 sm:p-6 md:p-8">
               <span className="text-[10px] text-[#666666] uppercase tracking-[0.2em] font-black block mb-3 sm:mb-4">Official Site</span>
               <a
-                href={project.authorWebsite}
+                href={project.authorUrl || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#1342FF] font-bold text-base sm:text-lg hover:underline transition truncate block"
               >
-                {project.authorWebsite.replace('https://', '').replace('www.', '')}
+                {(project.authorUrl || "").replace('https://', '').replace('www.', '')}
               </a>
             </div>
           </div>
