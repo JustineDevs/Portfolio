@@ -1,7 +1,13 @@
 #!/bin/sh
 # Run the same checks as GitHub Actions before allowing a push.
+# Skipped when pushing via `pnpm run ci:push` (checks already ran there).
 set -e
 cd "$(git rev-parse --show-toplevel)" || exit 1
+
+if [ -n "$GIT_PUSH_BYPASS_HOOK" ]; then
+  exit 0
+fi
+
 echo ""
 echo "pre-push: running ci:check (lint, test, production build)..."
 echo ""
