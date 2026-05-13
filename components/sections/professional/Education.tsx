@@ -17,7 +17,10 @@ export default function Education() {
       institution: 'Far East Asia Pacific Institute of Tourism Science and Technology',
       degree: 'Senior High School',
       specialization: 'ICT',
+      status: 'Graduated',
       period: '2022-2024',
+      proofLabel: 'Batch 13 proof',
+      proofHref: 'https://www.facebook.com/reel/728813249571957',
     },
   ]
 
@@ -36,11 +39,29 @@ export default function Education() {
               <p className="text-[14px] font-medium text-[#666666] mb-1">
                 {edu.degree} {edu.specialization && `(${edu.specialization})`}
               </p>
-              {edu.status && (
-                <span className="inline-block px-2 py-1 text-[11px] text-[#666666] bg-[#f5f5f5] rounded border border-[#e0e0e0] mb-2">
-                  {edu.status}
-                </span>
-              )}
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                {edu.status && (
+                  <span
+                    className={
+                      edu.status === 'Graduated'
+                        ? 'inline-block px-2 py-1 text-[11px] font-semibold text-[#166534] bg-[#ecfdf5] rounded border border-[#86efac]'
+                        : 'inline-block px-2 py-1 text-[11px] text-[#666666] bg-[#f5f5f5] rounded border border-[#e0e0e0]'
+                    }
+                  >
+                    {edu.status}
+                  </span>
+                )}
+                {edu.proofHref && edu.proofLabel && (
+                  <a
+                    href={edu.proofHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-2 py-1 text-[11px] font-semibold text-[#1342FF] bg-[#eef2ff] rounded border border-[#c7d2fe] hover:bg-[#e0e7ff] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1342FF]"
+                  >
+                    {edu.proofLabel}
+                  </a>
+                )}
+              </div>
               <div className="flex items-center gap-2 text-[12px] text-[#666666]">
                 <span>{edu.period}</span>
                 {edu.year && (
