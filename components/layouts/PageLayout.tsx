@@ -2,7 +2,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import SocialLinksBar from '@/components/ui/SocialLinksBar'
 import AsciiBackground from '@/components/ui/AsciiBackground'
-import type { PublicLegalLinks } from '@/lib/legal-links'
+import type { PublicLegalLinks } from '@/lib/legal-links-shared'
 
 interface PageLayoutProps {
   children: React.ReactNode
