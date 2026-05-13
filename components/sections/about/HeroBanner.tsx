@@ -4,7 +4,17 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import CornerDot from '@/components/ui/CornerDot'
 
-export default function HeroBanner() {
+interface HeroBannerProps {
+  title?: string
+  subtitle?: string
+  imageUrl?: string
+}
+
+export default function HeroBanner({
+  title = "",
+  subtitle = "",
+  imageUrl = "/Justinedevs_Banner.png",
+}: HeroBannerProps) {
   const [isScanning, setIsScanning] = useState(true)
   const [scanComplete, setScanComplete] = useState(false)
 
@@ -32,11 +42,11 @@ export default function HeroBanner() {
       
       <div className="p-4 xs:p-5 sm:p-6 md:p-8 lg:p-12">
         <h1 className="text-[28px] xs:text-[36px] sm:text-[42px] md:text-[48px] lg:text-[64px] font-bold text-[#424242] tracking-tight mb-4 xs:mb-5 sm:mb-6 leading-tight">
-          Behind the Code: Justine&apos;s Hidden Architectures
+          {title}
         </h1>
         
         <p className="text-[14px] xs:text-[16px] sm:text-[18px] lg:text-[20px] text-[#666666] mb-5 xs:mb-6 sm:mb-8 italic">
-          Who Is Justine? The Quiet Architect Behind the Screens
+          {subtitle}
         </p>
 
         <div className="relative w-full aspect-[3/1] rounded-lg overflow-hidden border border-[#d5d5d5] bg-black">
@@ -44,7 +54,7 @@ export default function HeroBanner() {
             className={`absolute inset-0 transition-opacity duration-1000 ${scanComplete ? 'opacity-100' : 'opacity-0'}`}
           >
             <Image
-              src="/Justinedevs_Banner.png"
+              src={imageUrl}
               alt="Justine Devs Banner"
               fill
               className="object-cover"
