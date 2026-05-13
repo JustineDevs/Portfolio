@@ -1,17 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { getProjectBySlug, getOtherProjects, projects } from '@/lib/projects'
 import LiquidImage from '@/components/ui/LiquidImage'
+import type { PublicProject } from '@/lib/content/types'
 
 interface DescriptionOtherProjectsProps {
-  slug: string
+  project: PublicProject
+  otherProjects: PublicProject[]
 }
 
-export default function DescriptionOtherProjects({ slug }: DescriptionOtherProjectsProps) {
-  const project = getProjectBySlug(slug) || projects.hyperkit
-  const otherProjects = getOtherProjects(slug, 2)
-
+export default function DescriptionOtherProjects({ project, otherProjects }: DescriptionOtherProjectsProps) {
   return (
     <section className="bg-[#F8FAFC]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
@@ -22,16 +20,16 @@ export default function DescriptionOtherProjects({ slug }: DescriptionOtherProje
                 <h2 className="text-lg sm:text-xl font-bold text-[#424242]">Description</h2>
               </div>
               <div className="p-4 sm:p-6">
-                {project.longDescription ? (
+                {project.bodyMd ? (
                   <div className="space-y-3 sm:space-y-4">
-                    {project.longDescription.map((paragraph, index) => (
+                    {project.bodyMd.split(/\n\n+/).filter(Boolean).map((paragraph, index) => (
                       <p key={index} className="text-sm sm:text-base text-[#666666] leading-relaxed">
                         {paragraph}
                       </p>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm sm:text-base text-[#666666] leading-relaxed">{project.description}</p>
+                  <p className="text-sm sm:text-base text-[#666666] leading-relaxed">{project.summary}</p>
                 )}
               </div>
             </div>
@@ -48,9 +46,9 @@ export default function DescriptionOtherProjects({ slug }: DescriptionOtherProje
                     className="block group"
                   >
                     <div className="relative h-32 sm:h-40 rounded-xl overflow-hidden bg-[#424242]">
-                      {otherProject.bannerImage || otherProject.coverImage ? (
+                      {otherProject.bannerImageUrl || otherProject.coverImageUrl ? (
                         <LiquidImage
-                          src={otherProject.bannerImage || otherProject.coverImage}
+                          src={otherProject.bannerImageUrl || otherProject.coverImageUrl || "/v2/showcase/banner.png"}
                           alt={otherProject.title}
                           strength={0.4}
                           speed={0.6}
