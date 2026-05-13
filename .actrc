@@ -1,0 +1,3 @@
+# nektos/act — https://github.com/nektos/act
+# Medium image with Node tooling; override with: act -P ubuntu-latest=...
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
