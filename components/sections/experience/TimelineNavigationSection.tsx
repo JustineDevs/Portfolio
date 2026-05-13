@@ -300,7 +300,7 @@ export default function TimelineNavigationSection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="px-4 xs:px-5 sm:px-6 md:px-8 py-4 xs:py-5 sm:py-6"
+                  className="min-h-[360px] xs:min-h-[400px] sm:min-h-[440px] px-4 xs:px-5 sm:px-6 md:px-8 py-4 xs:py-5 sm:py-6"
                 >
                   <div className="mb-4 xs:mb-5">
                     <h5 className="text-[13px] xs:text-[14px] sm:text-[15px] font-bold text-[#424242] mb-1">
