@@ -6,11 +6,12 @@ import {
   Instagram, 
   Linkedin, 
   Github,
-  Send
+  Send,
+  Mail,
 } from 'lucide-react'
 
 interface SocialLink {
-  platform: 'instagram' | 'x' | 'linkedin' | 'github' | 'telegram'
+  platform: 'instagram' | 'x' | 'linkedin' | 'github' | 'telegram' | 'email'
   url: string
   // Lucide icons accept `size?: string | number`, so our type must match that.
   icon: ComponentType<{ size?: number | string; className?: string }>
@@ -42,6 +43,7 @@ const defaultLinks: SocialLink[] = [
   { platform: 'linkedin', url: 'https://linkedin.com/in/justine-lupasi-444608295', icon: Linkedin },
   { platform: 'github', url: 'https://github.com/justinedevs', icon: GitHubIcon },
   { platform: 'telegram', url: 'https://t.me/TraderGOfficial', icon: Send },
+  { platform: 'email', url: 'mailto:JustineDevs@jstn.site', icon: Mail },
 ]
 
 export default function NeumorphicSocialButton({ 
@@ -52,14 +54,16 @@ export default function NeumorphicSocialButton({
 }: NeumorphicSocialButtonProps) {
   return (
     <div className="flex items-center gap-3">
-      {links.map((link, index) => {
+      {links.map((link) => {
         const Icon = link.icon
+        const isMailto = link.url.startsWith('mailto:')
         return (
           <motion.a
             key={link.platform}
             href={link.url}
-            target="_blank"
-            rel="noopener noreferrer"
+            {...(isMailto
+              ? {}
+              : { target: '_blank', rel: 'noopener noreferrer' })}
             className="relative flex items-center justify-center rounded-xl transition-all duration-300"
             style={{
               width: size,
