@@ -12,9 +12,7 @@ import { ScrambleTextOnHover } from './ui/scramble-text';
 const AvatarParticlesCanvas = dynamic(() => import('./three/AvatarParticlesCanvas'), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full absolute inset-0 z-20 flex items-center justify-center">
-      <div className="w-12 h-12 xs:w-16 xs:h-16 border-4 border-[#424242] border-t-transparent rounded-full animate-spin" />
-    </div>
+    <div className="relative z-20 w-full h-full min-h-[200px] bg-[#424242]" aria-hidden />
   ),
 });
 
@@ -26,7 +24,7 @@ const Hero = () => {
       <CornerDot position="bl" className="hidden xs:block" />
       <CornerDot position="br" className="hidden xs:block" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1fr] min-h-[400px] xs:min-h-[450px] sm:min-h-[500px] md:min-h-[550px] lg:min-h-[600px]">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1fr] min-h-[400px] xs:min-h-[450px] sm:min-h-[500px] md:min-h-[550px] lg:min-h-[600px] min-w-0">
         
         <div className="relative w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-full overflow-hidden border-b md:border-b-0 md:border-r border-[#d5d5d5]">
           <CornerDot position="br" className="hidden md:block" />
@@ -49,7 +47,7 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="relative w-full h-full flex flex-col bg-white overflow-hidden">
+        <div className="relative w-full h-full flex flex-col bg-white overflow-hidden min-w-0">
           <PixelGrid />
           <AnimatedNoise opacity={0.03} />
 
@@ -83,41 +81,53 @@ const Hero = () => {
             </div>
 
             <div className="flex-1 flex items-center justify-between gap-2 xs:gap-3 sm:gap-4 px-4 xs:px-6 sm:px-8 py-4 xs:py-5 sm:py-6 overflow-x-auto">
-              <div className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[100px] xs:max-w-[120px] sm:max-w-[140px] min-w-[60px]">
-                <Image 
-                  src="/Logo/one percent/one percent.jpg" 
-                  alt="OnePercent" 
-                  fill 
-                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all" 
+              <a
+                href="https://projectonepercent.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[100px] xs:max-w-[120px] sm:max-w-[140px] min-w-[60px] block shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] rounded-sm"
+              >
+                <Image
+                  src="/Logo/one percent/one percent.jpg"
+                  alt="Project One Percent"
+                  fill
+                  sizes="(max-width: 640px) 28vw, 140px"
+                  loading="lazy"
+                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all"
                 />
-              </div>
-              
-              <div className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[120px] xs:max-w-[140px] sm:max-w-[160px] min-w-[80px]">
-                <Image 
-                  src="/Logo/avalanche/Avalanche Logos/Avalanche Logos/_PNG/AvalancheLogo_Horizontal_1C_Black.png" 
-                  alt="Avalanche" 
-                  fill 
-                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all" 
-                />
-              </div>
+              </a>
 
-              <div className="relative h-5 xs:h-6 sm:h-8 flex-1 max-w-[100px] xs:max-w-[120px] sm:max-w-[140px] min-w-[60px]">
-                <Image 
-                  src="/Logo/mantle/Mantle-Brand-Assets/Mantle Logo_Horizontal/LOGO_HORIZONTAL_BLACK.svg" 
-                  alt="Mantle" 
-                  fill 
-                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all" 
+              <a
+                href="https://avax.network/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[120px] xs:max-w-[140px] sm:max-w-[160px] min-w-[80px] block shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] rounded-sm"
+              >
+                <Image
+                  src="/Logo/avalanche/Avalanche Logos/Avalanche Logos/_PNG/AvalancheLogo_Horizontal_1C_Black.png"
+                  alt="Avalanche"
+                  fill
+                  sizes="(max-width: 640px) 33vw, 160px"
+                  loading="lazy"
+                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all"
                 />
-              </div>
+              </a>
 
-              <div className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[90px] xs:max-w-[100px] sm:max-w-[120px] min-w-[50px]">
-                <Image 
-                  src="/Logo/metis/metis-black-horizontal.png" 
-                  alt="Metis" 
-                  fill 
-                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all" 
+              <a
+                href="https://metis.io/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[90px] xs:max-w-[100px] sm:max-w-[120px] min-w-[50px] block shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] rounded-sm"
+              >
+                <Image
+                  src="/Logo/metis/metis-black-horizontal.png"
+                  alt="Metis"
+                  fill
+                  sizes="(max-width: 640px) 25vw, 120px"
+                  loading="lazy"
+                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all"
                 />
-              </div>
+              </a>
             </div>
           </div>
         </div>
