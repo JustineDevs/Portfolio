@@ -1,30 +1,12 @@
 import { getSiteSetting } from "@/lib/content/public";
 
-export type PublicLegalLinks = {
-  privacyPolicyUrl: string | null;
-  termsUrl: string | null;
-};
+import { isSafeLegalHref, type PublicLegalLinks } from "@/lib/legal-links-shared";
+
+export type { PublicLegalLinks } from "@/lib/legal-links-shared";
 
 function trimEnv(value: string | undefined): string | null {
   const t = value?.trim();
   return t && t.length > 0 ? t : null;
-}
-
-export function isSafeLegalHref(href: string): boolean {
-  const t = href.trim();
-  if (!t) return false;
-  if (t.startsWith("/") && !t.startsWith("//") && t.length >= 2) {
-    if (t.includes("<") || t.includes(">")) return false;
-    return !/\s/.test(t);
-  }
-  try {
-    const u = new URL(t);
-    if (u.protocol === "https:") return true;
-    if (u.protocol === "http:" && (u.hostname === "localhost" || u.hostname === "127.0.0.1")) return true;
-    return false;
-  } catch {
-    return false;
-  }
 }
 
 function pickUrl(envRaw: string | undefined, db: unknown): string | null {
