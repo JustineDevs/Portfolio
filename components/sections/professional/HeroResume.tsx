@@ -103,15 +103,25 @@ export default function HeroResume() {
 
         <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-[#d5d5d5]">
           <h2 className="text-[18px] sm:text-[20px] font-bold text-[#424242] mb-3 sm:mb-4 tracking-[-0.01em]">About</h2>
-          <p className="text-[13px] sm:text-[14px] leading-[1.7] text-[#555555]">
-            A software developer specializing in blockchain and web technologies with a strong portfolio of projects. 
-            My experience also covers front-end projects, responsive web apps, user authentication systems, advanced crypto 
-            trading automation, and decentralized governance tools. <span className="font-semibold text-[#1342FF]">Co-Founder Hyperkit Labs at Hyperion</span> - 
-            Building innovative developer infrastructure tools and contributing to the Metis Layer 2 ecosystem. Since 2022, 
-            I have been an active <span className="font-semibold text-[#1342FF]">Web3 community moderator</span> and professional moderator, 
-            evolving from volunteer roles to paid projects. <span className="font-semibold text-[#1342FF]">Strong problem solver and communicator</span>, 
-            aiming to expand client-facing and IT infrastructure skills.
-          </p>
+          <div className="space-y-3 sm:space-y-4 text-[13px] sm:text-[14px] leading-[1.7] text-[#555555]">
+            <p>
+              I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
+              development, responsive web apps, authentication systems, developer tooling, crypto automation, and
+              decentralized systems.
+            </p>
+            <p>
+              As <span className="font-semibold text-[#1342FF]">Co-Founder of HyperKit Labs</span>, I work on developer
+              infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart
+              contract workflows and product experimentation.
+            </p>
+            <p>
+              I also bring community experience from{' '}
+              <span className="font-semibold text-[#1342FF]">Web3 moderation</span>, where I&apos;ve supported onboarding,
+              discussions, and technical guidance across Discord communities since 2023. I&apos;m especially interested in{' '}
+              <span className="font-semibold text-[#1342FF]">product architecture, systems thinking</span>, and building tools
+              that are practical, usable, and technically grounded.
+            </p>
+          </div>
         </div>
       </div>
 
