@@ -72,7 +72,7 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
                 <h3 className="text-[16px] xs:text-[17px] sm:text-[18px] font-bold text-[#424242] mb-3 xs:mb-4">Resources</h3>
                 <nav className="flex flex-col gap-2 xs:gap-3" aria-label="Resources">
                   <a 
-                    href="https://github.com/justinedevs/portfolio-v2/issues" 
+                    href="https://github.com/JustineDevs/portfolio/issues" 
                     target="_blank"
                     rel="noopener noreferrer"
                     className={resourceLinkClass}
