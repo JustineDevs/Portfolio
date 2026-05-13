@@ -8,37 +8,43 @@ import LiquidImage from '@/components/ui/LiquidImage';
 import { ScrambleTextOnHover } from '@/components/ui/scramble-text';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import Modal from '@/components/ui/Modal';
+import type { PublicProject } from '@/lib/content/types';
 
 type Theme = 'black' | 'white' | 'iridescent';
 
-export default function BrandBadgeProjectsSection() {
+interface AwardLike {
+  slug: string
+  title: string
+  eventName: string
+  description: string
+  year: string
+  proofUrl?: string | null
+  logoUrl?: string | null
+}
+
+export default function BrandBadgeProjectsSection({
+  featuredProjects,
+  featuredAwards,
+}: {
+  featuredProjects: PublicProject[]
+  featuredAwards: AwardLike[]
+}) {
   const [activeTheme, setActiveTheme] = useState<Theme>('black');
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const badgeData = {
-    'metis': {
-      title: 'Metis Hackathon',
-      event: 'METIS HYPERION HACKATHON',
-      description: 'Won first place in the Metis Hyperion Hackathon. Developed innovative blockchain solutions using Metis Layer 2 technology.',
-      date: '2025',
-      link: 'https://forum.ceg.vote/t/hyperhack-winners/10593',
-    },
-    'avalanche': {
-      title: 'Avalanche x402',
-      event: 'AVALANCHE BUILD X402 AGENTS',
-      description: 'Achieved recognition in the Avalanche Build x402 Agents program. Built decentralized applications leveraging Avalanche\'s high-performance blockchain.',
-      date: '2025',
-      link: 'https://x.com/AvaxDevelopers/status/2001334825199063331',
-    },
-      'mantle': {
-        title: 'Mantle Hackathon',
-        event: 'MANTLE GLOBAL HACKATHON',
-        description: 'Currently participating in the Mantle Global Hackathon 2025. Building innovative solutions on Mantle Network. Results to be announced.',
-        date: '2025',
-        link: 'https://www.hackquest.io/projects/Mantle-Global-Hackathon-2025-Hyperkit',
+  const badgeData = Object.fromEntries(
+    featuredAwards.map((award) => [
+      award.slug,
+      {
+        title: award.title,
+        event: award.eventName,
+        description: award.description,
+        date: award.year,
+        link: award.proofUrl || '',
       },
-  };
+    ])
+  );
 
   const handleBadgeClick = (badgeId: string) => {
     setSelectedBadge(badgeId);
@@ -151,7 +157,10 @@ export default function BrandBadgeProjectsSection() {
                       src={getLogoSrc('header')}
                       alt="JSTN Logo Header"
                       fill
+                      sizes="(max-width: 640px) 85vw, 320px"
+                      loading="lazy"
                       className="object-contain"
+                      unoptimized
                     />
                   </div>
                 </div>
@@ -165,7 +174,10 @@ export default function BrandBadgeProjectsSection() {
                         src={getLogoSrc('abstract')}
                         alt="JSTN Abstract Symbol"
                         fill
+                        sizes="(max-width: 640px) 12vw, 48px"
+                        loading="lazy"
                         className="object-contain"
+                        unoptimized
                       />
                     </div>
                   </div>
@@ -177,7 +189,10 @@ export default function BrandBadgeProjectsSection() {
                         src={getLogoSrc('brand')}
                         alt="JSTN Brand Name"
                         fill
+                        sizes="(max-width: 640px) 40vw, 180px"
+                        loading="lazy"
                         className="object-contain"
+                        unoptimized
                       />
                     </div>
                   </div>
@@ -200,83 +215,33 @@ export default function BrandBadgeProjectsSection() {
             </div>
 
             <div className="p-3 xs:p-4 sm:p-5">
-              <div className="mb-4 xs:mb-5">
-                <span className="text-[9px] xs:text-[10px] font-bold text-[#666666] tracking-wider uppercase">METIS HYPERION HACKATHON</span>
-                <div className="flex flex-col xs:flex-row xs:items-center justify-between mt-2 xs:mt-2.5 pb-3 xs:pb-4 border-b border-[#E5E5E5] gap-2 xs:gap-0">
-                  <div className="bg-[#424242] rounded-lg px-3 xs:px-4 py-2 xs:py-2.5 flex items-center gap-2 xs:gap-3 shadow-sm">
-                    <div className="relative w-6 h-6 xs:w-8 xs:h-8">
-                      <Image 
-                        src="/Logo/metis/metis-symbol-blue.svg" 
-                        alt="Metis" 
-                        fill 
-                        className="object-contain" 
-                      />
-                    </div>
-                    <div className="flex flex-col leading-tight">
-                      <span className="text-[9px] xs:text-[10px] text-white/60">Winning on</span>
-                      <span className="text-[11px] xs:text-[12px] font-bold text-white">Metis Hackathon</span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => handleBadgeClick('metis')}
-                    className="bg-[#424242] text-white text-[10px] xs:text-[11px] px-4 xs:px-5 py-1.5 xs:py-2 rounded-lg font-medium hover:opacity-90 transition-opacity w-fit"
-                  >
-                    Details
-                  </button>
-                </div>
-              </div>
-
-            <div>
-                  <span className="text-[9px] xs:text-[10px] font-bold text-[#666666] tracking-wider uppercase">AVALANCHE BUILD X402 AGENTS</span>
+              {featuredAwards.map((award) => (
+                <div className="mb-4 xs:mb-5" key={award.slug}>
+                  <span className="text-[9px] xs:text-[10px] font-bold text-[#666666] tracking-wider uppercase">{award.eventName}</span>
                   <div className="flex flex-col xs:flex-row xs:items-center justify-between mt-2 xs:mt-2.5 pb-3 xs:pb-4 border-b border-[#E5E5E5] gap-2 xs:gap-0">
                     <div className="bg-[#424242] rounded-lg px-3 xs:px-4 py-2 xs:py-2.5 flex items-center gap-2 xs:gap-3 shadow-sm">
                       <div className="relative w-6 h-6 xs:w-8 xs:h-8">
                         <Image 
-                          src="/Logo/avalanche/Avalanche Logomark/Avalanche Logomark/SVG/Avalanche_Logomark_Red.svg" 
-                          alt="Avalanche" 
+                          src={award.logoUrl || "/v2/showcase/banner.png"} 
+                          alt={award.title} 
                           fill 
                           className="object-contain" 
                         />
                       </div>
                       <div className="flex flex-col leading-tight">
-                        <span className="text-[9px] xs:text-[10px] text-white/60">Winning on</span>
-                        <span className="text-[11px] xs:text-[12px] font-bold text-white">Avalanche x402</span>
+                        <span className="text-[9px] xs:text-[10px] text-white/60">Featured on</span>
+                        <span className="text-[11px] xs:text-[12px] font-bold text-white">{award.title}</span>
                       </div>
                     </div>
                     <button 
-                      onClick={() => handleBadgeClick('avalanche')}
+                      onClick={() => handleBadgeClick(award.slug)}
                       className="bg-[#424242] text-white text-[10px] xs:text-[11px] px-4 xs:px-5 py-1.5 xs:py-2 rounded-lg font-medium hover:opacity-90 transition-opacity w-fit"
                     >
                       Details
                     </button>
                   </div>
                 </div>
-
-                  <div>
-                    <span className="text-[9px] xs:text-[10px] font-bold text-[#666666] tracking-wider uppercase">MANTLE GLOBAL HACKATHON</span>
-                    <div className="flex flex-col xs:flex-row xs:items-center justify-between mt-2 xs:mt-2.5 gap-2 xs:gap-0">
-                      <div className="bg-[#424242] rounded-lg px-3 xs:px-4 py-2 xs:py-2.5 flex items-center gap-2 xs:gap-3 shadow-sm">
-                        <div className="relative w-6 h-6 xs:w-8 xs:h-8">
-                          <Image 
-                            src="/Logo/mantle/Mantle-Brand-Assets/Mantle Logo Mark/Mantle-Logo-mark.svg" 
-                            alt="Mantle" 
-                            fill 
-                            className="object-contain" 
-                          />
-                        </div>
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-[9px] xs:text-[10px] text-yellow-400">In Progress</span>
-                          <span className="text-[11px] xs:text-[12px] font-bold text-white">Mantle Hackathon</span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => handleBadgeClick('mantle')}
-                        className="bg-[#424242] text-white text-[10px] xs:text-[11px] px-4 xs:px-5 py-1.5 xs:py-2 rounded-lg font-medium hover:opacity-90 transition-opacity w-fit"
-                      >
-                        Details
-                      </button>
-                    </div>
-                  </div>
+              ))}
             </div>
           </div>
 
@@ -286,11 +251,12 @@ export default function BrandBadgeProjectsSection() {
             <CornerDot position="bl" className="hidden lg:block" />
             
             <ScrollReveal direction="up" stagger={0.15} className="space-y-3 xs:space-y-4">
-              <div className="relative group overflow-hidden rounded-xl bg-[#424242] h-[200px] xs:h-[240px] sm:h-[280px]">
+              {featuredProjects.map((project) => (
+              <div key={project.slug} className="relative group overflow-hidden rounded-xl bg-[#424242] h-[200px] xs:h-[240px] sm:h-[280px]">
                 <div className="absolute inset-0 z-0">
                   <LiquidImage
-                    src="/v2/showcase/Hyperkit Banner (README).png"
-                    alt="HYPERKIT"
+                    src={project.bannerImageUrl || project.coverImageUrl || "/v2/showcase/banner.png"}
+                    alt={project.title}
                     strength={0.4}
                     speed={0.6}
                     size={0.8}
@@ -298,35 +264,15 @@ export default function BrandBadgeProjectsSection() {
                 </div>
                 <div className="absolute inset-0 z-10 p-3 xs:p-4 sm:p-5 flex items-end justify-end pointer-events-none">
                   <Link
-                    href="/projects/hyperkit"
+                    href={`/projects/${project.slug}`}
                     className="flex items-center gap-1.5 px-3 xs:px-4 py-1 xs:py-1.5 text-[10px] xs:text-[11px] font-medium text-white rounded-full bg-white/15 backdrop-blur-sm border border-white/20 hover:bg-white/25 transition-all pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
-                    aria-label="View Hyperkit project"
+                    aria-label={`View ${project.title} project`}
                   >
                     &lt; View
                   </Link>
                 </div>
               </div>
-
-              <div className="relative group overflow-hidden rounded-xl bg-[#424242] h-[200px] xs:h-[240px] sm:h-[280px]">
-                <div className="absolute inset-0 z-0">
-                  <LiquidImage
-                    src="/v2/showcase/Banner V1 METAGEN WALLET.png"
-                    alt="METAGEN WALLET"
-                    strength={0.4}
-                    speed={0.6}
-                    size={0.8}
-                  />
-                </div>
-                <div className="absolute inset-0 z-10 p-3 xs:p-4 sm:p-5 flex items-end justify-end pointer-events-none">
-                  <Link
-                    href="/projects/metagen-wallet"
-                    className="flex items-center gap-1.5 px-3 xs:px-4 py-1 xs:py-1.5 text-[10px] xs:text-[11px] font-medium text-white rounded-full bg-white/15 backdrop-blur-sm border border-white/20 hover:bg-white/25 transition-all pointer-events-auto focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2"
-                    aria-label="View Metagen Wallet project"
-                  >
-                    &lt; View
-                  </Link>
-                </div>
-              </div>
+              ))}
             </ScrollReveal>
 
             <div className="mt-4 xs:mt-5 flex justify-center">
@@ -385,4 +331,3 @@ export default function BrandBadgeProjectsSection() {
     </section>
   );
 }
-
