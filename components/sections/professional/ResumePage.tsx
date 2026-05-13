@@ -10,6 +10,8 @@ import LiquidImage from '@/components/ui/LiquidImage'
 import NeumorphicSocialButton from '@/components/ui/NeumorphicSocialButton'
 import Modal from '@/components/ui/Modal'
 import { useToast } from '@/components/providers/ToastProvider'
+import GithubActivitySection from '@/components/sections/GithubActivitySection'
+import type { PublicProject } from '@/lib/content/types'
 
 interface CellData {
   level: number
@@ -17,41 +19,52 @@ interface CellData {
   date: Date
 }
 
-export default function ResumePage() {
+interface AwardLike {
+  slug: string
+  title: string
+  eventName: string
+  description: string
+  year: string
+  proofUrl?: string | null
+  logoUrl?: string | null
+}
+
+export default function ResumePage({
+  featuredProjects = [],
+  featuredAwards = [],
+}: {
+  featuredProjects?: PublicProject[]
+  featuredAwards?: AwardLike[]
+}) {
   const { info } = useToast()
   const [selectedBadge, setSelectedBadge] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const badgeData = {
-    'metis': {
-      title: 'Metis Hackathon',
-      event: 'METIS HYPERION HACKATHON',
-      description: 'Won first place in the Metis Hyperion Hackathon. Developed innovative blockchain solutions using Metis Layer 2 technology.',
-      date: '2025',
-      link: 'https://forum.ceg.vote/t/hyperhack-winners/10593',
-    },
-    'avalanche': {
-      title: 'Avalanche x402',
-      event: 'AVALANCHE BUILD X402 AGENTS',
-      description: 'Achieved recognition in the Avalanche Build x402 Agents program. Built decentralized applications leveraging Avalanche\'s high-performance blockchain.',
-      date: '2025',
-      link: 'https://x.com/AvaxDevelopers/status/2001334825199063331',
-    },
-    'mantle': {
-      title: 'Mantle Hackathon',
-      event: 'MANTLE GLOBAL HACKATHON',
-      description: 'Participated in the Mantle Global Hackathon 2025. Built innovative solutions on Mantle Network.',
-      date: '2025',
-      link: 'https://www.hackquest.io/projects/Mantle-Global-Hackathon-2025-Hyperkit',
-    },
-    'certificate': {
-      title: 'Certificates',
-      event: 'CERTIFICATES',
-      description: 'Various certifications and achievements in blockchain development, web technologies, and software engineering.',
-      date: '2023-2024',
-      link: null,
-    },
-  }
+  const awardsData = featuredAwards
+  const badgeData = Object.fromEntries(
+    [
+      ...awardsData.map((award) => [
+        award.slug,
+        {
+          title: award.title,
+          event: award.eventName,
+          description: award.description,
+          date: award.year,
+          link: award.proofUrl || '',
+        },
+      ]),
+      [
+        'certificate',
+        {
+          title: 'Certificates',
+          event: 'CERTIFICATES',
+          description: 'Various certifications and achievements in blockchain development, web technologies, and software engineering.',
+          date: '2023-2024',
+          link: '',
+        },
+      ],
+    ]
+  )
 
   const handleBadgeClick = (badgeId: string) => {
     setSelectedBadge(badgeId)
@@ -64,14 +77,17 @@ export default function ResumePage() {
       degree: 'Bachelor of Science in Information Technology',
       specialization: 'Mobile Web Application Development',
       status: 'Dropped Out',
-      period: '2024-Present',
+      period: '2025-Present',
       year: '2nd Year',
     },
     {
       institution: 'Far East Asia Pacific Institute of Tourism Science and Technology',
       degree: 'Senior High School',
       specialization: 'ICT',
+      status: 'Graduated',
       period: '2022-2024',
+      proofLabel: 'Batch 13',
+      proofHref: 'https://www.facebook.com/reel/728813249571957',
     },
   ]
 
@@ -120,31 +136,13 @@ export default function ResumePage() {
     },
   ]
 
-  const projects = [
-    {
-      slug: 'hyperkit',
-      title: 'HYPERKIT',
-      subtitle: 'The Modular infrastructure toolkit',
-      description: 'for multi-chain dev',
-      image: '/v2/showcase/Hyperkit Banner (README).png',
-    },
-    {
-      slug: 'metagen-wallet',
-      title: 'METAGEN WALLET',
-      image: '/v2/showcase/Banner V1 METAGEN WALLET.png',
-    },
-    {
-      slug: 'astra',
-      title: 'ASTRA',
-      description: 'Web3-native AI-powered platform that generates personalized learning roadmaps using intelligent agents',
-      image: '/v2/showcase/ASTRA BANNER.png',
-    },
-    {
-      slug: 'hyperagent',
-      title: 'HyperAgent',
-      image: '/v2/showcase/HyperAgent.png',
-    },
-  ]
+  const projects = featuredProjects.map((project) => ({
+    slug: project.slug,
+    title: project.title.toUpperCase(),
+    subtitle: project.category,
+    description: project.summary,
+    image: project.bannerImageUrl || project.coverImageUrl || '/v2/showcase/banner.png',
+  }))
 
   // Activity Heatmap State
   const [selectedYear, setSelectedYear] = useState(2026)
@@ -347,19 +345,21 @@ export default function ResumePage() {
                   </h2>
                   <div className="space-y-4 text-[14px] leading-[1.8] text-[#555555]">
                     <p>
-                      A software developer specializing in blockchain and web technologies with a strong portfolio of projects. 
-                      My experience also covers front-end projects, responsive web apps, user authentication systems, advanced crypto 
-                      trading automation, and decentralized governance tools.
+                      I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
+                      development, responsive web apps, authentication systems, developer tooling, crypto automation, and
+                      decentralized systems.
                     </p>
                     <p>
-                      <span className="font-semibold text-[#1342FF]">Co-Founder Hyperkit Labs at Hyperion</span> - 
-                      Building innovative developer infrastructure tools and contributing to the Metis Layer 2 ecosystem. Since 2022, 
-                      I have been an active <span className="font-semibold text-[#1342FF]">Web3 community moderator</span> and professional moderator, 
-                      evolving from volunteer roles to paid projects.
+                      As <span className="font-semibold text-[#1342FF]">Co-Founder of HyperKit Labs</span>, I work on developer
+                      infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart
+                      contract workflows and product experimentation.
                     </p>
                     <p>
-                      <span className="font-semibold text-[#1342FF]">Strong problem solver and communicator</span>, 
-                      aiming to expand client-facing and IT infrastructure skills.
+                      I also bring community experience from{' '}
+                      <span className="font-semibold text-[#1342FF]">Web3 moderation</span>, where I&apos;ve supported onboarding,
+                      discussions, and technical guidance across Discord communities since 2023. I&apos;m especially interested in{' '}
+                      <span className="font-semibold text-[#1342FF]">product architecture, systems thinking</span>, and building tools
+                      that are practical, usable, and technically grounded.
                     </p>
                   </div>
                 </div>
@@ -488,11 +488,29 @@ export default function ResumePage() {
                     <p className="text-[13px] font-medium text-[#666666] mb-2">
                       {edu.degree} {edu.specialization && `(${edu.specialization})`}
                     </p>
-                    {edu.status && (
-                      <span className="inline-block px-2.5 py-1 text-[11px] text-[#666666] bg-[#f5f5f5] rounded border border-[#e0e0e0] mb-2">
-                        {edu.status}
-                      </span>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      {edu.status && (
+                        <span
+                          className={
+                            edu.status === 'Graduated'
+                              ? 'inline-block px-2.5 py-1 text-[11px] font-semibold text-[#166534] bg-[#ecfdf5] rounded border border-[#86efac]'
+                              : 'inline-block px-2.5 py-1 text-[11px] text-[#666666] bg-[#f5f5f5] rounded border border-[#e0e0e0]'
+                          }
+                        >
+                          {edu.status}
+                        </span>
+                      )}
+                      {edu.proofHref && edu.proofLabel && (
+                        <a
+                          href={edu.proofHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block px-2.5 py-1 text-[11px] font-semibold text-[#1342FF] bg-[#eef2ff] rounded border border-[#c7d2fe] hover:bg-[#e0e7ff] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1342FF]"
+                        >
+                          {edu.proofLabel}
+                        </a>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 text-[12px] text-[#666666] mt-2">
                       <span>{edu.period}</span>
                       {edu.year && (
@@ -515,89 +533,34 @@ export default function ResumePage() {
               </div>
               
               <div className="space-y-5">
-                  {/* Metis Hackathon Badge */}
-                  <div>
-                    <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">METIS HYPERION HACKATHON</span>
+                {awardsData.map((award) => (
+                  <div key={award.slug}>
+                    <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">{award.eventName}</span>
                     <div className="flex items-center justify-between mt-2.5 pb-4 border-b border-[#E5E5E5]">
                       <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
                         <div className="relative w-8 h-8">
                           <Image 
-                            src="/Logo/metis/metis-symbol-blue.svg" 
-                            alt="Metis" 
+                            src={award.logoUrl || "/v2/showcase/banner.png"} 
+                            alt={award.title} 
                             fill 
                             className="object-contain" 
                           />
                         </div>
                         <div className="flex flex-col leading-tight">
-                          <span className="text-[10px] text-white/60">Winning on</span>
-                          <span className="text-[12px] font-bold text-white">Metis Hackathon</span>
+                          <span className="text-[10px] text-white/60">Featured on</span>
+                          <span className="text-[12px] font-bold text-white">{award.title}</span>
                         </div>
                       </div>
                       <button 
-                        onClick={() => handleBadgeClick('metis')}
+                        onClick={() => handleBadgeClick(award.slug)}
                         className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                        aria-label="View Metis Hackathon badge details"
+                        aria-label={`View ${award.title} badge details`}
                       >
                         Details
                       </button>
                     </div>
                   </div>
-
-                {/* Avalanche Hackathon Badge */}
-                <div>
-                  <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">AVALANCHE BUILD X402 AGENTS</span>
-                  <div className="flex items-center justify-between mt-2.5 pb-4 border-b border-[#E5E5E5]">
-                    <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                      <div className="relative w-8 h-8">
-                        <Image 
-                          src="/Logo/avalanche/Avalanche Logomark/Avalanche Logomark/SVG/Avalanche_Logomark_Red.svg" 
-                          alt="Avalanche" 
-                          fill 
-                          className="object-contain" 
-                        />
-                      </div>
-                      <div className="flex flex-col leading-tight">
-                        <span className="text-[10px] text-white/60">Winning on</span>
-                        <span className="text-[12px] font-bold text-white">Avalanche x402</span>
-                      </div>
-                    </div>
-                    <button 
-                      onClick={() => handleBadgeClick('avalanche')}
-                      className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                      aria-label="View Avalanche x402 badge details"
-                    >
-                      Details
-                    </button>
-                  </div>
-                </div>
-
-                  {/* Mantle Hackathon Badge */}
-                  <div>
-                    <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">MANTLE GLOBAL HACKATHON</span>
-                    <div className="flex items-center justify-between mt-2.5 pb-4 border-b border-[#E5E5E5]">
-                      <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                        <div className="relative w-8 h-8">
-                          <Image 
-                            src="/Logo/mantle/Mantle-Brand-Assets/Mantle Logo Mark/Mantle-Logo-mark.svg" 
-                            alt="Mantle" 
-                            fill 
-                            className="object-contain" 
-                          />
-                        </div>
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-[10px] text-yellow-400">In Progress</span>
-                          <span className="text-[12px] font-bold text-white">Mantle Hackathon</span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => handleBadgeClick('mantle')}
-                        className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                        aria-label="View Mantle Hackathon badge details"
-                      >
-                        Details
-                      </button>
-                    </div>
-                  </div>
+                ))}
 
                 {/* Certificates */}
                 <div>
@@ -624,171 +587,7 @@ export default function ResumePage() {
         </div>
       </section>
 
-      {/* Tier 5: Activity Heatmap */}
-      <section className="relative border-l border-r border-b border-[#d5d5d5] bg-white">
-        <CornerDot position="bl" />
-        <CornerDot position="br" />
-        {/* Header Row */}
-        <div className="border-b border-[#d5d5d5] h-[56px] flex items-center px-6">
-          <h2 className="text-[20px] font-bold text-[#424242] tracking-[-0.01em]">Activity</h2>
-        </div>
-
-        {/* Content Row */}
-        <div className="p-6">
-          <div className="mb-5">
-            <h3 className="text-[15px] font-semibold text-[#424242] mb-1.5">Heatmap</h3>
-            <p className="text-[13px] leading-[1.6] text-[#666666] max-w-[480px]">
-              A visual representation showing activity levels over the past year. Each square represents a day, with color intensity indicating contribution volume.
-            </p>
-          </div>
-
-          {/* Summary Statistics */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="bg-white border border-[#e0e0e0] rounded-lg p-3"
-            >
-              <div className="text-[10px] text-[#666666] font-medium mb-1">Total Contributions</div>
-              <div className="text-[18px] font-bold text-[#424242]">{stats.totalContributions.toLocaleString()}</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-white border border-[#e0e0e0] rounded-lg p-3"
-            >
-              <div className="text-[10px] text-[#666666] font-medium mb-1">Active Days</div>
-              <div className="text-[18px] font-bold text-[#424242]">{stats.activeDays}</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="bg-white border border-[#e0e0e0] rounded-lg p-3"
-            >
-              <div className="text-[10px] text-[#666666] font-medium mb-1">Current Streak</div>
-              <div className="text-[18px] font-bold text-[#1342FF]">{stats.currentStreak} days</div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="bg-white border border-[#e0e0e0] rounded-lg p-3"
-            >
-              <div className="text-[10px] text-[#666666] font-medium mb-1">Longest Streak</div>
-              <div className="text-[18px] font-bold text-[#424242]">{stats.longestStreak} days</div>
-            </motion.div>
-          </div>
-
-          <div className="flex gap-5 items-start flex-col lg:flex-row">
-            <div className="flex-1 bg-white border border-[#e0e0e0] rounded-xl p-5 w-full">
-              <div className="w-full overflow-x-auto">
-                <div className="flex ml-7 mb-2">
-                  {months.map((month, i) => (
-                    <span key={i} className="text-[10px] text-[#666666] flex-1 text-center font-medium">
-                      {month}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="flex gap-0.5">
-                  <div className="flex flex-col justify-around py-0.5 mr-2 w-6">
-                    {days.map((day, i) => (
-                      <span key={i} className="text-[10px] text-[#666666] h-[10px] leading-none font-medium">
-                        {day}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-[3px] flex-1">
-                    {gridData.map((column, colIdx) => (
-                      <div key={colIdx} className="flex flex-col gap-[3px]">
-                        {column.map((cell, rowIdx) => {
-                          const isHovered = hoveredCell?.date.getTime() === cell.date.getTime()
-                          return (
-                            <motion.div
-                              key={rowIdx}
-                              onMouseEnter={(e) => handleCellHover(cell, e)}
-                              onMouseLeave={handleCellLeave}
-                              className={`w-[10px] h-[10px] rounded-[2px] ${getCellColor(cell.level)} transition-all duration-200 ${
-                                cell.contributions > 0 ? 'cursor-pointer hover:ring-2 hover:ring-[#424242] hover:ring-offset-1' : ''
-                              }`}
-                              whileHover={cell.contributions > 0 ? { scale: 1.3, zIndex: 10 } : {}}
-                              animate={isHovered ? { scale: 1.2, zIndex: 10 } : { scale: 1 }}
-                            />
-                          )
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="mt-4 flex justify-end items-center gap-2">
-                  <span className="text-[10px] text-[#666666] font-medium">Less</span>
-                  <div className="flex gap-[3px]">
-                    <div className="w-[10px] h-[10px] rounded-[2px] bg-[#EBEDF0]" />
-                    <div className="w-[10px] h-[10px] rounded-[2px] bg-[#9BE9A8]" />
-                    <div className="w-[10px] h-[10px] rounded-[2px] bg-[#30A14E]" />
-                    <div className="w-[10px] h-[10px] rounded-[2px] bg-[#216E39]" />
-                  </div>
-                  <span className="text-[10px] text-[#666666] font-medium">More</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex flex-row lg:flex-col gap-1.5 w-full lg:w-[80px] shrink-0">
-              {[2026, 2025, 2024, 2023].map((year) => (
-                <motion.button
-                  key={year}
-                  onClick={() => setSelectedYear(year)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`text-center lg:text-left px-4 py-2 rounded-lg text-[12px] font-semibold transition-all whitespace-nowrap flex-1 lg:flex-none ${
-                    year === selectedYear 
-                      ? 'bg-[#1342FF] text-white' 
-                      : 'text-[#666666] hover:bg-white hover:text-[#424242]'
-                  }`}
-                >
-                  {year}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Tooltip Portal */}
-      {mounted && createPortal(
-        <AnimatePresence>
-          {hoveredCell && (
-            <motion.div
-              ref={tooltipRef}
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.2 }}
-              className="fixed px-3 py-2 bg-[#424242] text-white text-[11px] font-medium rounded whitespace-nowrap pointer-events-none z-[9999] shadow-lg"
-              style={{
-                left: `${hoveredCell.x}px`,
-                top: `${hoveredCell.y}px`,
-                transform: 'translateX(-50%)',
-              }}
-            >
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="font-semibold">{hoveredCell.contributions} contributions</span>
-                <span className="text-[10px] text-white/80">{formatDate(hoveredCell.date)}</span>
-              </div>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-transparent border-t-[#424242]" />
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+      <GithubActivitySection />
 
       {/* Badge Details Modal */}
       <Modal
