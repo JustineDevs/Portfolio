@@ -1,0 +1,8 @@
+#!/bin/sh
+# Run the same checks as GitHub Actions before allowing a push.
+set -e
+cd "$(git rev-parse --show-toplevel)" || exit 1
+echo ""
+echo "pre-push: running ci:check (lint, test, production build)..."
+echo ""
+node scripts/ci-check.mjs
