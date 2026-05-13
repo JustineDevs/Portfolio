@@ -85,8 +85,10 @@ export default function Navbar() {
                   alt="JSTN Logo"
                   width={140}
                   height={48}
+                  sizes="140px"
                   className="object-contain h-8 xs:h-10 sm:h-12 w-auto"
                   priority
+                  unoptimized
                 />
               </Link>
             </div>
