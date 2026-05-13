@@ -14,7 +14,7 @@ import { useMode } from '@/components/providers/ModeProvider'
 import { animations } from '@/lib/design-tokens'
 
 import type { PublicProject } from '@/lib/content/types'
-import type { PublicLegalLinks } from '@/lib/legal-links'
+import type { PublicLegalLinks } from '@/lib/legal-links-shared'
 
 const TechAndDescriptionSection = dynamic(
   () => import('@/components/sections/TechAndDescriptionSection'),
