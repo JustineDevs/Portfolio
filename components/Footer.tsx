@@ -6,8 +6,8 @@ import CornerDot from '@/components/ui/CornerDot'
 import NeumorphicSocialButton from '@/components/ui/NeumorphicSocialButton'
 import HeartButton from '@/components/ui/HeartButton'
 import { useToast } from '@/components/providers/ToastProvider'
-import type { PublicLegalLinks } from '@/lib/legal-links'
-import { isSafeLegalHref } from '@/lib/legal-links'
+import type { PublicLegalLinks } from '@/lib/legal-links-shared'
+import { isSafeLegalHref } from '@/lib/legal-links-shared'
 
 const resourceLinkClass =
   'text-[#555555] text-[13px] xs:text-[14px] hover:text-[#424242] transition-colors focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2 rounded'
