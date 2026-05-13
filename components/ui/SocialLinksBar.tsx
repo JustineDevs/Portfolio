@@ -20,11 +20,7 @@ import {
 
 const PORTFOLIO_REPO_URL = 'https://github.com/JustineDevs/portfolio'
 
-/** Public uptime / status page (Instatus, Better Stack, etc.). Falls back to Vercel platform status if unset. */
-const statusPageUrl =
-  (typeof process.env.NEXT_PUBLIC_STATUS_PAGE_URL === 'string' &&
-    process.env.NEXT_PUBLIC_STATUS_PAGE_URL.trim()) ||
-  'https://www.vercel-status.com/'
+type BackendHealth = 'loading' | 'up' | 'down'
 
 interface SocialLink {
   platform: 'instagram' | 'x' | 'linkedin' | 'github' | 'tiktok' | 'threads' | 'telegram' | 'email'
@@ -107,6 +103,8 @@ export default function SocialLinksBar({
   const [mounted, setMounted] = useState(false)
   const [siteViews, setSiteViews] = useState<number | null>(null)
   const [repoStars, setRepoStars] = useState<number | null>(null)
+  const [backendHealth, setBackendHealth] = useState<BackendHealth>('loading')
+  const [backendLatencyMs, setBackendLatencyMs] = useState<number | null>(null)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
 
@@ -146,6 +144,43 @@ export default function SocialLinksBar({
     })()
     return () => {
       cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    const ping = async () => {
+      const t0 = typeof performance !== 'undefined' ? performance.now() : 0
+      try {
+        const res = await fetch('/api/health', { cache: 'no-store' })
+        const data = (await res.json().catch(() => ({}))) as {
+          ok?: boolean
+          latencyMs?: number
+        }
+        if (cancelled) return
+        if (res.ok && data.ok === true) {
+          setBackendHealth('up')
+          setBackendLatencyMs(
+            typeof data.latencyMs === 'number'
+              ? data.latencyMs
+              : Math.round(performance.now() - t0)
+          )
+        } else {
+          setBackendHealth('down')
+          setBackendLatencyMs(null)
+        }
+      } catch {
+        if (!cancelled) {
+          setBackendHealth('down')
+          setBackendLatencyMs(null)
+        }
+      }
+    }
+    void ping()
+    const id = setInterval(ping, 120_000)
+    return () => {
+      cancelled = true
+      clearInterval(id)
     }
   }, [])
 
@@ -190,22 +225,53 @@ export default function SocialLinksBar({
   const hoveredLink = hoveredIndex !== null ? enabledLinks[hoveredIndex] : null
   const hoveredLabel = hoveredLink ? platformLabels[hoveredLink.platform] || hoveredLink.platform : ''
 
+  const backendStatusTitle =
+    backendHealth === 'loading'
+      ? 'Checking backend (database)…'
+      : backendHealth === 'up'
+        ? `Backend OK — database reachable${
+            backendLatencyMs !== null ? ` (${backendLatencyMs} ms)` : ''
+          }`
+        : 'Backend unreachable — database check failed'
+
+  const backendStatusLabel =
+    backendHealth === 'loading'
+      ? 'Server status: checking'
+      : backendHealth === 'up'
+        ? 'Server status: backend OK'
+        : 'Server status: backend unavailable'
+
   return (
     <>
       <div className="h-[32px] xs:h-[36px] border-b border-[#d5d5d5] bg-white relative overflow-visible z-[100]">
         <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-full flex items-center justify-between gap-2 xs:gap-3 flex-wrap relative overflow-visible px-2 xs:px-0">
-          <a
-            href={statusPageUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-md py-0.5 pr-1 text-gray-400 transition-colors hover:text-[#424242] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
-            title="Uptime and incident status (opens in a new tab)"
-            aria-label="Server status (opens in a new tab)"
+          <span
+            role="status"
+            aria-live="polite"
+            aria-label={backendStatusLabel}
+            title={backendStatusTitle}
+            className="inline-flex shrink-0 cursor-default items-center gap-1.5 rounded-md py-0.5 pr-1 text-gray-400"
           >
-            <Activity size={14} className="shrink-0" aria-hidden />
+            <span
+              className={`size-1.5 shrink-0 rounded-full ${
+                backendHealth === 'up'
+                  ? 'bg-emerald-500'
+                  : backendHealth === 'down'
+                    ? 'bg-red-500'
+                    : 'animate-pulse bg-gray-300'
+              }`}
+              aria-hidden
+            />
+            <Activity
+              size={14}
+              className={`shrink-0 ${
+                backendHealth === 'down' ? 'text-red-500/90' : ''
+              }`}
+              aria-hidden
+            />
             <span className="text-[11px] font-medium tabular-nums leading-none sm:hidden">Status</span>
             <span className="hidden text-[11px] font-medium leading-none sm:inline">Server status</span>
-          </a>
+          </span>
           <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-2 xs:gap-2.5">
           <div className="flex items-center gap-2 xs:gap-2.5 pr-1.5 xs:pr-2 border-r border-[#e5e5e5] mr-1.5 xs:mr-2">
             <div
