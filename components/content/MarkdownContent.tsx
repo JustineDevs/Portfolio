@@ -4,7 +4,7 @@ import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
-import rehypeGithubAlerts from "rehype-github-alerts";
+import { rehypeGithubAlerts } from "rehype-github-alerts";
 
 import { normalizeAssetUrl } from "@/lib/asset-urls";
 import { cn } from "@/lib/utils";
