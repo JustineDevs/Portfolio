@@ -1,54 +1,77 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# See https://help.github.com/articles/ignoring-files/
 
-# dependencies
+# --- Dependencies ---
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
-/coverage
+# --- Environment & secrets (never commit) ---
+.env
+.env.*
+!.env.example
+!.env*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*credentials*.json
+serviceAccount*.json
 
-# next.js
+# --- Next.js & build output ---
 /.next/
 /out/
-
-# production
 /build
+dist/
+.vercel
+*.tsbuildinfo
 
-# misc
-.DS_Store
-*.pem
+# --- Caches & tooling ---
+.cache
+.turbo
+.swc
+.parcel-cache
+.eslintcache
+node_modules/.cache
 
-# debug
+# --- Test & coverage ---
+/coverage
+.nyc_output
+test-results/
+playwright-report/
+blob-report/
+
+# --- Logs ---
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# local env files
-.env*.local
-.env
+# --- Debug / local tooling ---
 .orchids
 
-# vercel
-.vercel
+# --- OS ---
+.DS_Store
+Thumbs.db
+Desktop.ini
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-*~
-
-# System files (Windows)
+# --- Windows system (watchers / indexing) ---
 DumpStack.log.tmp
 hiberfil.sys
 pagefile.sys
 swapfile.sys
 
-# Cache
-.cache
-.turbo
+# --- IDE / editor ---
+.vscode
+.idea
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# --- Local databases (Turso remote is via env; file DB stays local) ---
+/db/local.db
+/db/local.db-*
+*.sqlite
+*.sqlite3
