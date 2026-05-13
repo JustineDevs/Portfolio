@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useLayoutEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '@/components/Navbar'
@@ -87,60 +87,62 @@ export default function HomePageClient({
   featuredAwards: AwardLike[]
   legalLinks: PublicLegalLinks
 }) {
-  const [isLoading, setIsLoading] = useState(true)
+  /** Desktop-only intro overlay; mobile always sees content (Speed Insights / LCP). */
+  const [deskSplash, setDeskSplash] = useState(false)
   const { mode } = useMode()
 
-  useEffect(() => {
-    const hasSeenPreloading = sessionStorage.getItem('has-seen-preloading') === 'true'
-    
-    if (hasSeenPreloading) {
-      setIsLoading(false)
-    } else {
-      setTimeout(() => {
-        setIsLoading(false)
-        sessionStorage.setItem('has-seen-preloading', 'true')
-      }, 3500)
+  useLayoutEffect(() => {
+    if (typeof window === 'undefined') return
+    if (sessionStorage.getItem('has-seen-preloading') === 'true') return
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      sessionStorage.setItem('has-seen-preloading', 'true')
+      return
     }
+    setDeskSplash(true)
   }, [])
 
+  useEffect(() => {
+    if (!deskSplash) return
+    const id = window.setTimeout(() => {
+      setDeskSplash(false)
+      sessionStorage.setItem('has-seen-preloading', 'true')
+    }, 3200)
+    return () => window.clearTimeout(id)
+  }, [deskSplash])
+
   return (
-    <>
-      {isLoading && <PreLoading />}
-      {!isLoading && (
-        <div className="min-h-screen bg-[#F8F8F8] relative overflow-x-hidden">
-          <AsciiBackground />
-          
-          <SocialLinksBar />
-          <Navbar />
-
-          <main id="main-content" className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto pb-4 xs:pb-6 sm:pb-8 relative z-10 overflow-x-hidden">
-            <AnimatePresence mode="wait">
-              {mode === 'personal' ? (
-                <motion.div
-                  key="personal"
-                  {...animations.modeSwitch}
-                >
-                  <Hero />
-                  <TechAndDescriptionSection />
-                  <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
-                  <GithubActivitySection />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="professional"
-                  {...animations.modeSwitch}
-                >
-                  <ResumePage featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <Footer legalLinks={legalLinks} />
-          </main>
-          
-          <ScrollToTop />
+    <div className="min-h-screen bg-[#F8F8F8] relative overflow-x-hidden">
+      {deskSplash && (
+        <div className="pointer-events-auto fixed inset-0 z-[9999] hidden md:block" aria-hidden={false}>
+          <PreLoading />
         </div>
       )}
-    </>
+
+      <AsciiBackground />
+
+      <SocialLinksBar />
+      <Navbar />
+
+      <main id="main-content" className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto pb-4 xs:pb-6 sm:pb-8 relative z-10 overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          {mode === 'personal' ? (
+            <motion.div key="personal" {...animations.modeSwitch}>
+              <Hero />
+              <TechAndDescriptionSection />
+              <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
+              <GithubActivitySection />
+            </motion.div>
+          ) : (
+            <motion.div key="professional" {...animations.modeSwitch}>
+              <ResumePage featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <Footer legalLinks={legalLinks} />
+      </main>
+
+      <ScrollToTop />
+    </div>
   )
 }
