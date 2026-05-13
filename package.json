@@ -1,14 +1,22 @@
 {
   "name": "portfolio",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Portfolio website project",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
-    "dev:legacy": "next dev",
+    "dev": "next dev",
+    "dev:turbo": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "node --import tsx test/admin-users.integration.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:status": "node scripts/db/status.cjs",
+    "db:apply-google-schema": "node scripts/db/apply-google-schema.cjs",
+    "db:repair-email-hash": "node scripts/db/repair-email-hash.cjs",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "node -e \"const jiti=require('jiti')(process.cwd()); Promise.resolve(jiti('./db/seed.ts')).then((m)=>m.seedInitialContent()).catch((err)=>{console.error(err); process.exit(1);})\"",
     "commit": "node version/scripts/parallel-commit.js",
     "commit:dry": "node version/scripts/parallel-commit.js --dry-run",
     "commit:sh": "bash version/scripts/parallel-commit.sh",
@@ -17,9 +25,12 @@
     "commit:auto": "bash version/scripts/parallel-commit.sh --max 3",
     "status": "git status",
     "changes": "git status --porcelain",
-    "staged": "git diff --cached --name-only"
+    "staged": "git diff --cached --name-only",
+    "release:git-tag": "node version/scripts/git-tag-from-package.js"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "@libsql/win32-x64-msvc": "0.5.29",
     "@lobehub/fluent-emoji": "^4.1.0",
     "@lobehub/icons": "^4.0.3",
     "@lobehub/icons-static-svg": "^1.77.0",
@@ -31,15 +42,18 @@
     "antd": "^6.2.0",
     "antd-style": "^4.1.0",
     "clsx": "^2.1.1",
+    "drizzle-orm": "^0.44.2",
     "framer-motion": "^11.0.0",
     "geist": "^1.5.1",
     "gsap": "^3.14.2",
     "lenis": "^1.3.17",
     "lucide-react": "^0.344.0",
     "next": "^14.2.0",
+    "next-auth": "^5.0.0-beta.22",
     "react": "^18.3.0",
     "react-calendly": "^4.4.0",
     "react-dom": "^18.3.0",
+    "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.4.0",
     "three": "^0.182.0"
   },
@@ -49,6 +63,8 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "autoprefixer": "^10.4.0",
+    "dotenv": "^16.6.1",
+    "drizzle-kit": "^0.31.5",
     "eslint": "^8.56.0",
     "eslint-config-next": "^16.1.3",
     "postcss": "^8.4.0",
@@ -60,5 +76,5 @@
     "website"
   ],
   "author": "JustineDevs",
-  "license": "ISC"
+  "license": "GPL-3.0"
 }
