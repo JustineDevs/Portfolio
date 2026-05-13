@@ -30,7 +30,7 @@ export default function ResumeContentSection() {
       role: 'Web3 Community Moderator',
       period: '2023-2026',
       description: 'Managing and engaging with Web3 communities, providing technical support, and fostering community growth.',
-      website: 'https://oneproject.one',
+      website: 'https://projectonepercent.io/',
     },
   ]
 
