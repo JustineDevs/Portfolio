@@ -2,20 +2,18 @@ import Navbar from '@/components/Navbar'
 import HeroProjectHeader from '@/components/sections/project-showcase/HeroProjectHeader'
 import ResponsibilitiesNetworks from '@/components/sections/project-showcase/ResponsibilitiesNetworks'
 import DescriptionOtherProjects from '@/components/sections/project-showcase/DescriptionOtherProjects'
-import ActivitySection from '@/components/sections/ActivitySection'
+import GithubActivitySection from '@/components/sections/GithubActivitySection'
 import Footer from '@/components/Footer'
-import { getProjectBySlug, getAllProjects } from '@/lib/projects'
+import { getOtherPublishedProjects, getPublishedProjectBySlug } from '@/lib/content/public'
+import { getPublicLegalLinks } from '@/lib/legal-links'
 import { notFound } from 'next/navigation'
 
-export function generateStaticParams() {
-  const projects = getAllProjects()
-  return projects.map((project) => ({
-    slug: project.slug,
-  }))
-}
-
-export default function ProjectShowcasePage({ params }: { params: { slug: string } }) {
-  const project = getProjectBySlug(params.slug)
+export default async function ProjectShowcasePage({ params }: { params: { slug: string } }) {
+  const [project, otherProjects, legalLinks] = await Promise.all([
+    getPublishedProjectBySlug(params.slug),
+    getOtherPublishedProjects(params.slug, 2),
+    getPublicLegalLinks(),
+  ])
   
   if (!project) {
     notFound()
@@ -25,14 +23,14 @@ export default function ProjectShowcasePage({ params }: { params: { slug: string
     <>
       <Navbar />
       <main className="bg-[#F8FAFC]">
-        <HeroProjectHeader slug={params.slug} />
-        <ResponsibilitiesNetworks slug={params.slug} />
-        <DescriptionOtherProjects slug={params.slug} />
+        <HeroProjectHeader project={project} />
+        <ResponsibilitiesNetworks project={project} />
+        <DescriptionOtherProjects project={project} otherProjects={otherProjects} />
         <div className="max-w-7xl mx-auto">
-          <ActivitySection />
+          <GithubActivitySection />
         </div>
       </main>
-      <Footer />
+      <Footer legalLinks={legalLinks} />
     </>
   )
 }
