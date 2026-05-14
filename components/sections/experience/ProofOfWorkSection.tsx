@@ -1,90 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import CornerDot from "@/components/ui/CornerDot";
 import { getRenderableImageUrl, isSvgAssetUrl } from "@/lib/asset-urls";
-
-interface ProofPayload {
-  projects: Array<{
-    slug: string;
-    title: string;
-    summary: string;
-    category: string;
-    bannerImageUrl?: string | null;
-    coverImageUrl?: string | null;
-  }>;
-  posts: Array<{
-    slug: string;
-    title: string;
-    summary: string;
-    postType: string;
-    sourcePlatform?: string | null;
-    canonicalUrl?: string | null;
-    coverImageUrl?: string | null;
-  }>;
-  testimonials: Array<{
-    id?: number;
-    name: string;
-    role?: string | null;
-    quote: string;
-  }>;
-  awards: Array<{
-    id?: number;
-    slug: string;
-    title: string;
-    eventName: string;
-    description: string;
-    year: string;
-    proofUrl?: string | null;
-    logoUrl?: string | null;
-  }>;
-  certificates: Array<{
-    id?: number;
-    slug: string;
-    title: string;
-    description: string;
-    proofUrl?: string | null;
-    logoUrl?: string | null;
-  }>;
-}
-
-type ProjectCard = {
-  key: string;
-  typeLabel: string;
-  title: string;
-  summary: string;
-  href?: string | null;
-  imageUrl?: string | null;
-};
-
-type WritingCard = {
-  key: string;
-  label: string;
-  title: string;
-  summary: string;
-  href: string;
-  imageUrl?: string | null;
-};
-
-type TestimonialCard = {
-  key: string;
-  label: string;
-  title?: string | null;
-  quote: string;
-};
-
-type AwardCard = {
-  slug: string;
-  title: string;
-  summary: string;
-  year: string;
-  href?: string | null;
-  logoUrl?: string | null;
-  sourceLabel: string;
-};
+import type { ExperiencePageData } from "@/lib/content/page-data";
 
 function AssetThumb({ src, alt }: { src?: string | null; alt: string }) {
   if (!src) return null;
@@ -105,64 +26,15 @@ function AssetThumb({ src, alt }: { src?: string | null; alt: string }) {
   );
 }
 
-export default function ProofOfWorkSection() {
-  const [payload, setPayload] = useState<ProofPayload>({
-    projects: [],
-    posts: [],
-    testimonials: [],
-    awards: [],
-    certificates: [],
-  });
-
-  useEffect(() => {
-    async function loadProof() {
-      const response = await fetch("/api/proof-of-work");
-      const data = await response.json();
-      setPayload(data);
-    }
-
-    loadProof();
-  }, []);
-
-  const featuredProofCards = payload.projects.slice(0, 4).map<ProjectCard>((project) => ({
-    key: project.slug,
-    typeLabel: project.category || "Project",
-    title: project.title,
-    summary: project.summary,
-    href: `/projects/${project.slug}`,
-    imageUrl: project.bannerImageUrl || project.coverImageUrl || null,
-  }));
-
-  const featuredPosts = payload.posts.slice(0, 3).map<WritingCard>((post) => ({
-    key: post.slug,
-    label: post.postType === "native" ? "Article" : post.sourcePlatform || "External",
-    title: post.title,
-    summary: post.summary,
-    href: post.postType === "external" && post.canonicalUrl ? post.canonicalUrl : `/blog/${post.slug}`,
-    imageUrl: post.coverImageUrl || null,
-  }));
-
-  const featuredTestimonials = payload.testimonials.slice(0, 2).map<TestimonialCard>((testimonial) => ({
-    key: `${testimonial.name}-${testimonial.id ?? testimonial.name}`,
-    label: testimonial.role || "Testimonial",
-    title: testimonial.name,
-    quote: testimonial.quote,
-  }));
-
-  const featuredAwards = payload.awards.slice(0, 3).map<AwardCard>((award) => ({
-    slug: award.slug,
-    title: award.title,
-    summary: award.description,
-    year: award.year,
-    href: award.proofUrl,
-    logoUrl: award.logoUrl,
-    sourceLabel: award.year || "Award",
-  }));
-
+export default function ProofOfWorkSection({ payload }: { payload: ExperiencePageData["proofOfWork"] }) {
+  const featuredProofCards = payload.projects;
+  const featuredPosts = payload.writing;
+  const featuredTestimonials = payload.testimonials;
+  const featuredAwards = payload.awards;
   const featuredCertificates = payload.certificates.slice(0, 3);
 
   return (
-    <section className="relative border-l border-r border-b border-[#d5d5d5] bg-[#F8F8F8]">
+    <section id="proof-of-work" className="relative scroll-mt-24 border-l border-r border-b border-[#d5d5d5] bg-[#F8F8F8]">
       <CornerDot position="bl" />
       <CornerDot position="br" />
 

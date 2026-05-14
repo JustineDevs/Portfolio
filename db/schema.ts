@@ -14,6 +14,7 @@ export const highlightTypes = [
   "post",
   "testimonial",
   "award",
+  "certificate",
   "custom",
 ] as const;
 export const adminUserStatuses = ["active", "disabled"] as const;
@@ -154,6 +155,27 @@ export const awards = sqliteTable(
   })
 );
 
+export const certificates = sqliteTable(
+  "certificates",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    slug: text("slug").notNull(),
+    title: text("title").notNull(),
+    issuer: text("issuer"),
+    description: text("description").notNull(),
+    proofUrl: text("proof_url"),
+    logoUrl: text("logo_url"),
+    status: text("status", { enum: contentStatuses }).notNull().default("draft"),
+    featured: integer("featured", { mode: "boolean" }).notNull().default(false),
+    sortOrder: integer("sort_order").notNull().default(0),
+    ...timestamps,
+  },
+  (table) => ({
+    slugUnique: uniqueIndex("certificates_slug_unique").on(table.slug),
+    statusIdx: index("certificates_status_idx").on(table.status),
+  })
+);
+
 export const projectAwards = sqliteTable(
   "project_awards",
   {
@@ -245,6 +267,7 @@ export const highlights = sqliteTable(
     highlightType: text("highlight_type", { enum: highlightTypes })
       .notNull()
       .default("custom"),
+    placementKey: text("placement_key"),
     targetId: integer("target_id"),
     titleOverride: text("title_override"),
     summaryOverride: text("summary_override"),
@@ -258,6 +281,7 @@ export const highlights = sqliteTable(
   (table) => ({
     statusIdx: index("highlights_status_idx").on(table.status),
     pinnedIdx: index("highlights_pinned_idx").on(table.pinned),
+    placementIdx: index("highlights_placement_idx").on(table.placementKey),
   })
 );
 

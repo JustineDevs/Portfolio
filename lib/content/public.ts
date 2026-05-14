@@ -8,7 +8,13 @@ import {
 } from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 import {
+  placementMatches,
+  type HighlightPlacementKey,
+  type HighlightType,
+} from "@/lib/content/highlight-placement";
+import {
   awards,
+  certificates,
   githubActivitySnapshots,
   highlights,
   pageSections,
@@ -40,6 +46,7 @@ export type FeaturedCertificateCard = {
   id?: number;
   slug: string;
   title: string;
+  issuer?: string | null;
   description: string;
   proofUrl?: string | null;
   logoUrl?: string | null;
@@ -154,6 +161,11 @@ export async function getFeaturedPosts(limit?: number) {
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
 }
 
+export async function getLatestPosts(limit?: number) {
+  const posts = await getPublishedPosts();
+  return typeof limit === "number" ? posts.slice(0, limit) : posts;
+}
+
 export async function getPublishedTestimonials() {
   try {
     return await db
@@ -191,18 +203,45 @@ export async function getPublishedAwards() {
   }
 }
 
-export async function getFeaturedAwardCards(limit?: number): Promise<FeaturedAwardCard[]> {
+export async function getPublishedCertificates() {
+  try {
+    const rows = await db
+      .select()
+      .from(certificates)
+      .where(eq(certificates.status, "published"))
+      .orderBy(desc(certificates.featured), asc(certificates.sortOrder), desc(certificates.updatedAt));
+
+    return Promise.all(
+      rows.map(async (certificate) => ({
+        ...certificate,
+        logoUrl: await normalizeOptionalImageAssetUrl(certificate.logoUrl),
+      })),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export async function getFeaturedAwardCards(
+  limit?: number,
+  placementKey?: HighlightPlacementKey,
+): Promise<FeaturedAwardCard[]> {
   const [awardRows, highlightRows] = await Promise.all([
     getPublishedAwards(),
     getPublishedHighlights(),
   ]);
 
   const featuredAwardRows = awardRows.filter((award) => award.featured);
-  const awardById = new Map(featuredAwardRows.map((award) => [award.id, award]));
+  const awardById = new Map(awardRows.map((award) => [award.id, award]));
+  const prioritizedAwardRows = [...featuredAwardRows, ...awardRows.filter((award) => !award.featured)];
   const cards: FeaturedAwardCard[] = [];
   const seen = new Set<string>();
 
-  for (const highlight of highlightRows.filter((row) => row.highlightType === "award")) {
+  for (const highlight of highlightRows.filter(
+    (row) =>
+      row.highlightType === "award" &&
+      (!placementKey || placementMatches(row.placementKey, row.highlightType as HighlightType, placementKey)),
+  )) {
     const targetAward = highlight.targetId ? awardById.get(highlight.targetId) : null;
     if (!targetAward) continue;
     const title = highlight.titleOverride?.trim() || targetAward?.title || "Award";
@@ -223,7 +262,7 @@ export async function getFeaturedAwardCards(limit?: number): Promise<FeaturedAwa
     });
   }
 
-  for (const award of featuredAwardRows) {
+  for (const award of prioritizedAwardRows) {
     const dedupeKey = `${award.title.toLowerCase()}|${award.proofUrl || ""}`;
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
@@ -243,20 +282,81 @@ export async function getFeaturedAwardCards(limit?: number): Promise<FeaturedAwa
   return typeof limit === "number" ? cards.slice(0, limit) : cards;
 }
 
-export async function getFeaturedCertificateCards(limit?: number): Promise<FeaturedCertificateCard[]> {
-  const highlightRows = await getPublishedHighlights();
+export async function getFeaturedCertificateCards(
+  limit?: number,
+  placementKey?: HighlightPlacementKey,
+): Promise<FeaturedCertificateCard[]> {
+  const [certificateRows, highlightRows] = await Promise.all([
+    getPublishedCertificates(),
+    getPublishedHighlights(),
+  ]);
 
-  const cards = highlightRows
-    .filter((row) => row.highlightType === "custom" && row.pinned)
-    .map((highlight) => ({
+  const highlightedCertificates = highlightRows.filter(
+    (row) =>
+      row.highlightType === "certificate" &&
+      (!placementKey || placementMatches(row.placementKey, row.highlightType as HighlightType, placementKey)),
+  );
+  const certificateById = new Map(certificateRows.map((certificate) => [certificate.id, certificate]));
+  const cards: FeaturedCertificateCard[] = [];
+  const seen = new Set<string>();
+
+  for (const highlight of highlightedCertificates) {
+    const targetCertificate = highlight.targetId ? certificateById.get(highlight.targetId) : null;
+    const title = highlight.titleOverride?.trim() || targetCertificate?.title || "Certificate";
+    const proofUrl = highlight.linkOverride?.trim() || targetCertificate?.proofUrl || null;
+    const dedupeKey = `${title.toLowerCase()}|${proofUrl || ""}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    cards.push({
       id: highlight.id,
-      slug: `certificate-${highlight.id ?? highlight.sortOrder}`,
-      title: highlight.titleOverride?.trim() || "Certificate",
-      description: highlight.summaryOverride?.trim() || "Certificate highlight",
-      proofUrl: highlight.linkOverride?.trim() || null,
+      slug: targetCertificate?.slug || `highlight-certificate-${highlight.id ?? dedupeKey}`,
+      title,
+      issuer: targetCertificate?.issuer || null,
+      description: highlight.summaryOverride?.trim() || targetCertificate?.description || "Certificate highlight",
+      proofUrl,
+      logoUrl: highlight.imageUrlOverride?.trim() || targetCertificate?.logoUrl || null,
+    });
+  }
+
+  for (const certificate of certificateRows) {
+    const dedupeKey = `${certificate.title.toLowerCase()}|${certificate.proofUrl || ""}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    cards.push({
+      id: certificate.id,
+      slug: certificate.slug,
+      title: certificate.title,
+      issuer: certificate.issuer,
+      description: certificate.description,
+      proofUrl: certificate.proofUrl,
+      logoUrl: certificate.logoUrl,
+    });
+  }
+
+  for (const highlight of highlightRows.filter(
+    (row) =>
+      row.highlightType === "custom" &&
+      row.pinned &&
+      (!placementKey || placementMatches(row.placementKey, row.highlightType as HighlightType, placementKey)),
+  )) {
+    const title = highlight.titleOverride?.trim() || "Certificate";
+    const proofUrl = highlight.linkOverride?.trim() || null;
+    const dedupeKey = `${title.toLowerCase()}|${proofUrl || ""}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    cards.push({
+      id: highlight.id,
+      slug: `legacy-certificate-${highlight.id ?? highlight.sortOrder}`,
+      title,
+      issuer: null,
+      description: highlight.summaryOverride?.trim() || "Legacy certificate highlight",
+      proofUrl,
       logoUrl: highlight.imageUrlOverride?.trim() || null,
-    }))
-    .filter((card) => card.title || card.description);
+    });
+  }
 
   return typeof limit === "number" ? cards.slice(0, limit) : cards;
 }

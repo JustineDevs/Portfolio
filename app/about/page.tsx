@@ -3,17 +3,10 @@ import Sidebar from '@/components/sections/about/Sidebar'
 import HeroBanner from '@/components/sections/about/HeroBanner'
 import StoryResponsibilities from '@/components/sections/about/StoryResponsibilities'
 import StrengthsHowVision from '@/components/sections/about/StrengthsHowVision'
-import { getPublishedPageSections } from '@/lib/content/public'
-import { getPublicLegalLinks } from '@/lib/legal-links'
+import { getAboutPageData } from '@/lib/content/page-data'
 
 export default async function AboutPage() {
-  const [sections, legalLinks] = await Promise.all([
-    getPublishedPageSections('about'),
-    getPublicLegalLinks(),
-  ])
-  const byKey = Object.fromEntries(sections.map((section) => [section.sectionKey, section]))
-  const heroMeta = byKey.hero?.metaJson ? JSON.parse(byKey.hero.metaJson) : {}
-  const sidebarMeta = byKey.reading_map?.metaJson ? JSON.parse(byKey.reading_map.metaJson) : {}
+  const { byKey, heroMeta, sidebarMeta, legalLinks } = await getAboutPageData()
 
   return (
     <PageLayout legalLinks={legalLinks}>

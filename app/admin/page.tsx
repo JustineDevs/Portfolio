@@ -28,6 +28,13 @@ const adminSections: Section[] = [
     countLabel: (n) => `${n} post${n === 1 ? "" : "s"}`,
   },
   {
+    href: "/admin/certificates",
+    label: "Certificates",
+    description: "Formal certificate records and proof links.",
+    count: (c) => c.certificates,
+    countLabel: (n) => `${n} certificate${n === 1 ? "" : "s"}`,
+  },
+  {
     href: "/admin/highlights",
     label: "Highlights",
     description: "Pinned proof-of-work and card overrides.",

@@ -7,6 +7,7 @@ import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/abo
 import type { SelectOption } from "@/components/admin/FormPrimitives";
 import {
   awards,
+  certificates,
   githubActivitySnapshots,
   highlights,
   pageSections,
@@ -88,9 +89,17 @@ export async function listAwardsForAdmin() {
   return db.select().from(awards).orderBy(desc(awards.updatedAt), asc(awards.sortOrder));
 }
 
+export async function listCertificatesForAdmin() {
+  await requireAdminSession();
+  return db.select().from(certificates).orderBy(desc(certificates.updatedAt), asc(certificates.sortOrder));
+}
+
 export async function listHighlightsForAdmin() {
   await requireAdminSession();
-  return db.select().from(highlights).orderBy(desc(highlights.pinned), asc(highlights.sortOrder));
+  return db
+    .select()
+    .from(highlights)
+    .orderBy(asc(highlights.placementKey), desc(highlights.pinned), asc(highlights.sortOrder));
 }
 
 export async function listHighlightTargetOptionsForAdmin(): Promise<{
@@ -98,10 +107,11 @@ export async function listHighlightTargetOptionsForAdmin(): Promise<{
   post: SelectOption[];
   testimonial: SelectOption[];
   award: SelectOption[];
+  certificate: SelectOption[];
 }> {
   await requireAdminSession();
 
-  const [projectRows, postRows, testimonialRows, awardRows] = await Promise.all([
+  const [projectRows, postRows, testimonialRows, awardRows, certificateRows] = await Promise.all([
     db
       .select({ id: projects.id, title: projects.title, slug: projects.slug })
       .from(projects)
@@ -122,6 +132,11 @@ export async function listHighlightTargetOptionsForAdmin(): Promise<{
       .from(awards)
       .where(eq(awards.status, "published"))
       .orderBy(desc(awards.featured), asc(awards.sortOrder), asc(awards.title)),
+    db
+      .select({ id: certificates.id, title: certificates.title, issuer: certificates.issuer })
+      .from(certificates)
+      .where(eq(certificates.status, "published"))
+      .orderBy(desc(certificates.featured), asc(certificates.sortOrder), asc(certificates.title)),
   ]);
 
   return {
@@ -132,12 +147,22 @@ export async function listHighlightTargetOptionsForAdmin(): Promise<{
       label: row.role ? `${row.name} (${row.role})` : row.name,
     })),
     award: awardRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.year})` })),
+    certificate: certificateRows.map((row) => ({
+      value: String(row.id),
+      label: row.issuer ? `${row.title} (${row.issuer})` : row.title,
+    })),
   };
 }
 
 export async function getHighlightForAdmin(id: number) {
   await requireAdminSession();
   const rows = await db.select().from(highlights).where(eq(highlights.id, id)).limit(1);
+  return rows[0] ?? null;
+}
+
+export async function getCertificateForAdmin(id: number) {
+  await requireAdminSession();
+  const rows = await db.select().from(certificates).where(eq(certificates.id, id)).limit(1);
   return rows[0] ?? null;
 }
 
@@ -220,6 +245,7 @@ export type AdminDashboardCounts = {
   projects: number;
   posts: number;
   highlights: number;
+  certificates: number;
   aboutSections: number;
   activitySnapshots: number;
   siteSettings: number;
@@ -228,10 +254,11 @@ export type AdminDashboardCounts = {
 export async function getAdminDashboardCounts(): Promise<AdminDashboardCounts> {
   await requireAdminSession();
 
-  const [[proj], [pst], [hi], [abt], [snap], [set]] = await Promise.all([
+  const [[proj], [pst], [hi], [cert], [abt], [snap], [set]] = await Promise.all([
     db.select({ n: count() }).from(projects),
     db.select({ n: count() }).from(posts),
     db.select({ n: count() }).from(highlights),
+    db.select({ n: count() }).from(certificates),
     db.select({ n: count() }).from(pageSections).where(eq(pageSections.pageKey, "about")),
     db.select({ n: count() }).from(githubActivitySnapshots),
     db.select({ n: count() }).from(siteSettings),
@@ -241,6 +268,7 @@ export async function getAdminDashboardCounts(): Promise<AdminDashboardCounts> {
     projects: Number(proj?.n ?? 0),
     posts: Number(pst?.n ?? 0),
     highlights: Number(hi?.n ?? 0),
+    certificates: Number(cert?.n ?? 0),
     aboutSections: Number(abt?.n ?? 0),
     activitySnapshots: Number(snap?.n ?? 0),
     siteSettings: Number(set?.n ?? 0),

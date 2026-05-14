@@ -1,11 +1,10 @@
 import Link from "next/link";
 
 import PageLayout from "@/components/layouts/PageLayout";
-import { getPublishedPosts } from "@/lib/content/public";
-import { getPublicLegalLinks } from "@/lib/legal-links";
+import { getBlogIndexPageData } from "@/lib/content/page-data";
 
 export default async function BlogPage() {
-  const [posts, legalLinks] = await Promise.all([getPublishedPosts(), getPublicLegalLinks()]);
+  const { posts, legalLinks } = await getBlogIndexPageData();
 
   return (
     <PageLayout legalLinks={legalLinks}>

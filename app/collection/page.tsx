@@ -1,15 +1,11 @@
 import CollectionPageClient from "@/components/collection/CollectionPageClient";
 import PageLayout from "@/components/layouts/PageLayout";
-import { getCollectionIndex } from "@/lib/github/public-collection";
-import { getPublicLegalLinks } from "@/lib/legal-links";
+import { getCollectionPageData } from "@/lib/content/page-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function CollectionPage() {
-  const [collectionIndex, legalLinks] = await Promise.all([
-    getCollectionIndex(),
-    getPublicLegalLinks(),
-  ]);
+  const { collectionIndex, legalLinks } = await getCollectionPageData();
 
   return (
     <PageLayout legalLinks={legalLinks}>

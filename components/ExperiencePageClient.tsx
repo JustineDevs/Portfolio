@@ -8,8 +8,15 @@ import GithubActivitySection from "@/components/sections/GithubActivitySection";
 import ProofOfWorkSection from "@/components/sections/experience/ProofOfWorkSection";
 import PixeledCursorTrail from "@/components/ui/PixeledCursorTrail";
 import type { PublicLegalLinks } from "@/lib/legal-links-shared";
+import type { ExperiencePageData } from "@/lib/content/page-data";
 
-export default function ExperiencePageClient({ legalLinks }: { legalLinks: PublicLegalLinks }) {
+export default function ExperiencePageClient({
+  legalLinks,
+  proofOfWork,
+}: {
+  legalLinks: PublicLegalLinks;
+  proofOfWork: ExperiencePageData["proofOfWork"];
+}) {
   const [showCursorTrail, setShowCursorTrail] = useState(false);
 
   useEffect(() => {
@@ -44,7 +51,7 @@ export default function ExperiencePageClient({ legalLinks }: { legalLinks: Publi
         <HeroTitle />
         <TimelineNavigationSection />
         <GithubActivitySection />
-        <ProofOfWorkSection />
+        <ProofOfWorkSection payload={proofOfWork} />
       </PageLayout>
     </>
   );

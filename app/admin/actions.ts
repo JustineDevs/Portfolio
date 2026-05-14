@@ -13,6 +13,7 @@ import {
 } from "@/lib/content/revalidate";
 import {
   awards,
+  certificates,
   highlights,
   pageSections,
   posts,
@@ -29,6 +30,11 @@ import { and, eq, ne } from "drizzle-orm";
 import { fetchGithubActivityForYear, saveGithubActivitySnapshot } from "@/lib/github/activity";
 import { normalizeAssetFieldsInObjectAsync, normalizeOptionalImageAssetUrl } from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
+import {
+  getDefaultPlacementKeyForType,
+  isPlacementCompatibleWithType,
+  type HighlightType,
+} from "@/lib/content/highlight-placement";
 
 function stringValue(formData: FormData, key: string) {
   return formData.get(key)?.toString().trim() ?? "";
@@ -118,6 +124,20 @@ function validatePostPayload(payload: {
   return null
 }
 
+function validateCertificatePayload(payload: {
+  slug: string;
+  title: string;
+  description: string;
+  status: "draft" | "published" | "archived";
+}) {
+  if (!payload.slug) return "Slug is required."
+  if (!/^[a-z0-9-]+$/.test(payload.slug)) return "Slug must use lowercase letters, numbers, and hyphens only."
+  if (!payload.title) return "Title is required."
+  if (!payload.description) return "Description is required."
+  if (!payload.status) return "Status is required."
+  return null
+}
+
 function parseStatus(value: string, returnTo: string) {
   const allowed = new Set(["draft", "published", "archived"])
   if (!allowed.has(value)) {
@@ -135,11 +155,19 @@ function parsePostType(value: string, returnTo: string) {
 }
 
 function parseHighlightType(value: string, returnTo: string) {
-  const allowed = new Set(["project", "post", "testimonial", "award", "custom"])
+  const allowed = new Set(["project", "post", "testimonial", "award", "certificate", "custom"])
   if (!allowed.has(value)) {
     redirectWithError(returnTo, "Highlight type is invalid.")
   }
-  return value as "project" | "post" | "testimonial" | "award" | "custom"
+  return value as "project" | "post" | "testimonial" | "award" | "certificate" | "custom"
+}
+
+function parseHighlightPlacementKey(value: string, highlightType: HighlightType, returnTo: string) {
+  const normalized = value.trim() || getDefaultPlacementKeyForType(highlightType)
+  if (!isPlacementCompatibleWithType(normalized, highlightType)) {
+    redirectWithError(returnTo, "Placement is invalid for the selected highlight type.")
+  }
+  return normalized
 }
 
 function normalizePublishedAt(value: string | null, returnTo: string) {
@@ -381,6 +409,58 @@ export async function savePostAction(formData: FormData) {
   redirect(`/admin/writing/${postId}`);
 }
 
+export async function saveCertificateAction(formData: FormData) {
+  await requireAdminSession();
+
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  const fallbackReturnTo = id ? `/admin/certificates/${id}` : "/admin/certificates/new";
+  const returnTo = normalizeReturnTo(stringValue(formData, "returnTo") || fallbackReturnTo, fallbackReturnTo);
+  const slug = stringValue(formData, "slug");
+  const logoUrl = await validateOptionalImageUrl(optionalString(formData, "logoUrl"), returnTo, "Logo URL");
+  const payload = {
+    slug,
+    title: stringValue(formData, "title"),
+    issuer: optionalString(formData, "issuer"),
+    description: stringValue(formData, "description"),
+    proofUrl: validateOptionalUrl(optionalString(formData, "proofUrl"), returnTo, "Proof URL"),
+    logoUrl,
+    status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
+    featured: parseBoolean(formData, "featured"),
+    sortOrder: Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
+    updatedAt: new Date().toISOString(),
+  };
+
+  const certificateError = validateCertificatePayload(payload);
+  if (certificateError) {
+    redirectWithError(returnTo, certificateError);
+  }
+
+  const existingCertificate = await db
+    .select({ id: certificates.id })
+    .from(certificates)
+    .where(id ? and(eq(certificates.slug, slug), ne(certificates.id, id)) : eq(certificates.slug, slug))
+    .limit(1);
+
+  if (existingCertificate[0]) {
+    redirectWithError(returnTo, "Certificate slug must be unique.");
+  }
+
+  let certificateId = id;
+  if (certificateId) {
+    await db.update(certificates).set(payload).where(eq(certificates.id, certificateId));
+  } else {
+    const result = await db.insert(certificates).values({
+      ...payload,
+      createdAt: new Date().toISOString(),
+    }).returning({ id: certificates.id });
+    certificateId = result[0]?.id ?? 0;
+  }
+
+  revalidateHome();
+  revalidateExperience();
+  redirect(`/admin/certificates/${certificateId}`);
+}
+
 export async function savePageSectionAction(formData: FormData) {
   await requireAdminSession();
   const id = Number.parseInt(stringValue(formData, "id"), 10);
@@ -445,41 +525,55 @@ export async function savePageSectionAction(formData: FormData) {
 export async function saveHighlightAction(formData: FormData) {
   await requireAdminSession();
   const id = Number.parseInt(stringValue(formData, "id"), 10);
-  const imageUrlOverride = await validateOptionalImageUrl(optionalString(formData, "imageUrlOverride"), "/admin/highlights", "Image Override");
-  const highlightType = parseHighlightType(stringValue(formData, "highlightType") || "custom", "/admin/highlights");
+  const formKey = stringValue(formData, "formKey") || (id ? `highlight-${id}` : "new-0");
+  const returnTo = normalizeReturnTo(stringValue(formData, "returnTo") || `/admin/highlights?form=${encodeURIComponent(formKey)}`, "/admin/highlights");
+  const imageUrlOverride = await validateOptionalImageUrl(optionalString(formData, "imageUrlOverride"), returnTo, "Image Override");
+  const highlightType = parseHighlightType(stringValue(formData, "highlightType") || "custom", returnTo);
+  const placementKey = parseHighlightPlacementKey(
+    stringValue(formData, "placementKey"),
+    highlightType,
+    returnTo,
+  );
   const rawTargetId = Number.parseInt(stringValue(formData, "targetId"), 10);
   const targetId = Number.isFinite(rawTargetId) && rawTargetId > 0 ? rawTargetId : null;
   const payload = {
     highlightType,
+    placementKey,
     targetId,
     titleOverride: optionalString(formData, "titleOverride"),
     summaryOverride: optionalString(formData, "summaryOverride"),
     imageUrlOverride,
-    linkOverride: validateOptionalUrl(optionalString(formData, "linkOverride"), "/admin/highlights", "Link Override"),
+    linkOverride: validateOptionalUrl(optionalString(formData, "linkOverride"), returnTo, "Link Override"),
     pinned: parseBoolean(formData, "pinned"),
-    status: parseStatus(stringValue(formData, "status") || "draft", "/admin/highlights"),
+    status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
     sortOrder: Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
     updatedAt: new Date().toISOString(),
   };
 
   if (payload.highlightType === "custom") {
     if (!payload.titleOverride || !payload.summaryOverride) {
-      redirectWithError("/admin/highlights", "Certificates require both Title Override and Summary Override.");
+      redirectWithError(returnTo, "Manual cards require both Title Override and Summary Override.");
     }
-  } else if (!payload.targetId) {
-    redirectWithError("/admin/highlights", `${payload.highlightType} highlights require a target.`);
+  } else if (!payload.targetId && (payload.highlightType === "project" || payload.highlightType === "post")) {
+    redirectWithError(returnTo, `${payload.highlightType} highlights require a target.`);
   } else {
-    const targetLookup =
-      payload.highlightType === "project"
-        ? await db.select({ id: projects.id }).from(projects).where(and(eq(projects.id, payload.targetId), eq(projects.status, "published"))).limit(1)
-        : payload.highlightType === "post"
-          ? await db.select({ id: posts.id }).from(posts).where(and(eq(posts.id, payload.targetId), eq(posts.status, "published"))).limit(1)
-          : payload.highlightType === "testimonial"
-            ? await db.select({ id: testimonials.id }).from(testimonials).where(and(eq(testimonials.id, payload.targetId), eq(testimonials.status, "published"))).limit(1)
-            : await db.select({ id: awards.id }).from(awards).where(and(eq(awards.id, payload.targetId), eq(awards.status, "published"))).limit(1);
+    if (payload.targetId) {
+      const targetLookup =
+        payload.highlightType === "project"
+          ? await db.select({ id: projects.id }).from(projects).where(and(eq(projects.id, payload.targetId), eq(projects.status, "published"))).limit(1)
+          : payload.highlightType === "post"
+            ? await db.select({ id: posts.id }).from(posts).where(and(eq(posts.id, payload.targetId), eq(posts.status, "published"))).limit(1)
+            : payload.highlightType === "testimonial"
+              ? await db.select({ id: testimonials.id }).from(testimonials).where(and(eq(testimonials.id, payload.targetId), eq(testimonials.status, "published"))).limit(1)
+              : payload.highlightType === "award"
+                ? await db.select({ id: awards.id }).from(awards).where(and(eq(awards.id, payload.targetId), eq(awards.status, "published"))).limit(1)
+                : await db.select({ id: certificates.id }).from(certificates).where(and(eq(certificates.id, payload.targetId), eq(certificates.status, "published"))).limit(1);
 
-    if (!targetLookup[0]) {
-      redirectWithError("/admin/highlights", `Selected target is not a published ${payload.highlightType}.`);
+      if (!targetLookup[0]) {
+        redirectWithError(returnTo, `Selected target is not a published ${payload.highlightType}.`);
+      }
+    } else if (!payload.titleOverride || !payload.summaryOverride) {
+      redirectWithError(returnTo, `${payload.highlightType} highlights without a target require both Title Override and Summary Override.`);
     }
   }
 
@@ -491,6 +585,7 @@ export async function saveHighlightAction(formData: FormData) {
 
   revalidateHome();
   revalidateExperience();
+  redirect(`${returnTo}${returnTo.includes("?") ? "&" : "?"}saved=${id ? "updated" : "created"}`);
 }
 
 export async function saveSiteSettingAction(formData: FormData) {

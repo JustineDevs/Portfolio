@@ -3,8 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import MarkdownContent from "@/components/content/MarkdownContent";
 import PageLayout from "@/components/layouts/PageLayout";
-import { getPublishedPostBySlug } from "@/lib/content/public";
-import { getPublicLegalLinks } from "@/lib/legal-links";
+import { getBlogPostPageData } from "@/lib/content/page-data";
 
 function isSafeExternalUrl(value: string) {
   try {
@@ -20,7 +19,7 @@ export default async function BlogPostPage({
 }: {
   params: { slug: string };
 }) {
-  const [post, legalLinks] = await Promise.all([getPublishedPostBySlug(params.slug), getPublicLegalLinks()]);
+  const { post, legalLinks } = await getBlogPostPageData(params.slug);
 
   if (!post) {
     notFound();

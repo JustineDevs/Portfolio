@@ -4,16 +4,11 @@ import ResponsibilitiesNetworks from '@/components/sections/project-showcase/Res
 import DescriptionOtherProjects from '@/components/sections/project-showcase/DescriptionOtherProjects'
 import GithubActivitySection from '@/components/sections/GithubActivitySection'
 import Footer from '@/components/Footer'
-import { getOtherPublishedProjects, getPublishedProjectBySlug } from '@/lib/content/public'
-import { getPublicLegalLinks } from '@/lib/legal-links'
+import { getProjectDetailPageData } from '@/lib/content/page-data'
 import { notFound } from 'next/navigation'
 
 export default async function ProjectShowcasePage({ params }: { params: { slug: string } }) {
-  const [project, otherProjects, legalLinks] = await Promise.all([
-    getPublishedProjectBySlug(params.slug),
-    getOtherPublishedProjects(params.slug, 2),
-    getPublicLegalLinks(),
-  ])
+  const { project, otherProjects, legalLinks } = await getProjectDetailPageData(params.slug)
   
   if (!project) {
     notFound()

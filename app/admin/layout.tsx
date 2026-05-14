@@ -8,6 +8,7 @@ const adminLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/projects", label: "Projects" },
   { href: "/admin/writing", label: "Writing" },
+  { href: "/admin/certificates", label: "Certificates" },
   { href: "/admin/highlights", label: "Highlights" },
   { href: "/admin/about", label: "About" },
   { href: "/admin/activity", label: "Activity" },

@@ -1,11 +1,10 @@
 import PageLayout from '@/components/layouts/PageLayout'
 import ProjectsHero from '@/components/sections/projects/ProjectsHero'
 import ProjectsGrid from '@/components/sections/projects/ProjectsGrid'
-import { getPublishedProjects } from '@/lib/content/public'
-import { getPublicLegalLinks } from '@/lib/legal-links'
+import { getProjectsPageData } from '@/lib/content/page-data'
 
 export default async function ProjectsPage() {
-  const [projects, legalLinks] = await Promise.all([getPublishedProjects(), getPublicLegalLinks()])
+  const { projects, legalLinks } = await getProjectsPageData()
   return (
     <PageLayout legalLinks={legalLinks}>
       <ProjectsHero />
