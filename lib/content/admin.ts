@@ -103,25 +103,12 @@ export async function listHighlightsForAdmin() {
 }
 
 export async function listHighlightTargetOptionsForAdmin(): Promise<{
-  project: SelectOption[];
-  post: SelectOption[];
   testimonial: SelectOption[];
   award: SelectOption[];
-  certificate: SelectOption[];
 }> {
   await requireAdminSession();
 
-  const [projectRows, postRows, testimonialRows, awardRows, certificateRows] = await Promise.all([
-    db
-      .select({ id: projects.id, title: projects.title, slug: projects.slug })
-      .from(projects)
-      .where(eq(projects.status, "published"))
-      .orderBy(asc(projects.sortOrder), asc(projects.title)),
-    db
-      .select({ id: posts.id, title: posts.title, slug: posts.slug })
-      .from(posts)
-      .where(eq(posts.status, "published"))
-      .orderBy(desc(posts.publishedAt), asc(posts.title)),
+  const [testimonialRows, awardRows] = await Promise.all([
     db
       .select({ id: testimonials.id, name: testimonials.name, role: testimonials.role })
       .from(testimonials)
@@ -132,25 +119,14 @@ export async function listHighlightTargetOptionsForAdmin(): Promise<{
       .from(awards)
       .where(eq(awards.status, "published"))
       .orderBy(desc(awards.featured), asc(awards.sortOrder), asc(awards.title)),
-    db
-      .select({ id: certificates.id, title: certificates.title, issuer: certificates.issuer })
-      .from(certificates)
-      .where(eq(certificates.status, "published"))
-      .orderBy(desc(certificates.featured), asc(certificates.sortOrder), asc(certificates.title)),
   ]);
 
   return {
-    project: projectRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.slug})` })),
-    post: postRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.slug})` })),
     testimonial: testimonialRows.map((row) => ({
       value: String(row.id),
       label: row.role ? `${row.name} (${row.role})` : row.name,
     })),
     award: awardRows.map((row) => ({ value: String(row.id), label: `${row.title} (${row.year})` })),
-    certificate: certificateRows.map((row) => ({
-      value: String(row.id),
-      label: row.issuer ? `${row.title} (${row.issuer})` : row.title,
-    })),
   };
 }
 
