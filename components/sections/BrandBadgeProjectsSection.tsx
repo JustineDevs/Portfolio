@@ -207,9 +207,9 @@ export default function BrandBadgeProjectsSection({
                 <p className="text-[10px] xs:text-[11px] sm:text-[12px] text-[#666666] mt-0.5">Badges earned from hackathon wins</p>
               </div>
               <Link
-                href="/projects"
+                href="/experience#proof-of-work"
                 className="text-[10px] xs:text-[11px] text-[#666666] border border-[#D5D5D5] px-2 xs:px-3 sm:px-4 py-1 xs:py-1.5 rounded-lg hover:bg-white transition-colors font-medium focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                aria-label="View all badges"
+                aria-label="View all proof of work and writing items"
               >
                 View all
               </Link>
