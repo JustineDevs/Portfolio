@@ -8,20 +8,13 @@ import CornerDot from "@/components/ui/CornerDot";
 import { getRenderableImageUrl, isSvgAssetUrl } from "@/lib/asset-urls";
 
 interface ProofPayload {
-  highlights: Array<{
-    id?: number;
-    highlightType: string;
-    targetId?: number | null;
-    titleOverride?: string | null;
-    summaryOverride?: string | null;
-    imageUrlOverride?: string | null;
-    linkOverride?: string | null;
-    pinned?: boolean;
-    resolvedTitle: string;
-    resolvedSummary: string;
-    resolvedImageUrl?: string | null;
-    resolvedHref?: string | null;
-    resolvedMeta: string;
+  projects: Array<{
+    slug: string;
+    title: string;
+    summary: string;
+    category: string;
+    bannerImageUrl?: string | null;
+    coverImageUrl?: string | null;
   }>;
   posts: Array<{
     slug: string;
@@ -29,6 +22,8 @@ interface ProofPayload {
     summary: string;
     postType: string;
     sourcePlatform?: string | null;
+    canonicalUrl?: string | null;
+    coverImageUrl?: string | null;
   }>;
   testimonials: Array<{
     id?: number;
@@ -37,23 +32,32 @@ interface ProofPayload {
     quote: string;
   }>;
   awards: Array<{
+    id?: number;
     slug: string;
     title: string;
-    description?: string | null;
+    eventName: string;
+    description: string;
     year: string;
+    proofUrl?: string | null;
+    logoUrl?: string | null;
+  }>;
+  certificates: Array<{
+    id?: number;
+    slug: string;
+    title: string;
+    description: string;
     proofUrl?: string | null;
     logoUrl?: string | null;
   }>;
 }
 
-type HighlightCard = {
+type ProjectCard = {
   key: string;
   typeLabel: string;
   title: string;
   summary: string;
   href?: string | null;
   imageUrl?: string | null;
-  pinned?: boolean;
 };
 
 type WritingCard = {
@@ -103,10 +107,11 @@ function AssetThumb({ src, alt }: { src?: string | null; alt: string }) {
 
 export default function ProofOfWorkSection() {
   const [payload, setPayload] = useState<ProofPayload>({
-    highlights: [],
+    projects: [],
     posts: [],
     testimonials: [],
     awards: [],
+    certificates: [],
   });
 
   useEffect(() => {
@@ -119,139 +124,42 @@ export default function ProofOfWorkSection() {
     loadProof();
   }, []);
 
-  const proofHighlights = payload.highlights.filter(
-    (highlight) => highlight.highlightType === "project",
-  );
-  const postHighlights = payload.highlights.filter((highlight) => highlight.highlightType === "post");
-  const testimonialHighlights = payload.highlights.filter((highlight) => highlight.highlightType === "testimonial");
-  const awardHighlights = payload.highlights.filter((highlight) => highlight.highlightType === "award");
-
-  const featuredProofCards = proofHighlights.slice(0, 4).map<HighlightCard>((highlight, index) => ({
-    key: `proof-${highlight.id ?? index}`,
-    typeLabel: highlight.resolvedMeta,
-    title: highlight.resolvedTitle,
-    summary: highlight.resolvedSummary,
-    href: highlight.resolvedHref,
-    imageUrl: highlight.resolvedImageUrl,
-    pinned: highlight.pinned,
+  const featuredProofCards = payload.projects.slice(0, 4).map<ProjectCard>((project) => ({
+    key: project.slug,
+    typeLabel: project.category || "Project",
+    title: project.title,
+    summary: project.summary,
+    href: `/projects/${project.slug}`,
+    imageUrl: project.bannerImageUrl || project.coverImageUrl || null,
   }));
 
-  const featuredPosts = (() => {
-    const seen = new Set<string>();
-    const cards: WritingCard[] = [];
+  const featuredPosts = payload.posts.slice(0, 3).map<WritingCard>((post) => ({
+    key: post.slug,
+    label: post.postType === "native" ? "Article" : post.sourcePlatform || "External",
+    title: post.title,
+    summary: post.summary,
+    href: post.postType === "external" && post.canonicalUrl ? post.canonicalUrl : `/blog/${post.slug}`,
+    imageUrl: post.coverImageUrl || null,
+  }));
 
-    for (const highlight of postHighlights) {
-      const title = highlight.resolvedTitle;
-      const href = highlight.resolvedHref?.trim() || "#";
-      const dedupeKey = `${title.toLowerCase()}|${href}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
+  const featuredTestimonials = payload.testimonials.slice(0, 2).map<TestimonialCard>((testimonial) => ({
+    key: `${testimonial.name}-${testimonial.id ?? testimonial.name}`,
+    label: testimonial.role || "Testimonial",
+    title: testimonial.name,
+    quote: testimonial.quote,
+  }));
 
-      cards.push({
-        key: `highlight-post-${highlight.id ?? dedupeKey}`,
-        label: highlight.resolvedMeta || "Highlight",
-        title,
-        summary: highlight.resolvedSummary || "Writing highlight",
-        href,
-        imageUrl: highlight.resolvedImageUrl || null,
-      });
-    }
+  const featuredAwards = payload.awards.slice(0, 3).map<AwardCard>((award) => ({
+    slug: award.slug,
+    title: award.title,
+    summary: award.description,
+    year: award.year,
+    href: award.proofUrl,
+    logoUrl: award.logoUrl,
+    sourceLabel: award.year || "Award",
+  }));
 
-    for (const post of payload.posts) {
-      const href = `/blog/${post.slug}`;
-      const dedupeKey = `${post.title.toLowerCase()}|${href}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
-
-      cards.push({
-        key: post.slug,
-        label: post.postType === "native" ? "Article" : post.sourcePlatform || "External",
-        title: post.title,
-        summary: post.summary,
-        href,
-      });
-    }
-
-    return cards.slice(0, 3);
-  })();
-
-  const featuredTestimonials = (() => {
-    const seen = new Set<string>();
-    const cards: TestimonialCard[] = [];
-
-    for (const highlight of testimonialHighlights) {
-      const title = highlight.resolvedTitle || "Testimonial";
-      const quote = highlight.resolvedSummary || "Testimonial highlight";
-      const dedupeKey = `${title.toLowerCase()}|${quote.toLowerCase()}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
-
-      cards.push({
-        key: `highlight-testimonial-${highlight.id ?? dedupeKey}`,
-        label: highlight.resolvedMeta || "Highlight",
-        title,
-        quote,
-      });
-    }
-
-    for (const testimonial of payload.testimonials) {
-      const dedupeKey = `${testimonial.name.toLowerCase()}|${testimonial.quote.toLowerCase()}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
-
-      cards.push({
-        key: `${testimonial.name}-${testimonial.id ?? dedupeKey}`,
-        label: testimonial.role || "Testimonial",
-        title: testimonial.name,
-        quote: testimonial.quote,
-      });
-    }
-
-    return cards.slice(0, 2);
-  })();
-
-  const featuredAwards = (() => {
-    const seen = new Set<string>();
-    const cards: AwardCard[] = [];
-
-    for (const highlight of awardHighlights) {
-      const title = highlight.resolvedTitle || "Award";
-      const href = highlight.resolvedHref?.trim() || null;
-      const dedupeKey = `${title.toLowerCase()}|${href || ""}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
-
-      cards.push({
-        slug: `highlight-${highlight.id ?? dedupeKey}`,
-        title,
-        summary: highlight.resolvedSummary || "Award highlight",
-        year: "",
-        href,
-        logoUrl: highlight.resolvedImageUrl || null,
-        sourceLabel: highlight.resolvedMeta || "Highlight",
-      });
-    }
-
-    for (const award of payload.awards) {
-      const title = award.title.trim();
-      const href = award.proofUrl?.trim() || null;
-      const dedupeKey = `${title.toLowerCase()}|${href || ""}`;
-      if (seen.has(dedupeKey)) continue;
-      seen.add(dedupeKey);
-
-      cards.push({
-        slug: award.slug,
-        title,
-        summary: award.description?.trim() || "Award",
-        year: award.year,
-        href,
-        logoUrl: award.logoUrl?.trim() || null,
-        sourceLabel: award.year || "Award",
-      });
-    }
-
-    return cards.slice(0, 3);
-  })();
+  const featuredCertificates = payload.certificates.slice(0, 3);
 
   return (
     <section className="relative border-l border-r border-b border-[#d5d5d5] bg-[#F8F8F8]">
@@ -282,11 +190,6 @@ export default function ProofOfWorkSection() {
                   <span className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
                     {highlight.typeLabel}
                   </span>
-                  {highlight.pinned ? (
-                    <span className="rounded-full bg-[#424242] px-2 py-1 text-[10px] font-semibold text-white">
-                      Pinned
-                    </span>
-                  ) : null}
                 </div>
                 <div className="mt-3 flex items-start gap-3">
                   <AssetThumb src={highlight.imageUrl} alt={highlight.title} />
@@ -398,6 +301,25 @@ export default function ProofOfWorkSection() {
                       </div>
                       <div className="mt-2 text-[15px] font-bold text-[#424242]">{award.title}</div>
                       <p className="mt-2 text-[13px] leading-[1.7] text-[#555555]">{award.summary}</p>
+                    </div>
+                    <span className="shrink-0 text-sm text-[#1342FF]">Open ↗</span>
+                  </a>
+                ))}
+                {featuredCertificates.map((certificate) => (
+                  <a
+                    key={certificate.slug}
+                    href={certificate.proofUrl || "#"}
+                    target={certificate.proofUrl ? "_blank" : undefined}
+                    rel={certificate.proofUrl ? "noopener noreferrer" : undefined}
+                    className="flex items-start gap-3 rounded-xl border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
+                  >
+                    <AssetThumb src={certificate.logoUrl || null} alt={certificate.title} />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
+                        Certificate
+                      </div>
+                      <div className="mt-2 text-[15px] font-bold text-[#424242]">{certificate.title}</div>
+                      <p className="mt-2 text-[13px] leading-[1.7] text-[#555555]">{certificate.description}</p>
                     </div>
                     <span className="shrink-0 text-sm text-[#1342FF]">Open ↗</span>
                   </a>
