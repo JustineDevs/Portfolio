@@ -20,7 +20,7 @@ export default async function AdminHighlightsPage({
       <section className="rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
         <h1 className="text-2xl font-bold tracking-tight text-[#424242]">Highlights</h1>
         <p className="mt-2 text-sm text-[#666666]">
-          Curate support cards with explicit placements. Types control the valid targets; placement decides which page section consumes the card. Use `certificate` for real certificate entities and `manual card` only for legacy or freeform overrides.
+          Highlights only feed the Experience testimonials and awards lanes. Use `testimonial`, `award`, or `manual card`. Certificates are managed separately in the Certificates CMS.
         </p>
         <AdminErrorBanner message={errorMessage} />
       </section>
