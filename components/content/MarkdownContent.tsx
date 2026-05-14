@@ -9,12 +9,14 @@ import { rehypeGithubAlerts } from "rehype-github-alerts";
 import { getRenderableImageUrl, normalizeAssetUrl } from "@/lib/asset-urls";
 import { cn } from "@/lib/utils";
 
-type Variant = "page" | "admin";
+type Variant = "page" | "admin" | "collection";
 
 type Props = {
   markdown: string;
   variant?: Variant;
   className?: string;
+  linkBaseUrl?: string;
+  imageBaseUrl?: string;
 };
 
 function isExternalHref(href: string) {
@@ -40,8 +42,29 @@ function getAlertClasses(className: string) {
   return "border-[#d5d5d5] bg-[#fafafa] text-[#424242]";
 }
 
-function getMarkdownComponents(variant: Variant): Partial<Components> {
+function resolveMaybeRelativeUrl(value: string, baseUrl?: string) {
+  if (!baseUrl) {
+    return normalizeAssetUrl(value);
+  }
+
+  try {
+    if (/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(value) || value.startsWith("//")) {
+      return normalizeAssetUrl(value);
+    }
+
+    return new URL(value, baseUrl).toString();
+  } catch {
+    return normalizeAssetUrl(value);
+  }
+}
+
+function getMarkdownComponents(
+  variant: Variant,
+  { linkBaseUrl, imageBaseUrl }: { linkBaseUrl?: string; imageBaseUrl?: string },
+): Partial<Components> {
   const proseText = variant === "page" ? "text-[15px] sm:text-[16px]" : "text-sm";
+  const roundedClass = variant === "collection" ? "" : "rounded-xl";
+  const alertRoundedClass = variant === "collection" ? "" : "rounded-2xl";
 
   return {
     h1: ({ children }) => (
@@ -68,7 +91,7 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
       return <p className={cn("mt-3 leading-[1.85] text-[#424242] first:mt-0", proseText)}>{children}</p>;
     },
     a: ({ href, children }) => {
-      const resolvedHref = href ? normalizeAssetUrl(href) : "#";
+      const resolvedHref = href ? resolveMaybeRelativeUrl(href, linkBaseUrl) : "#";
       const external = isExternalHref(resolvedHref);
 
       return (
@@ -83,7 +106,7 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
       );
     },
     img: ({ src, alt }) => {
-      const resolvedSrc = src ? getRenderableImageUrl(src) : "";
+      const resolvedSrc = src ? getRenderableImageUrl(resolveMaybeRelativeUrl(src, imageBaseUrl)) : "";
       if (!resolvedSrc) return null;
 
       return (
@@ -91,7 +114,7 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
           src={resolvedSrc}
           alt={alt || ""}
           loading="lazy"
-          className="mt-4 w-full rounded-xl border border-[#d5d5d5] bg-white object-cover first:mt-0"
+          className={cn("mt-4 w-full border border-[#d5d5d5] bg-white object-cover first:mt-0", roundedClass)}
         />
       );
     },
@@ -108,19 +131,28 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
       const isInline = !(typeof className === "string" && className.includes("language-")) && !content.includes("\n");
 
       if (isInline) {
-        return <code className="rounded bg-[#ececec] px-1.5 py-0.5 font-mono text-[0.9em] text-[#333333]">{children}</code>;
+        return (
+          <code
+            className={cn(
+              "bg-[#ececec] px-1.5 py-0.5 font-mono text-[0.9em] text-[#333333]",
+              variant === "collection" ? "" : "rounded",
+            )}
+          >
+            {children}
+          </code>
+        );
       }
 
       return <code className={cn("block whitespace-pre font-mono text-[0.85em] text-[#333333]", className)}>{children}</code>;
     },
     pre: ({ children }) => (
-      <pre className="mt-4 overflow-x-auto rounded-xl border border-[#e5e5e5] bg-[#f6f6f6] p-4 text-[0.85em] first:mt-0">
+      <pre className={cn("mt-4 overflow-x-auto border border-[#e5e5e5] bg-[#f6f6f6] p-4 text-[0.85em] first:mt-0", roundedClass)}>
         {children}
       </pre>
     ),
     hr: () => <hr className="my-6 border-[#e0e0e0]" />,
     table: ({ children }) => (
-      <div className="mt-4 overflow-x-auto rounded-xl border border-[#d5d5d5] first:mt-0">
+      <div className={cn("mt-4 overflow-x-auto border border-[#d5d5d5] first:mt-0", roundedClass)}>
         <table className="min-w-full border-collapse bg-white text-left text-sm">{children}</table>
       </div>
     ),
@@ -135,7 +167,8 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
           <div
             {...props}
             className={cn(
-              "mt-5 rounded-2xl border px-4 py-4 shadow-sm first:mt-0 [&_.octicon]:shrink-0",
+              "mt-5 border px-4 py-4 shadow-sm first:mt-0 [&_.octicon]:shrink-0",
+              alertRoundedClass,
               getAlertClasses(className),
             )}
           >
@@ -155,7 +188,13 @@ function getMarkdownComponents(variant: Variant): Partial<Components> {
   };
 }
 
-export default function MarkdownContent({ markdown, variant = "page", className }: Props) {
+export default function MarkdownContent({
+  markdown,
+  variant = "page",
+  className,
+  linkBaseUrl,
+  imageBaseUrl,
+}: Props) {
   const trimmed = markdown.trim();
   if (!trimmed) return null;
 
@@ -164,7 +203,7 @@ export default function MarkdownContent({ markdown, variant = "page", className 
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
         rehypePlugins={[rehypeGithubAlerts]}
-        components={getMarkdownComponents(variant)}
+        components={getMarkdownComponents(variant, { linkBaseUrl, imageBaseUrl })}
       >
         {trimmed}
       </ReactMarkdown>

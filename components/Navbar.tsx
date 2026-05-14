@@ -14,7 +14,7 @@ export default function Navbar() {
   const router = useRouter();
   const { mode, setMode, saveCurrentPage } = useMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience']
+  const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience', '/collection']
   const PROFESSIONAL_MODE_PAGE = '/'
 
   useEffect(() => {
@@ -39,6 +39,7 @@ export default function Navbar() {
     { name: 'About', href: '/about' },
     { name: 'Projects', href: '/projects' },
     { name: 'Experience', href: '/experience' },
+    { name: 'Collection', href: '/collection' },
   ];
 
   const handleNavLinkClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
