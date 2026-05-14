@@ -14,7 +14,7 @@ interface ModeContextType {
 const ModeContext = createContext<ModeContextType | undefined>(undefined)
 
 // Valid pages that can be tracked
-const VALID_PAGES = ['/', '/about', '/projects', '/experience']
+const VALID_PAGES = ['/', '/about', '/projects', '/experience', '/collection']
 
 function isValidPage(path: string): boolean {
   return VALID_PAGES.includes(path) || path.startsWith('/projects/')
