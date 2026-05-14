@@ -155,11 +155,11 @@ function parsePostType(value: string, returnTo: string) {
 }
 
 function parseHighlightType(value: string, returnTo: string) {
-  const allowed = new Set(["project", "post", "testimonial", "award", "certificate", "custom"])
+  const allowed = new Set(["testimonial", "award", "custom"])
   if (!allowed.has(value)) {
     redirectWithError(returnTo, "Highlight type is invalid.")
   }
-  return value as "project" | "post" | "testimonial" | "award" | "certificate" | "custom"
+  return value as "testimonial" | "award" | "custom"
 }
 
 function parseHighlightPlacementKey(value: string, highlightType: HighlightType, returnTo: string) {
@@ -554,20 +554,12 @@ export async function saveHighlightAction(formData: FormData) {
     if (!payload.titleOverride || !payload.summaryOverride) {
       redirectWithError(returnTo, "Manual cards require both Title Override and Summary Override.");
     }
-  } else if (!payload.targetId && (payload.highlightType === "project" || payload.highlightType === "post")) {
-    redirectWithError(returnTo, `${payload.highlightType} highlights require a target.`);
   } else {
     if (payload.targetId) {
       const targetLookup =
-        payload.highlightType === "project"
-          ? await db.select({ id: projects.id }).from(projects).where(and(eq(projects.id, payload.targetId), eq(projects.status, "published"))).limit(1)
-          : payload.highlightType === "post"
-            ? await db.select({ id: posts.id }).from(posts).where(and(eq(posts.id, payload.targetId), eq(posts.status, "published"))).limit(1)
-            : payload.highlightType === "testimonial"
-              ? await db.select({ id: testimonials.id }).from(testimonials).where(and(eq(testimonials.id, payload.targetId), eq(testimonials.status, "published"))).limit(1)
-              : payload.highlightType === "award"
-                ? await db.select({ id: awards.id }).from(awards).where(and(eq(awards.id, payload.targetId), eq(awards.status, "published"))).limit(1)
-                : await db.select({ id: certificates.id }).from(certificates).where(and(eq(certificates.id, payload.targetId), eq(certificates.status, "published"))).limit(1);
+        payload.highlightType === "testimonial"
+          ? await db.select({ id: testimonials.id }).from(testimonials).where(and(eq(testimonials.id, payload.targetId), eq(testimonials.status, "published"))).limit(1)
+          : await db.select({ id: awards.id }).from(awards).where(and(eq(awards.id, payload.targetId), eq(awards.status, "published"))).limit(1);
 
       if (!targetLookup[0]) {
         redirectWithError(returnTo, `Selected target is not a published ${payload.highlightType}.`);
