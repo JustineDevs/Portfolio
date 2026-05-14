@@ -9,6 +9,7 @@ import {
   getFeaturedCertificateCards,
   getLatestPosts,
   getOtherPublishedProjects,
+  getPublishedAwards,
   getPublishedHighlights,
   getPublishedPageSections,
   getPublishedPostBySlug,
@@ -70,49 +71,16 @@ type HighlightRow = Awaited<ReturnType<typeof getPublishedHighlights>>[number];
 
 function buildProjectProofCards(
   projects: Awaited<ReturnType<typeof getPublishedProjects>>,
-  highlights: HighlightRow[],
 ) {
-  const projectHighlights = highlights.filter(
-    (highlight) =>
-      highlight.highlightType === "project" &&
-      placementMatches(highlight.placementKey, highlight.highlightType as HighlightType, "experience.projects"),
-  );
-  const seen = new Set<string>();
   const cards: ProofProjectCard[] = [];
 
-  for (const highlight of projectHighlights) {
-    const title = highlight.titleOverride?.trim();
-    const href = highlight.linkOverride?.trim() || "#";
-    const summary = highlight.summaryOverride?.trim() || "Project highlight";
-    const typeLabel = "Highlight";
-    if (!title) continue;
-
-    const dedupeKey = `${title.toLowerCase()}|${href}`;
-    if (seen.has(dedupeKey)) continue;
-    seen.add(dedupeKey);
-
-    cards.push({
-      key: `highlight-project-${highlight.id ?? dedupeKey}`,
-      typeLabel,
-      title,
-      summary,
-      href,
-      imageUrl: highlight.imageUrlOverride || null,
-    });
-  }
-
   for (const project of projects) {
-    const href = `/projects/${project.slug}`;
-    const dedupeKey = `${project.title.toLowerCase()}|${href}`;
-    if (seen.has(dedupeKey)) continue;
-    seen.add(dedupeKey);
-
     cards.push({
       key: project.slug,
       typeLabel: project.category || "Project",
       title: project.title,
       summary: project.summary,
-      href,
+      href: `/projects/${project.slug}`,
       imageUrl: project.bannerImageUrl || project.coverImageUrl || null,
     });
   }
@@ -122,41 +90,11 @@ function buildProjectProofCards(
 
 function buildWritingCards(
   posts: Awaited<ReturnType<typeof getLatestPosts>>,
-  highlights: HighlightRow[],
 ) {
-  const postHighlights = highlights.filter(
-    (highlight) =>
-      highlight.highlightType === "post" &&
-      placementMatches(highlight.placementKey, highlight.highlightType as HighlightType, "experience.writing"),
-  );
-  const seen = new Set<string>();
   const cards: ProofWritingCard[] = [];
-
-  for (const highlight of postHighlights) {
-    const title = highlight.titleOverride?.trim();
-    const href = highlight.linkOverride?.trim() || "#";
-    if (!title) continue;
-
-    const dedupeKey = `${title.toLowerCase()}|${href}`;
-    if (seen.has(dedupeKey)) continue;
-    seen.add(dedupeKey);
-
-    cards.push({
-      key: `highlight-post-${highlight.id ?? dedupeKey}`,
-      label: "Highlight",
-      title,
-      summary: highlight.summaryOverride?.trim() || "Writing highlight",
-      href,
-      imageUrl: highlight.imageUrlOverride || null,
-    });
-  }
 
   for (const post of posts) {
     const href = post.postType === "external" && post.canonicalUrl ? post.canonicalUrl : `/blog/${post.slug}`;
-    const dedupeKey = `${post.title.toLowerCase()}|${href}`;
-    if (seen.has(dedupeKey)) continue;
-    seen.add(dedupeKey);
-
     cards.push({
       key: post.slug,
       label: post.postType === "native" ? "Article" : post.sourcePlatform || "External",
@@ -176,18 +114,24 @@ function buildTestimonialCards(
 ) {
   const testimonialHighlights = highlights.filter(
     (highlight) =>
-      highlight.highlightType === "testimonial" &&
-      placementMatches(highlight.placementKey, highlight.highlightType as HighlightType, "experience.testimonials"),
+      (highlight.highlightType === "testimonial" || highlight.highlightType === "custom") &&
+      placementMatches(
+        highlight.placementKey,
+        highlight.highlightType as HighlightType,
+        "experience.testimonials",
+      ),
   );
   const testimonialById = new Map(testimonials.map((testimonial) => [testimonial.id, testimonial]));
   const seen = new Set<string>();
   const cards: ProofTestimonialCard[] = [];
 
   for (const highlight of testimonialHighlights) {
-    const target = highlight.targetId ? testimonialById.get(highlight.targetId) : null;
-    const title = highlight.titleOverride?.trim() || target?.name || "Testimonial";
+    const target = highlight.highlightType === "testimonial" && highlight.targetId
+      ? testimonialById.get(highlight.targetId)
+      : null;
+    const title = highlight.titleOverride?.trim() || target?.name || "Manual testimonial";
     const quote = highlight.summaryOverride?.trim() || target?.quote || "Testimonial highlight";
-    const label = target?.role || "Highlight";
+    const label = target?.role || (highlight.highlightType === "custom" ? "Manual card" : "Highlight");
     const dedupeKey = `${title.toLowerCase()}|${quote.toLowerCase()}`;
     if (seen.has(dedupeKey)) continue;
     seen.add(dedupeKey);
@@ -216,7 +160,7 @@ function buildTestimonialCards(
   return cards.slice(0, 2);
 }
 
-function buildAwardCards(awards: Awaited<ReturnType<typeof getFeaturedAwardCards>>) {
+function toProofAwardCards(awards: Awaited<ReturnType<typeof getFeaturedAwardCards>>) {
   return awards.slice(0, 3).map<ProofAwardCard>((award) => ({
     slug: award.slug,
     title: award.title,
@@ -228,18 +172,59 @@ function buildAwardCards(awards: Awaited<ReturnType<typeof getFeaturedAwardCards
   }));
 }
 
+function buildExperienceAwardCards(
+  awards: Awaited<ReturnType<typeof getFeaturedAwardCards>>,
+  highlights: HighlightRow[],
+) {
+  const cards = toProofAwardCards(awards);
+  const seen = new Set(cards.map((award) => `${award.title.toLowerCase()}|${award.href || ""}`));
+
+  for (const highlight of highlights.filter(
+    (row) =>
+      row.highlightType === "custom" &&
+      placementMatches(row.placementKey, row.highlightType as HighlightType, "experience.awards"),
+  )) {
+    const title = highlight.titleOverride?.trim();
+    const href = highlight.linkOverride?.trim() || null;
+    if (!title) continue;
+
+    const dedupeKey = `${title.toLowerCase()}|${href || ""}`;
+    if (seen.has(dedupeKey)) continue;
+    seen.add(dedupeKey);
+
+    cards.push({
+      slug: `manual-award-${highlight.id ?? dedupeKey}`,
+      title,
+      summary: highlight.summaryOverride?.trim() || "Manual card",
+      year: "",
+      href,
+      logoUrl: highlight.imageUrlOverride || null,
+      sourceLabel: "Manual card",
+    });
+  }
+
+  return cards.slice(0, 3);
+}
+
 export async function getHomePageData() {
-  const [projects, awards, certificates, legalLinks] = await Promise.all([
+  const [projects, awards, legalLinks] = await Promise.all([
     getPublishedProjects(),
-    getFeaturedAwardCards(2, "home.awards"),
-    getFeaturedCertificateCards(3, "home.certificates"),
+    getPublishedAwards(),
     getPublicLegalLinks(),
   ]);
 
   return {
     featuredProjects: projects.slice(0, 2),
-    featuredAwards: awards.slice(0, 2),
-    featuredCertificates: certificates,
+    featuredAwards: awards.slice(0, 2).map((award) => ({
+      slug: award.slug,
+      title: award.title,
+      eventName: award.eventName,
+      description: award.description,
+      year: award.year,
+      proofUrl: award.proofUrl,
+      logoUrl: award.logoUrl,
+    })),
+    featuredCertificates: [],
     legalLinks,
   };
 }
@@ -319,10 +304,10 @@ export async function getExperiencePageData(): Promise<ExperiencePageData> {
   return {
     legalLinks,
     proofOfWork: {
-      projects: buildProjectProofCards(projects, highlights),
-      writing: buildWritingCards(posts, highlights),
+      projects: buildProjectProofCards(projects),
+      writing: buildWritingCards(posts),
       testimonials: buildTestimonialCards(testimonials, highlights),
-      awards: buildAwardCards(awards),
+      awards: buildExperienceAwardCards(awards, highlights),
       certificates,
     },
   };
