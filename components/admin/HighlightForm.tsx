@@ -20,11 +20,8 @@ import {
 } from "@/lib/content/highlight-placement";
 
 const HIGHLIGHT_TYPE_OPTIONS: SelectOption[] = [
-  { value: "project", label: "Project" },
-  { value: "post", label: "Post" },
   { value: "testimonial", label: "Testimonial" },
   { value: "award", label: "Award" },
-  { value: "certificate", label: "Certificate" },
   { value: "custom", label: "Manual Card" },
 ];
 
@@ -49,11 +46,8 @@ type HighlightValue = {
 };
 
 type TargetOptionMap = {
-  project: SelectOption[];
-  post: SelectOption[];
   testimonial: SelectOption[];
   award: SelectOption[];
-  certificate: SelectOption[];
 };
 
 export function HighlightForm({
@@ -69,7 +63,10 @@ export function HighlightForm({
   errorMessage?: string;
   savedMessage?: string;
 }) {
-  const initialType = (value?.highlightType || "custom") as HighlightType;
+  const initialType =
+    value?.highlightType === "testimonial" || value?.highlightType === "award" || value?.highlightType === "custom"
+      ? (value.highlightType as HighlightType)
+      : "custom";
   const [highlightType, setHighlightType] = useState<HighlightType>(initialType);
   const [placementKey, setPlacementKey] = useState<string>(
     value?.placementKey || getDefaultPlacementKeyForType(initialType),
@@ -77,11 +74,8 @@ export function HighlightForm({
   const [targetId, setTargetId] = useState(value?.targetId ? String(value.targetId) : "0");
 
   const currentTargetOptions = useMemo(() => {
-    if (highlightType === "project") return targetOptions.project;
-    if (highlightType === "post") return targetOptions.post;
     if (highlightType === "testimonial") return targetOptions.testimonial;
     if (highlightType === "award") return targetOptions.award;
-    if (highlightType === "certificate") return targetOptions.certificate;
     return [];
   }, [highlightType, targetOptions]);
   const currentPlacementOptions = useMemo(() => getPlacementOptionsForType(highlightType), [highlightType]);
@@ -197,7 +191,7 @@ export function HighlightForm({
         rows={4}
       />
       <p className="text-sm text-[#666666]">
-        Highlights now route by explicit placement. Type controls which placements are valid, while placement controls where the card appears.
+        Highlights now support only `testimonial`, `award`, and `manual card`, and they feed only the Experience testimonials/awards lanes.
       </p>
       <CheckboxField label="Pinned" name="pinned" defaultChecked={value?.pinned} />
       <AdminFormSubmitButton>{value ? "Save highlight" : "Create highlight"}</AdminFormSubmitButton>
