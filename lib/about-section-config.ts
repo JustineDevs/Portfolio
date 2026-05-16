@@ -16,7 +16,7 @@ export const ABOUT_SECTION_CONFIG: Record<AboutSectionKey, AboutSectionConfig> =
     description: "Personal opener. Use this for who you are, the page framing, and the image that sets the tone.",
     titleLabel: "Headline",
     subtitleLabel: "Subheadline",
-    bodyLabel: "Optional body (Markdown)",
+    bodyLabel: "Body (Markdown)",
     metaLabel: "Meta JSON",
     metaHint: `Example: { "imageUrl": "/Justinedevs_Banner.png" }`,
   },

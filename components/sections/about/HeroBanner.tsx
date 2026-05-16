@@ -3,17 +3,20 @@
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import CornerDot from '@/components/ui/CornerDot'
+import MarkdownContent from '@/components/content/MarkdownContent'
 import { getRenderableImageUrl, isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
 
 interface HeroBannerProps {
   title?: string
   subtitle?: string
+  bodyMarkdown?: string
   imageUrl?: string
 }
 
 export default function HeroBanner({
   title = "",
   subtitle = "",
+  bodyMarkdown = "",
   imageUrl = "/Justinedevs_Banner.png",
 }: HeroBannerProps) {
   const normalizedImageUrl = normalizeAssetUrl(imageUrl)
@@ -51,6 +54,15 @@ export default function HeroBanner({
         <p className="text-[14px] xs:text-[16px] sm:text-[18px] lg:text-[20px] text-[#666666] mb-5 xs:mb-6 sm:mb-8 italic">
           {subtitle}
         </p>
+
+        {bodyMarkdown.trim() ? (
+          <div className="mb-5 xs:mb-6 sm:mb-8 max-w-3xl text-[#555555]">
+            <MarkdownContent
+              markdown={bodyMarkdown}
+              className="[&_p]:text-[13px] xs:[&_p]:text-[14px] sm:[&_p]:text-[15px] [&_p]:leading-[1.9]"
+            />
+          </div>
+        ) : null}
 
         <div className="relative w-full aspect-[3/1] rounded-lg overflow-hidden border border-[#d5d5d5] bg-black">
           <div 

@@ -6,7 +6,7 @@ import StrengthsHowVision from '@/components/sections/about/StrengthsHowVision'
 import { getAboutPageData } from '@/lib/content/page-data'
 
 export default async function AboutPage() {
-  const { byKey, heroMeta, sidebarMeta, legalLinks } = await getAboutPageData()
+  const { byKey, heroMeta, sidebarMeta, recentPosts, legalLinks } = await getAboutPageData()
 
   return (
     <PageLayout legalLinks={legalLinks}>
@@ -17,6 +17,7 @@ export default async function AboutPage() {
           heading={byKey.reading_map?.title || undefined}
           subheading={byKey.reading_map?.subtitle || undefined}
           navSections={sidebarMeta.panels || []}
+          recentPosts={recentPosts}
         />
 
         {/* Main Content */}
@@ -24,6 +25,7 @@ export default async function AboutPage() {
           <HeroBanner
             title={byKey.hero?.title || undefined}
             subtitle={byKey.hero?.subtitle || undefined}
+            bodyMarkdown={byKey.hero?.bodyMd || ""}
             imageUrl={heroMeta.imageUrl}
           />
           <StoryResponsibilities
