@@ -2,11 +2,13 @@
 
 import type { Components } from "react-markdown";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import { rehypeGithubAlerts } from "rehype-github-alerts";
 
 import { getRenderableImageUrl, normalizeAssetUrl } from "@/lib/asset-urls";
+import { normalizeCmsMarkdown } from "@/lib/content/markdown-normalize";
 import { cn } from "@/lib/utils";
 
 type Variant = "page" | "admin" | "collection";
@@ -195,14 +197,14 @@ export default function MarkdownContent({
   linkBaseUrl,
   imageBaseUrl,
 }: Props) {
-  const trimmed = markdown.trim();
+  const trimmed = normalizeCmsMarkdown(markdown).trim();
   if (!trimmed) return null;
 
   return (
     <div className={cn("markdown-body text-[#424242]", className)}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkBreaks]}
-        rehypePlugins={[rehypeGithubAlerts]}
+        rehypePlugins={[rehypeRaw, rehypeGithubAlerts]}
         components={getMarkdownComponents(variant, { linkBaseUrl, imageBaseUrl })}
       >
         {trimmed}

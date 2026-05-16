@@ -30,6 +30,7 @@ import { and, eq, ne } from "drizzle-orm";
 import { fetchGithubActivityForYear, saveGithubActivitySnapshot } from "@/lib/github/activity";
 import { normalizeAssetFieldsInObjectAsync, normalizeOptionalImageAssetUrl } from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
+import { normalizeCmsMarkdown } from "@/lib/content/markdown-normalize";
 import {
   getDefaultPlacementKeyForType,
   isPlacementCompatibleWithType,
@@ -365,7 +366,7 @@ export async function savePostAction(formData: FormData) {
     slug,
     title: stringValue(formData, "title"),
     summary: stringValue(formData, "summary"),
-    bodyMd: optionalString(formData, "bodyMd"),
+    bodyMd: optionalString(formData, "bodyMd") ? normalizeCmsMarkdown(optionalString(formData, "bodyMd")!) : null,
     postType: parsePostType(stringValue(formData, "postType") || "native", returnTo),
     sourcePlatform: optionalString(formData, "sourcePlatform"),
     canonicalUrl: validateOptionalUrl(optionalString(formData, "canonicalUrl"), returnTo, "Canonical URL", false),
