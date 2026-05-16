@@ -19,6 +19,53 @@ import {
   getPublishedTestimonials,
 } from "@/lib/content/public";
 
+export type HomeFeaturedAward = {
+  slug: string;
+  title: string;
+  eventName: string;
+  description: string;
+  year: string;
+  proofUrl?: string | null;
+  logoUrl?: string | null;
+};
+
+export type HomePageData = {
+  featuredProjects: Awaited<ReturnType<typeof getPublishedProjects>>;
+  featuredAwards: HomeFeaturedAward[];
+  featuredCertificates: [];
+  legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
+};
+
+export type AboutRecentPost = {
+  slug: string;
+  title: string;
+  summary: string;
+  postType: "native" | "external";
+  canonicalUrl?: string | null;
+};
+
+export type AboutSidebarPanel = {
+  id: string;
+  title: string;
+  description: string;
+  philosophy: string;
+  link: string;
+  heading: string;
+  intro: string;
+  points: string[];
+  summary: string;
+  extended: string;
+};
+
+export type AboutPageData = {
+  sections: Awaited<ReturnType<typeof getPublishedPageSections>>;
+  byKey: Record<string, (Awaited<ReturnType<typeof getPublishedPageSections>>)[number]>;
+  heroMeta: { imageUrl?: string };
+  sidebarMeta: { panels?: AboutSidebarPanel[] };
+  recentPosts: AboutRecentPost[];
+  legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
+};
+
 export type ProofProjectCard = {
   key: string;
   typeLabel: string;
@@ -226,12 +273,13 @@ export async function getHomePageData() {
     })),
     featuredCertificates: [],
     legalLinks,
-  };
+  } satisfies HomePageData;
 }
 
-export async function getAboutPageData() {
-  const [sections, legalLinks] = await Promise.all([
+export async function getAboutPageData(): Promise<AboutPageData> {
+  const [sections, recentPosts, legalLinks] = await Promise.all([
     getPublishedPageSections("about"),
+    getLatestPosts(3),
     getPublicLegalLinks(),
   ]);
   const byKey = Object.fromEntries(sections.map((section) => [section.sectionKey, section]));
@@ -239,8 +287,15 @@ export async function getAboutPageData() {
   return {
     sections,
     byKey,
-    heroMeta: byKey.hero?.metaJson ? JSON.parse(byKey.hero.metaJson) : {},
-    sidebarMeta: byKey.reading_map?.metaJson ? JSON.parse(byKey.reading_map.metaJson) : {},
+    heroMeta: byKey.hero?.metaJson ? (JSON.parse(byKey.hero.metaJson) as { imageUrl?: string }) : {},
+    sidebarMeta: byKey.reading_map?.metaJson ? (JSON.parse(byKey.reading_map.metaJson) as { panels?: AboutSidebarPanel[] }) : {},
+    recentPosts: recentPosts.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      summary: post.summary,
+      postType: post.postType,
+      canonicalUrl: post.canonicalUrl,
+    })),
     legalLinks,
   };
 }
@@ -308,7 +363,7 @@ export async function getExperiencePageData(): Promise<ExperiencePageData> {
       writing: buildWritingCards(posts),
       testimonials: buildTestimonialCards(testimonials, highlights),
       awards: buildExperienceAwardCards(awards, highlights),
-      certificates,
+      certificates: certificates.slice(0, 3),
     },
   };
 }

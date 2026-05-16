@@ -2,34 +2,25 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-
-interface SidebarSection {
-  id: string
-  title: string
-  description: string
-  philosophy: string
-  link: string
-  heading: string
-  intro: string
-  points: string[]
-  summary: string
-  extended: string
-}
+import MarkdownContent from '@/components/content/MarkdownContent'
+import type { AboutRecentPost, AboutSidebarPanel } from '@/lib/content/page-data'
 
 interface SidebarProps {
   dateLabel?: string
   heading?: string
   subheading?: string
-  navSections?: SidebarSection[]
+  navSections?: AboutSidebarPanel[]
+  recentPosts?: AboutRecentPost[]
 }
 
-const defaultSections: SidebarSection[] = []
+const defaultSections: AboutSidebarPanel[] = []
 
 export default function Sidebar({
   dateLabel = '',
   heading = '',
   subheading = '',
   navSections = defaultSections,
+  recentPosts = [],
 }: SidebarProps) {
   const [activePanel, setActivePanel] = useState<string | null>(null)
 
@@ -47,7 +38,11 @@ export default function Sidebar({
     <>
       <aside className="hidden lg:block w-[280px] shrink-0 border-r border-[#d5d5d5] bg-white sticky top-[101px] h-[calc(100vh-101px)] overflow-y-auto">
         <div className="p-6 border-b border-[#d5d5d5]">
-          <p className="text-[12px] text-[#666666] mb-2">{dateLabel}</p>
+          {dateLabel ? (
+            <div className="mb-2 text-[12px] text-[#666666]">
+              <MarkdownContent markdown={dateLabel} className="[&_*]:text-[12px] [&_p]:mt-0 [&_p]:leading-[1.6]" />
+            </div>
+          ) : null}
           <h2 className="text-[20px] font-bold text-[#424242] tracking-[-0.01em]">{heading}</h2>
           <h3 className="text-[16px] font-semibold text-[#424242] mt-4">{subheading}</h3>
         </div>
@@ -74,6 +69,36 @@ export default function Sidebar({
 
         <div className="p-6 border-t border-[#d5d5d5] mt-auto">
           <h3 className="text-[14px] font-semibold text-[#424242]">Blogs</h3>
+          {recentPosts.length > 0 ? (
+            <div className="mt-4 space-y-4">
+              {recentPosts.map((post) => {
+                const href = post.postType === 'external' && post.canonicalUrl ? post.canonicalUrl : `/blog/${post.slug}`
+                const isExternal = post.postType === 'external' && Boolean(post.canonicalUrl)
+
+                return isExternal ? (
+                  <a
+                    key={post.slug}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block border border-[#d5d5d5] p-3 transition-colors hover:bg-[#fafafa]"
+                  >
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-[#666666]">Writing</div>
+                    <h4 className="mt-2 text-[13px] font-semibold leading-[1.5] text-[#424242]">{post.title}</h4>
+                  </a>
+                ) : (
+                  <Link
+                    key={post.slug}
+                    href={href}
+                    className="block border border-[#d5d5d5] p-3 transition-colors hover:bg-[#fafafa]"
+                  >
+                    <div className="text-[11px] uppercase tracking-[0.18em] text-[#666666]">Writing</div>
+                    <h4 className="mt-2 text-[13px] font-semibold leading-[1.5] text-[#424242]">{post.title}</h4>
+                  </Link>
+                )
+              })}
+            </div>
+          ) : null}
           <Link href="/blog" className="mt-3 inline-block text-sm text-[#1342FF] hover:underline">
             Read writing →
           </Link>
@@ -103,23 +128,28 @@ export default function Sidebar({
             </div>
 
             <div className="px-6 py-6 space-y-5 overflow-y-auto max-h-[calc(85vh-60px)]">
-              <p className="text-[14px] text-[#333] leading-relaxed">
-                <strong>{activeContent.heading}</strong> {activeContent.intro}
-              </p>
+              <MarkdownContent
+                markdown={`**${activeContent.heading}** ${activeContent.intro}`.trim()}
+                className="[&_*]:text-[14px] [&_p]:mt-0 [&_p]:leading-relaxed"
+              />
 
               {activeContent.points.map((point, idx) => (
-                <p key={idx} className="text-[14px] text-[#333] leading-relaxed whitespace-pre-line">
-                  {point}
-                </p>
+                <MarkdownContent
+                  key={idx}
+                  markdown={point}
+                  className="[&_*]:text-[14px] [&_p]:mt-0 [&_p]:leading-relaxed"
+                />
               ))}
 
-              <p className="text-[14px] text-[#333] leading-relaxed">
-                {activeContent.summary}
-              </p>
+              <MarkdownContent
+                markdown={activeContent.summary}
+                className="[&_*]:text-[14px] [&_p]:mt-0 [&_p]:leading-relaxed"
+              />
 
-              <p className="text-[14px] text-[#555] leading-relaxed">
-                {activeContent.extended}
-              </p>
+              <MarkdownContent
+                markdown={activeContent.extended}
+                className="[&_*]:text-[14px] [&_p]:mt-0 [&_p]:leading-relaxed [&_*]:text-[#555]"
+              />
 
               <div className="flex items-center gap-3 pt-4 border-t border-[#d5d5d5]">
                 <div className="w-3 h-3 rounded-full bg-[#424242]" />
