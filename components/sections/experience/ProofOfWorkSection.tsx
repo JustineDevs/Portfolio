@@ -4,14 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 
 import CornerDot from "@/components/ui/CornerDot";
-import { getRenderableImageUrl, isSvgAssetUrl } from "@/lib/asset-urls";
+import { getRenderableImageUrl, shouldUseUnoptimizedImage } from "@/lib/asset-urls";
 import type { ExperiencePageData } from "@/lib/content/page-data";
 
 function AssetThumb({ src, alt }: { src?: string | null; alt: string }) {
   if (!src) return null;
 
   const renderableSrc = getRenderableImageUrl(src);
-  const unoptimized = isSvgAssetUrl(src) || renderableSrc.startsWith("/api/image/resolve");
+  const unoptimized = shouldUseUnoptimizedImage(src);
 
   return (
     <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-[#f8f8f8]">
@@ -160,10 +160,7 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
                           alt={award.title}
                           fill
                           className="object-contain p-1.5"
-                          unoptimized={
-                            isSvgAssetUrl(award.logoUrl) ||
-                            getRenderableImageUrl(award.logoUrl).startsWith("/api/image/resolve")
-                          }
+                          unoptimized={shouldUseUnoptimizedImage(award.logoUrl)}
                         />
                       ) : null}
                     </div>

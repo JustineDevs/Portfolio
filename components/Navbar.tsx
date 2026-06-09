@@ -9,16 +9,19 @@ import CornerDot from './ui/CornerDot';
 import { useMode } from '@/components/providers/ModeProvider';
 import { tokens } from '@/lib/design-tokens';
 
+const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience', '/collection'] as const
+const PROFESSIONAL_MODE_PAGE = '/'
+const isPersonalOnlyPage = (value: string) =>
+  (PERSONAL_ONLY_PAGES as readonly string[]).includes(value)
+
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { mode, setMode, saveCurrentPage } = useMode();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience', '/collection']
-  const PROFESSIONAL_MODE_PAGE = '/'
 
   useEffect(() => {
-    if (mode === 'professional' && PERSONAL_ONLY_PAGES.includes(pathname)) {
+    if (mode === 'professional' && isPersonalOnlyPage(pathname)) {
       if (pathname !== PROFESSIONAL_MODE_PAGE) {
         try {
           const savedPages = JSON.parse(
@@ -35,6 +38,17 @@ export default function Navbar() {
     saveCurrentPage(pathname)
   }, [pathname, mode, setMode, saveCurrentPage])
 
+  useEffect(() => {
+    setMobileMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
+
   const navLinks = [
     { name: 'About', href: '/about' },
     { name: 'Projects', href: '/projects' },
@@ -43,7 +57,7 @@ export default function Navbar() {
   ];
 
   const handleNavLinkClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (mode === 'professional' && PERSONAL_ONLY_PAGES.includes(href)) {
+    if (mode === 'professional' && isPersonalOnlyPage(href)) {
       e.preventDefault()
       try {
         const savedPages = JSON.parse(
@@ -61,7 +75,7 @@ export default function Navbar() {
 
   return (
     <div className="w-full font-sans">
-      <nav className={`tier-1-navbar sticky top-0 z-50 w-full border-b border-[#d5d5d5] backdrop-blur-sm ${tokens.transitions.default} bg-[#FAFAFA]/95 overflow-hidden`}>
+      <nav className={`tier-1-navbar sticky top-0 z-50 w-full border-b border-[#d5d5d5] backdrop-blur-md ${tokens.transitions.default} bg-[#FAFAFA]/92 overflow-hidden`}>
         <div className="relative w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-[56px] xs:h-[60px] sm:h-[65px] flex items-center justify-between overflow-hidden px-2 xs:px-0">
           <CornerDot position="bl" className="hidden sm:block" />
           <CornerDot position="br" className="hidden sm:block" />
@@ -100,7 +114,7 @@ export default function Navbar() {
                   key={link.name} 
                   href={link.href}
                   onClick={(e) => handleNavLinkClick(link.href, e)}
-                  className={`text-xs xl:text-sm font-medium tracking-wide transition-all duration-300 relative whitespace-nowrap ${
+                  className={`text-xs xl:text-sm font-medium tracking-[0.08em] transition-all duration-300 relative whitespace-nowrap pb-1 ${
                     pathname === link.href 
                       ? 'text-[#424242]' 
                       : 'text-gray-500 hover:text-[#424242]'
@@ -170,7 +184,7 @@ export default function Navbar() {
               href="https://t.me/TraderGOfficial" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-medium text-gray-600 hover:text-[#424242] transition-colors whitespace-nowrap"
+              className="hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-full border border-transparent px-2 py-1 text-[10px] sm:text-xs font-medium text-gray-600 hover:border-[#d5d5d5] hover:text-[#424242] transition-colors whitespace-nowrap"
               aria-label="Shoot a DM on Telegram"
             >
               <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#0055FF]" />
@@ -182,7 +196,7 @@ export default function Navbar() {
               href="https://cal.com/justinedevs" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="hidden xs:block bg-[#424242] text-white text-[10px] sm:text-xs font-medium px-3 py-2 sm:px-4 sm:py-2.5 lg:px-5 lg:py-3 min-h-[36px] sm:min-h-[40px] lg:min-h-[44px] rounded-md hover:bg-[#333333] transition-colors shadow-sm tracking-wide focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2 whitespace-nowrap flex items-center justify-center"
+              className="hidden xs:block bg-[#424242] text-white text-[10px] sm:text-xs font-medium px-3 py-2 sm:px-4 sm:py-2.5 lg:px-5 lg:py-3 min-h-[36px] sm:min-h-[40px] lg:min-h-[44px] rounded-md hover:bg-[#333333] transition-colors shadow-sm tracking-[0.04em] focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2 whitespace-nowrap flex items-center justify-center"
               aria-label="Schedule a call"
             >
               Schedule a Call
@@ -207,7 +221,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white border-b border-[#d5d5d5] overflow-hidden"
+            className="lg:hidden bg-white/98 backdrop-blur-md border-b border-[#d5d5d5] overflow-hidden"
           >
             <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] mx-auto px-2 xs:px-4 py-4 space-y-4">
               <div className="flex flex-col gap-3">
@@ -219,10 +233,10 @@ export default function Navbar() {
                       handleNavLinkClick(link.href, e)
                       setMobileMenuOpen(false)
                     }}
-                    className={`text-sm font-medium tracking-wide transition-colors py-2 ${
+                    className={`rounded-md text-sm font-medium tracking-[0.08em] transition-colors py-2 ${
                       pathname === link.href
-                        ? 'text-[#424242] border-l-2 border-[#424242] pl-3'
-                        : 'text-gray-500 hover:text-[#424242] pl-3'
+                        ? 'bg-[#f5f6f8] text-[#424242] border-l-2 border-[#424242] pl-3'
+                        : 'text-gray-500 hover:bg-[#f8f8f8] hover:text-[#424242] pl-3'
                     }`}
                   >
                     {link.name}
@@ -230,7 +244,7 @@ export default function Navbar() {
                 ))}
               </div>
 
-              <div className="pt-4 border-t border-[#d5d5d5]">
+              <div className="pt-4 border-t border-[#d5d5d5] space-y-4">
                 <div className="flex items-center p-1 bg-white border border-[#d5d5d5] rounded-full w-fit">
                   <button
                     onClick={() => {
@@ -276,29 +290,28 @@ export default function Navbar() {
                     Professional
                   </button>
                 </div>
-              </div>
 
-              <div className="pt-4 border-t border-[#d5d5d5] flex flex-col xs:flex-row xs:items-center gap-3">
-                <a
-                  href="https://t.me/TraderGOfficial"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-xs font-medium text-gray-600 hover:text-[#424242] transition-colors"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0055FF]" />
-                  Shoot a DM
-                </a>
+                <div className="flex flex-col gap-3">
                   <a
                     href="https://cal.com/justinedevs"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#424242] text-white text-xs font-medium px-4 py-2.5 min-h-[40px] rounded-md hover:bg-[#333333] transition-colors shadow-sm tracking-wide w-fit flex items-center justify-center"
+                    className="flex min-h-[44px] items-center justify-center rounded-md bg-[#424242] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
                     onClick={() => setMobileMenuOpen(false)}
                     aria-label="Schedule a call"
                   >
                     Schedule a Call
                   </a>
+                  <a
+                    href="https://t.me/TraderGOfficial"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex min-h-[44px] items-center justify-center rounded-md border border-[#d5d5d5] px-4 py-3 text-sm font-medium text-[#424242] transition-colors hover:bg-[#f8f8f8]"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Send a Message
+                  </a>
+                </div>
               </div>
             </div>
           </motion.div>

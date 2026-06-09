@@ -34,8 +34,8 @@ const Hero = () => {
           
           <div className="absolute inset-0 z-0">
             <InteractiveDotGrid 
-              backgroundColor="#424242"
-              dotColor="#666666"
+              backgroundColor="#2B3138"
+              dotColor="#64748B"
               dotSize={2}
               dotSpacing={24}
               distortionRadius={100}
@@ -43,7 +43,11 @@ const Hero = () => {
             />
           </div>
 
-          <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_center,transparent_0%,#424242_120%)] pointer-events-none" />
+          <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_42%_34%,rgba(127,212,255,0.34)_0%,rgba(127,212,255,0.14)_18%,rgba(19,66,255,0.12)_36%,rgba(43,49,56,0)_64%)]" />
+          <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_48%_48%,rgba(248,251,255,0.18)_0%,rgba(248,251,255,0.07)_22%,rgba(43,49,56,0)_54%)]" />
+          <div className="absolute inset-0 z-10 pointer-events-none opacity-60 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0)_18%,rgba(255,255,255,0)_82%,rgba(19,66,255,0.08)_100%)]" />
+          <div className="absolute inset-0 z-10 pointer-events-none opacity-35 bg-[repeating-linear-gradient(180deg,rgba(255,255,255,0.08)_0px,rgba(255,255,255,0.08)_1px,transparent_1px,transparent_26px)]" />
+          <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#2B3138_120%)]" />
           
           <div className="relative z-20 w-full h-full">
             <AvatarParticlesCanvas />

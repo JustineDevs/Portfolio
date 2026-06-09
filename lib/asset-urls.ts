@@ -2,6 +2,12 @@ const IMAGE_EXTENSION_RE =
   /\.(avif|bmp|gif|heic|heif|ico|jpe?g|jfif|pjpeg|pjp|png|svg|tiff?|webp)(?:$|[?#])/i;
 const ASSET_OBJECT_KEY_RE =
   /(image|icon|logo|avatar|cover|banner|thumbnail|poster)(?:Url|Src|Path|Override)?$/i;
+const WRAPPED_IMAGE_HOSTS = new Set([
+  "github.com",
+  "drive.google.com",
+  "dropbox.com",
+  "www.dropbox.com",
+]);
 
 function normalizeLocalAssetPath(input: string): string {
   let value = input.trim().replace(/\\/g, "/");
@@ -90,7 +96,7 @@ function extractImageFromHtml(html: string, baseUrl: string): string | null {
   return null;
 }
 
-function isHttpAssetUrl(value: string): boolean {
+export function isHttpAssetUrl(value: string): boolean {
   return value.startsWith("http://") || value.startsWith("https://");
 }
 
@@ -159,7 +165,24 @@ export function getRenderableImageUrl(input: string): string {
   const value = normalizeAssetUrl(input);
   if (!value) return value;
   if (!isHttpAssetUrl(value)) return value;
+  if (isDirectImageAssetUrl(value)) return value;
+  try {
+    const url = new URL(value);
+    if (!WRAPPED_IMAGE_HOSTS.has(url.hostname)) {
+      return value;
+    }
+  } catch {
+    return value;
+  }
   return `/api/image/resolve?url=${encodeURIComponent(value)}`;
+}
+
+export function shouldUseUnoptimizedImage(input: string): boolean {
+  const value = normalizeAssetUrl(input);
+  if (!value) return true;
+  if (isSvgAssetUrl(value)) return true;
+  if (isHttpAssetUrl(value)) return true;
+  return value.startsWith("/api/image/resolve");
 }
 
 export async function resolveImageAssetUrl(input: string): Promise<string> {

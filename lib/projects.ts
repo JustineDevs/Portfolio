@@ -362,7 +362,6 @@ export const projects: Record<string, Project> = {
     tags: ['Portfolio', 'Projects', 'Showcase'],
     author: 'Justine Lupasi',
     authorWebsite: 'https://github.com/JustineDevs',
-    websiteUrl: 'https://justinedevs.vercel.app',
     coverImage: '/v2/showcase/Portfolio V1.png',
     bannerImage: '/v2/showcase/Portfolio V1.png',
     responsibilities: [

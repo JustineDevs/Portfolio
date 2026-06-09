@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useTexture } from '@react-three/drei'
 import * as THREE from 'three'
-import { getRenderableImageUrl, isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
+import { getRenderableImageUrl, isHttpAssetUrl, isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
 
 interface LiquidImageProps {
   src: string
@@ -14,6 +14,12 @@ interface LiquidImageProps {
   speed?: number
   size?: number
   priority?: boolean
+}
+
+type NavigatorWithConnection = Navigator & {
+  connection?: {
+    saveData?: boolean
+  }
 }
 
 const vertexShader = `
@@ -166,13 +172,42 @@ export default function LiquidImage({
   const [isClient, setIsClient] = useState(false)
   const [hasError, setHasError] = useState(false)
   const [isTextureReady, setIsTextureReady] = useState(false)
+  const [webglEnabled, setWebglEnabled] = useState(false)
   const normalizedSrc = useMemo(() => normalizeAssetUrl(src), [src])
   const renderableSrc = useMemo(() => getRenderableImageUrl(normalizedSrc), [normalizedSrc])
   const fallbackSrc = '/v2/showcase/banner.png'
-  const shouldUseCanvas = isClient && !hasError && isTextureReady && !isSvgAssetUrl(normalizedSrc)
+  const shouldUseCanvas =
+    isClient &&
+    webglEnabled &&
+    !hasError &&
+    isTextureReady &&
+    !isSvgAssetUrl(normalizedSrc) &&
+    !isHttpAssetUrl(normalizedSrc) &&
+    !renderableSrc.startsWith('/api/image/resolve')
 
   useEffect(() => {
     setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const isSmallScreen = window.matchMedia('(max-width: 767px)').matches
+    const saveData = (navigator as NavigatorWithConnection).connection?.saveData === true
+
+    if (prefersReducedMotion || isSmallScreen || saveData) {
+      setWebglEnabled(false)
+      return
+    }
+
+    const canvas = document.createElement('canvas')
+    const context =
+      canvas.getContext('webgl2', { antialias: false }) ||
+      canvas.getContext('webgl', { antialias: false }) ||
+      canvas.getContext('experimental-webgl', { antialias: false })
+
+    setWebglEnabled(Boolean(context))
   }, [])
 
   useEffect(() => {
@@ -186,7 +221,7 @@ export default function LiquidImage({
       return
     }
 
-    if (isSvgAssetUrl(normalizedSrc)) {
+    if (isSvgAssetUrl(normalizedSrc) || !webglEnabled) {
       setIsTextureReady(true)
       return
     }
@@ -212,7 +247,7 @@ export default function LiquidImage({
       image.onload = null
       image.onerror = null
     }
-  }, [isClient, normalizedSrc, renderableSrc])
+  }, [isClient, normalizedSrc, renderableSrc, webglEnabled])
 
   if (!shouldUseCanvas) {
     return (

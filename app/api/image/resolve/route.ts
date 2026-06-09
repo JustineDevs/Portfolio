@@ -26,10 +26,20 @@ export async function GET(request: Request) {
       accept: "image/*,*/*;q=0.8",
     },
     signal: AbortSignal.timeout(12_000),
-  }).catch(() => null);
+  }).catch((error) => error as Error);
 
-  if (!upstream || !upstream.ok) {
-    return NextResponse.json({ error: "Failed to fetch remote image." }, { status: 502 });
+  if (upstream instanceof Error) {
+    return NextResponse.json(
+      { error: "Failed to fetch remote image.", detail: upstream.message, resolved },
+      { status: 502, headers: { "cache-control": "no-store" } },
+    );
+  }
+
+  if (!upstream.ok) {
+    return NextResponse.json(
+      { error: "Failed to fetch remote image.", status: upstream.status, resolved },
+      { status: 502, headers: { "cache-control": "no-store" } },
+    );
   }
 
   const headers = new Headers();

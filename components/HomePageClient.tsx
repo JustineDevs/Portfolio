@@ -133,7 +133,7 @@ export default function HomePageClient({
       <SocialLinksBar />
       <Navbar />
 
-      <main id="main-content" className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto pb-4 xs:pb-6 sm:pb-8 relative z-10 overflow-x-hidden">
+      <main id="main-content" className="site-main">
         <AnimatePresence mode="wait">
           {mode === 'personal' ? (
             <motion.div key="personal" {...animations.modeSwitch}>

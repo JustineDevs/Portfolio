@@ -9,7 +9,7 @@ import { ScrambleTextOnHover } from '@/components/ui/scramble-text';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import Modal from '@/components/ui/Modal';
 import type { PublicProject } from '@/lib/content/types';
-import { getRenderableImageUrl, isSvgAssetUrl } from '@/lib/asset-urls';
+import { getRenderableImageUrl, shouldUseUnoptimizedImage } from '@/lib/asset-urls';
 
 type Theme = 'black' | 'white' | 'iridescent';
 
@@ -227,10 +227,7 @@ export default function BrandBadgeProjectsSection({
                           alt={award.title} 
                           fill 
                           className="object-contain" 
-                          unoptimized={
-                            isSvgAssetUrl(award.logoUrl || "/v2/showcase/banner.png") ||
-                            getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png").startsWith("/api/image/resolve")
-                          }
+                          unoptimized={shouldUseUnoptimizedImage(award.logoUrl || "/v2/showcase/banner.png")}
                         />
                       </div>
                       <div className="flex flex-col leading-tight">

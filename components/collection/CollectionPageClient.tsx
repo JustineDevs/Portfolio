@@ -445,15 +445,14 @@ export default function CollectionPageClient({ initialIndex }: { initialIndex: C
   const repoLabel = `${initialIndex.repo.owner}/${initialIndex.repo.repo}`;
 
   return (
-    <section className="border-l border-r border-b border-[#d5d5d5] bg-white">
-      <div className="border-b border-[#d5d5d5] px-4 py-6 sm:px-6 md:px-8 lg:px-10">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#666666]">Collection</p>
-        <h1 className="mt-3 text-[32px] font-bold leading-none tracking-[-0.03em] text-[#424242] sm:text-[44px]">
+    <section className="page-frame page-panel">
+      <div className="border-b border-[#d5d5d5] px-4 py-6 sm:px-6 md:px-8 lg:px-10 bg-[radial-gradient(circle_at_top_left,rgba(19,66,255,0.05),transparent_36%)]">
+        <p className="page-header-kicker">Collection</p>
+        <h1 className="mt-3 text-[32px] font-black leading-[0.95] tracking-[-0.05em] text-[#424242] sm:text-[44px] md:text-[56px]">
           Curated repositories and developer resources
         </h1>
-        <p className="mt-4 max-w-4xl text-sm leading-[1.8] text-[#555555] sm:text-base">
-          A curated collection of helpful repositories for developers, featuring resources on AI, Large Language Models
-          (LLMs), and much more. Your go-to hub for essential tools, libraries, and projects to boost your development journey.
+        <p className="mt-4 max-w-4xl text-sm leading-[1.8] text-[#58606d] sm:text-base">
+          A structured index of repositories, tools, files, and reference material worth keeping in active reach. Browse the marketplace layer, then inspect the underlying source and support files in one place.
         </p>
         <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <StatCard label="Categories" value={String(initialIndex.repo.totalCategories)} />

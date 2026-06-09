@@ -52,8 +52,8 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
           <CornerDot position="tl" className="hidden sm:block" />
           <CornerDot position="tr" className="hidden sm:block" />
           
-          <div className="lg:w-[60%] shrink-0 min-w-0 border-b lg:border-b-0 border-[#d5d5d5] p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10 flex items-center overflow-x-hidden">
-            <div className="relative w-full max-w-[280px] xs:max-w-[350px] sm:max-w-[450px] md:max-w-[550px] lg:max-w-[650px] xl:max-w-[750px] h-[120px] xs:h-[150px] sm:h-[180px] md:h-[200px] lg:h-[220px] xl:h-[240px] overflow-hidden">
+          <div className="lg:w-[48%] shrink-0 min-w-0 border-b lg:border-b-0 border-[#d5d5d5] p-3 xs:p-4 sm:p-5 md:p-6 lg:p-8 flex items-center overflow-x-hidden">
+            <div className="relative w-full max-w-[240px] xs:max-w-[300px] sm:max-w-[380px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[580px] h-[92px] xs:h-[110px] sm:h-[130px] md:h-[150px] lg:h-[165px] xl:h-[180px] overflow-hidden">
               <Image 
                 src="/JSTN Logo/SVG/Logo Header - B.svg" 
                 alt="JSTN Logo" 
@@ -66,8 +66,8 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
             </div>
           </div>
 
-          <div className="flex-1 min-w-0 p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10">
-            <div className="flex flex-col xs:flex-row gap-4 xs:gap-6 sm:gap-8 md:gap-10 lg:gap-16 xl:gap-20">
+          <div className="flex-1 min-w-0 p-3 xs:p-4 sm:p-5 md:p-6 lg:p-8">
+            <div className="flex flex-col xs:flex-row gap-4 xs:gap-5 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12">
               <div>
                 <h3 className="text-[16px] xs:text-[17px] sm:text-[18px] font-bold text-[#424242] mb-3 xs:mb-4">Resources</h3>
                 <nav className="flex flex-col gap-2 xs:gap-3" aria-label="Resources">
@@ -115,7 +115,7 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
           </div>
         </div>
 
-        <div className="relative h-[48px] xs:h-[52px] sm:h-[56px] flex flex-col xs:flex-row items-center justify-between px-3 xs:px-4 sm:px-6 gap-1 xs:gap-2 py-2 xs:py-0">
+        <div className="relative h-[40px] xs:h-[44px] sm:h-[48px] flex flex-col xs:flex-row items-center justify-between px-3 xs:px-4 sm:px-5 gap-1 xs:gap-2 py-1.5 xs:py-0">
           <p className="text-[#555555] text-[10px] xs:text-[11px] sm:text-[12px] font-medium text-center xs:text-left">
             © 2026 JSTN Resources.{' '}
             <Link

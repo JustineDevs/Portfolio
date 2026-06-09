@@ -10,6 +10,8 @@
 .env.*
 !.env.example
 !.env*.example
+.dev.vars*
+!.dev.vars.example
 *.pem
 *.key
 *.p12
@@ -19,10 +21,12 @@ serviceAccount*.json
 
 # --- Next.js & build output ---
 /.next/
+.open-next/
 /out/
 /build
 dist/
 .vercel
+.wrangler/
 *.tsbuildinfo
 
 # --- Caches & tooling ---
@@ -39,6 +43,8 @@ node_modules/.cache
 test-results/
 playwright-report/
 blob-report/
+.pnpm-store/
+Screenshot *.png
 
 # --- Logs ---
 *.log

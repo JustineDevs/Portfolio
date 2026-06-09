@@ -111,6 +111,7 @@ const nextConfig = {
     // Do not bundle native libsql into Server Components
     serverComponentsExternalPackages: [
       '@libsql/client',
+      '@libsql/isomorphic-ws',
       'libsql',
       '@libsql/win32-x64-msvc',
       '@libsql/darwin-arm64',

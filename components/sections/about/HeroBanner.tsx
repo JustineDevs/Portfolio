@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
 import CornerDot from '@/components/ui/CornerDot'
 import MarkdownContent from '@/components/content/MarkdownContent'
-import { getRenderableImageUrl, isSvgAssetUrl, normalizeAssetUrl } from '@/lib/asset-urls'
+import { getRenderableImageUrl, normalizeAssetUrl, shouldUseUnoptimizedImage } from '@/lib/asset-urls'
 
 interface HeroBannerProps {
   title?: string
@@ -42,16 +42,17 @@ export default function HeroBanner({
   }, [])
 
   return (
-    <section className="relative border-l border-r border-b border-[#d5d5d5] bg-white">
+    <section className="page-frame page-panel">
       <CornerDot position="tl" className="hidden xs:block" />
       <CornerDot position="tr" className="hidden xs:block" />
       
       <div className="p-4 xs:p-5 sm:p-6 md:p-8 lg:p-12">
-        <h1 className="text-[28px] xs:text-[36px] sm:text-[42px] md:text-[48px] lg:text-[64px] font-bold text-[#424242] tracking-tight mb-4 xs:mb-5 sm:mb-6 leading-tight">
+        <p className="page-header-kicker mb-3">About</p>
+        <h1 className="text-[28px] xs:text-[36px] sm:text-[42px] md:text-[48px] lg:text-[64px] font-black text-[#424242] tracking-[-0.05em] mb-4 xs:mb-5 sm:mb-6 leading-[0.95]">
           {title}
         </h1>
         
-        <p className="text-[14px] xs:text-[16px] sm:text-[18px] lg:text-[20px] text-[#666666] mb-5 xs:mb-6 sm:mb-8 italic">
+        <p className="text-[14px] xs:text-[16px] sm:text-[18px] lg:text-[20px] text-[#666666] mb-5 xs:mb-6 sm:mb-8 italic max-w-3xl">
           {subtitle}
         </p>
 
@@ -64,7 +65,7 @@ export default function HeroBanner({
           </div>
         ) : null}
 
-        <div className="relative w-full aspect-[3/1] rounded-lg overflow-hidden border border-[#d5d5d5] bg-black">
+        <div className="relative w-full aspect-[3/1] rounded-[20px] overflow-hidden border border-[#cfd4dc] bg-black shadow-[0_18px_45px_rgba(29,35,42,0.10)]">
           <div 
             className={`absolute inset-0 transition-opacity duration-1000 ${scanComplete ? 'opacity-100' : 'opacity-0'}`}
           >
@@ -75,7 +76,7 @@ export default function HeroBanner({
               className="object-cover"
               priority
               sizes="(max-width: 375px) 100vw, (max-width: 768px) 100vw, (max-width: 1024px) 90vw, 1500px"
-              unoptimized={isSvgAssetUrl(normalizedImageUrl) || renderableImageUrl.startsWith("/api/image/resolve")}
+              unoptimized={shouldUseUnoptimizedImage(normalizedImageUrl)}
             />
           </div>
 

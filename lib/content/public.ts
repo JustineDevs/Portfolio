@@ -52,8 +52,32 @@ export type FeaturedCertificateCard = {
   logoUrl?: string | null;
 };
 
-export async function getPublishedProjects() {
+type PublicTestimonial = typeof testimonials.$inferSelect;
+type PublicAward = typeof awards.$inferSelect;
+type PublicCertificate = typeof certificates.$inferSelect;
+type PublicPageSection = typeof pageSections.$inferSelect;
+type PublicHighlight = typeof highlights.$inferSelect;
+type PublicGithubActivitySnapshot = typeof githubActivitySnapshots.$inferSelect;
+type NormalizedAward = Omit<PublicAward, "logoUrl"> & { logoUrl: string | null };
+type NormalizedCertificate = Omit<PublicCertificate, "logoUrl"> & { logoUrl: string | null };
+type NormalizedPageSection = PublicPageSection;
+type NormalizedHighlight = Omit<PublicHighlight, "imageUrlOverride"> & { imageUrlOverride: string | null };
+
+async function withPublicContentFallback<T>(
+  scope: string,
+  fallback: T,
+  operation: () => Promise<T>,
+): Promise<T> {
   try {
+    return await operation();
+  } catch (error) {
+    console.error(`[content/public] ${scope}`, error);
+    return fallback;
+  }
+}
+
+export async function getPublishedProjects(): Promise<PublicProject[]> {
+  return withPublicContentFallback("getPublishedProjects", [] as PublicProject[], async () => {
     const projectRows = await db
       .select()
       .from(projects)
@@ -61,13 +85,11 @@ export async function getPublishedProjects() {
       .orderBy(desc(projects.featured), asc(projects.sortOrder), desc(projects.publishedAt));
 
     return hydrateProjects(projectRows);
-  } catch {
-    return [];
-  }
+  });
 }
 
-export async function getPublishedProjectBySlug(slug: string) {
-  try {
+export async function getPublishedProjectBySlug(slug: string): Promise<PublicProject | null> {
+  return withPublicContentFallback("getPublishedProjectBySlug", null, async () => {
     const rows = await db
       .select()
       .from(projects)
@@ -80,9 +102,7 @@ export async function getPublishedProjectBySlug(slug: string) {
 
     const hydrated = await hydrateProjects(rows);
     return hydrated[0] ?? null;
-  } catch {
-    return null;
-  }
+  });
 }
 
 export async function getOtherPublishedProjects(currentSlug: string, limit = 2) {
@@ -96,8 +116,8 @@ export async function getFeaturedProjects(limit?: number) {
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
 }
 
-export async function getPublishedPosts() {
-  try {
+export async function getPublishedPosts(): Promise<PublicPost[]> {
+  return withPublicContentFallback("getPublishedPosts", [] as PublicPost[], async () => {
     const postRows = await db
       .select()
       .from(posts)
@@ -119,13 +139,11 @@ export async function getPublishedPosts() {
         publishedAt: post.publishedAt,
       })),
     );
-  } catch {
-    return [];
-  }
+  });
 }
 
-export async function getPublishedPostBySlug(slug: string) {
-  try {
+export async function getPublishedPostBySlug(slug: string): Promise<PublicPost | null> {
+  return withPublicContentFallback("getPublishedPostBySlug", null, async () => {
     const rows = await db
       .select()
       .from(posts)
@@ -150,9 +168,7 @@ export async function getPublishedPostBySlug(slug: string) {
       featured: post.featured,
       publishedAt: post.publishedAt,
     };
-  } catch {
-    return null;
-  }
+  });
 }
 
 export async function getFeaturedPosts(limit?: number) {
@@ -166,16 +182,14 @@ export async function getLatestPosts(limit?: number) {
   return typeof limit === "number" ? posts.slice(0, limit) : posts;
 }
 
-export async function getPublishedTestimonials() {
-  try {
+export async function getPublishedTestimonials(): Promise<PublicTestimonial[]> {
+  return withPublicContentFallback("getPublishedTestimonials", [] as PublicTestimonial[], async () => {
     return await db
       .select()
       .from(testimonials)
       .where(eq(testimonials.status, "published"))
       .orderBy(desc(testimonials.featured), asc(testimonials.sortOrder), desc(testimonials.updatedAt));
-  } catch {
-    return [];
-  }
+  });
 }
 
 export async function getFeaturedTestimonials(limit?: number) {
@@ -184,8 +198,8 @@ export async function getFeaturedTestimonials(limit?: number) {
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
 }
 
-export async function getPublishedAwards() {
-  try {
+export async function getPublishedAwards(): Promise<NormalizedAward[]> {
+  return withPublicContentFallback("getPublishedAwards", [] as NormalizedAward[], async () => {
     const rows = await db
       .select()
       .from(awards)
@@ -198,13 +212,11 @@ export async function getPublishedAwards() {
         logoUrl: await normalizeOptionalImageAssetUrl(award.logoUrl),
       })),
     );
-  } catch {
-    return [];
-  }
+  });
 }
 
-export async function getPublishedCertificates() {
-  try {
+export async function getPublishedCertificates(): Promise<NormalizedCertificate[]> {
+  return withPublicContentFallback("getPublishedCertificates", [] as NormalizedCertificate[], async () => {
     const rows = await db
       .select()
       .from(certificates)
@@ -217,9 +229,7 @@ export async function getPublishedCertificates() {
         logoUrl: await normalizeOptionalImageAssetUrl(certificate.logoUrl),
       })),
     );
-  } catch {
-    return [];
-  }
+  });
 }
 
 export async function getFeaturedAwardCards(
@@ -361,8 +371,8 @@ export async function getFeaturedCertificateCards(
   return typeof limit === "number" ? cards.slice(0, limit) : cards;
 }
 
-export async function getPublishedPageSections(pageKey: string) {
-  try {
+export async function getPublishedPageSections(pageKey: string): Promise<NormalizedPageSection[]> {
+  return withPublicContentFallback("getPublishedPageSections", [] as NormalizedPageSection[], async () => {
     const rows = await db
       .select()
       .from(pageSections)
@@ -394,13 +404,11 @@ export async function getPublishedPageSections(pageKey: string) {
     return pageKey === "about"
       ? normalizedRows.sort((a, b) => a.sortOrder - b.sortOrder)
       : normalizedRows;
-  } catch {
-    return [];
-  }
+  });
 }
 
-export async function getPublishedHighlights() {
-  try {
+export async function getPublishedHighlights(): Promise<NormalizedHighlight[]> {
+  return withPublicContentFallback("getPublishedHighlights", [] as NormalizedHighlight[], async () => {
     const rows = await db
       .select()
       .from(highlights)
@@ -413,13 +421,11 @@ export async function getPublishedHighlights() {
         imageUrlOverride: await normalizeOptionalImageAssetUrl(highlight.imageUrlOverride),
       })),
     );
-  } catch {
-    return [];
-  }
+  });
 }
 
-export async function getLatestGithubActivitySnapshot(year: number) {
-  try {
+export async function getLatestGithubActivitySnapshot(year: number): Promise<PublicGithubActivitySnapshot | null> {
+  return withPublicContentFallback("getLatestGithubActivitySnapshot", null, async () => {
     const rows = await db
       .select()
       .from(githubActivitySnapshots)
@@ -428,13 +434,11 @@ export async function getLatestGithubActivitySnapshot(year: number) {
       .limit(1);
 
     return rows[0] ?? null;
-  } catch {
-    return null;
-  }
+  });
 }
 
 export async function getSiteSetting<T>(key: string, fallback?: T): Promise<T | null> {
-  try {
+  return withPublicContentFallback("getSiteSetting", fallback ?? null, async () => {
     const rows = await db
       .select()
       .from(siteSettings)
@@ -446,9 +450,7 @@ export async function getSiteSetting<T>(key: string, fallback?: T): Promise<T | 
     }
 
     return JSON.parse(rows[0].valueJson) as T;
-  } catch {
-    return fallback ?? null;
-  }
+  });
 }
 
 async function hydrateProjects(
