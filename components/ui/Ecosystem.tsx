@@ -148,4 +148,4 @@ export default function Ecosystem({
   )
 }
 
-export { Ripple, OrbitingCircles }
+export { OrbitingCircles }

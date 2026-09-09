@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowUpRight, FolderKanban, Settings2, Sparkles, type LucideIcon } from "lucide-react";
 
 import { requireAdminSession } from "@/lib/auth";
 import type { AdminDashboardCounts } from "@/lib/content/admin";
@@ -64,6 +65,13 @@ const adminSections: Section[] = [
   },
 ];
 
+const summaryCards: [string, number, LucideIcon][] = [
+  ["Projects", 0, FolderKanban],
+  ["Writing", 0, Sparkles],
+  ["Proof", 0, ArrowUpRight],
+  ["Settings", 0, Settings2],
+];
+
 export default async function AdminDashboardPage() {
   const session = await requireAdminSession();
   const email = session?.user?.email ?? "authorized admin";
@@ -71,13 +79,36 @@ export default async function AdminDashboardPage() {
 
   return (
     <main className="space-y-8">
-      <section className="rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">Portfolio CMS V1</p>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight">Admin Console</h1>
-        <p className="mt-3 max-w-2xl text-sm leading-6 text-[#555555]">
+      <section className="rounded-lg border border-[#e4e4e7] bg-white p-6 shadow-sm sm:p-8">
+        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#71717a]">Portfolio CMS</p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#18181b]">Good to see you.</h1>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#52525b]">
           Signed in as {email}. This is the private CMS console for the current portfolio data model, writing flow,
           highlights, and activity refresh controls.
-        </p>
+            </p>
+          </div>
+          <div className="flex items-center gap-2 rounded-md border border-[#e4e4e7] bg-[#fafafa] px-3 py-2 text-xs text-[#71717a]">
+            <span className="h-2 w-2 rounded-full bg-emerald-500" />
+            Workspace ready
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Content summary" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {summaryCards.map(([label, , Icon], index) => {
+          const values = [counts.projects, counts.posts, counts.certificates + counts.highlights, counts.siteSettings];
+          return (
+          <div key={label as string} className="rounded-lg border border-[#e4e4e7] bg-white px-4 py-5 shadow-sm">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#71717a]">{label as string}</p>
+              <Icon className="h-4 w-4 text-[#a1a1aa]" aria-hidden="true" />
+            </div>
+            <p className="mt-2 text-2xl font-bold tracking-tight text-[#18181b]">{values[index]}</p>
+          </div>
+          );
+        })}
       </section>
 
       <section aria-label="CMS sections" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -87,9 +118,12 @@ export default async function AdminDashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-2xl border border-[#d5d5d5] bg-white p-5 transition-colors hover:bg-[#fafafa] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#424242]/25 focus-visible:ring-offset-2"
+              className="group rounded-lg border border-[#e4e4e7] bg-white p-5 transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-[#a1a1aa] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#18181b]/25 focus-visible:ring-offset-2"
             >
-              <h2 className="text-lg font-semibold">{item.label}</h2>
+              <div className="flex items-start justify-between gap-4">
+                <h2 className="text-lg font-semibold">{item.label}</h2>
+                <ArrowUpRight aria-hidden className="h-4 w-4 text-[#a1a1aa] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </div>
               <p className="mt-1 text-xs font-medium uppercase tracking-wide text-[#888888]">{item.countLabel(n)}</p>
               <p className="mt-2 text-sm text-[#666666]">{item.description}</p>
             </Link>

@@ -1,6 +1,6 @@
 import { projects } from "./projects";
 
-export const legacyAboutPanels = [
+const legacyAboutPanels = [
   {
     id: "intuitive-engineering",
     title: "/Intuitive Engineering",

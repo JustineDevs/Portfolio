@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { listCertificatesForAdmin } from "@/lib/content/admin";
 
 export default async function AdminCertificatesPage() {
@@ -18,24 +19,25 @@ export default async function AdminCertificatesPage() {
       </section>
 
       <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <div className="grid grid-cols-[1.5fr_1fr_140px_120px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
+        <div className="grid grid-cols-[1.5fr_1fr_140px_170px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
           <div>Certificate</div>
           <div>Issuer</div>
           <div>Status</div>
-          <div>Edit</div>
+          <div>Actions</div>
         </div>
         {certificates.map((certificate) => (
-          <div key={certificate.id} className="grid grid-cols-[1.5fr_1fr_140px_120px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
+          <div key={certificate.id} className="grid grid-cols-[1.5fr_1fr_140px_170px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
             <div>
               <div className="font-semibold text-[#424242]">{certificate.title}</div>
               <div className="text-[#666666]">{certificate.slug}</div>
             </div>
             <div className="text-[#555555]">{certificate.issuer || "—"}</div>
             <div className="capitalize text-[#555555]">{certificate.status}</div>
-            <div>
+            <div className="flex flex-wrap items-center gap-3">
               <Link href={`/admin/certificates/${certificate.id}`} className="text-[#1342FF] hover:underline">
                 Edit
               </Link>
+              <AdminDeleteButton type="certificate" id={certificate.id} />
             </div>
           </div>
         ))}

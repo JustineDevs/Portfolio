@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { listPostsForAdmin } from "@/lib/content/admin";
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 
 export default async function AdminWritingPage() {
   const posts = await listPostsForAdmin();
@@ -18,24 +19,25 @@ export default async function AdminWritingPage() {
       </section>
 
       <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <div className="grid grid-cols-[1.5fr_140px_140px_120px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
+        <div className="grid grid-cols-[1.5fr_140px_140px_160px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
           <div>Post</div>
           <div>Type</div>
           <div>Status</div>
-          <div>Edit</div>
+          <div>Actions</div>
         </div>
         {posts.map((post) => (
-          <div key={post.id} className="grid grid-cols-[1.5fr_140px_140px_120px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
+          <div key={post.id} className="grid grid-cols-[1.5fr_140px_140px_160px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
             <div>
               <div className="font-semibold text-[#424242]">{post.title}</div>
               <div className="text-[#666666]">{post.slug}</div>
             </div>
             <div className="capitalize text-[#555555]">{post.postType}</div>
             <div className="capitalize text-[#555555]">{post.status}</div>
-            <div>
+            <div className="flex items-center gap-3">
               <Link href={`/admin/writing/${post.id}`} className="text-[#1342FF] hover:underline">
                 Edit
               </Link>
+              <AdminDeleteButton type="post" id={post.id} />
             </div>
           </div>
         ))}

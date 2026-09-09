@@ -61,6 +61,8 @@ export default function NeumorphicSocialButton({
           <motion.a
             key={link.platform}
             href={link.url}
+            aria-label={`${link.platform === 'x' ? 'X (Twitter)' : link.platform} profile`}
+            title={`${link.platform === 'x' ? 'X (Twitter)' : link.platform} profile`}
             {...(isMailto
               ? {}
               : { target: '_blank', rel: 'noopener noreferrer' })}

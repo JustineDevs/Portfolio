@@ -46,7 +46,7 @@ export default function HeroBanner({
       <CornerDot position="tl" className="hidden xs:block" />
       <CornerDot position="tr" className="hidden xs:block" />
       
-      <div className="p-4 xs:p-5 sm:p-6 md:p-8 lg:p-12">
+      <div className="p-4 xs:p-5 sm:p-6 md:p-8 lg:p-10 xl:p-12">
         <p className="page-header-kicker mb-3">About</p>
         <h1 className="text-[28px] xs:text-[36px] sm:text-[42px] md:text-[48px] lg:text-[64px] font-black text-[#424242] tracking-[-0.05em] mb-4 xs:mb-5 sm:mb-6 leading-[0.95]">
           {title}
@@ -65,7 +65,7 @@ export default function HeroBanner({
           </div>
         ) : null}
 
-        <div className="relative w-full aspect-[3/1] rounded-[20px] overflow-hidden border border-[#cfd4dc] bg-black shadow-[0_18px_45px_rgba(29,35,42,0.10)]">
+        <div className="relative w-full aspect-[4/1] rounded-[20px] overflow-hidden border border-[#cfd4dc] bg-black shadow-[0_18px_45px_rgba(29,35,42,0.10)]">
           <div 
             className={`absolute inset-0 transition-opacity duration-1000 ${scanComplete ? 'opacity-100' : 'opacity-0'}`}
           >

@@ -3,8 +3,6 @@ import { ReactNode } from "react";
 import { adminInputControlClass } from "@/components/admin/admin-styles";
 import { cn } from "@/lib/utils";
 
-export { adminButtonPrimaryClass, adminInputControlClass, adminLinkOutlineClass } from "@/components/admin/admin-styles";
-
 export function AdminErrorBanner({ message }: { message?: string }) {
   if (!message) return null;
 

@@ -79,12 +79,12 @@ export async function getPostForAdmin(id: number) {
   return rows[0] ?? null;
 }
 
-export async function listTestimonialsForAdmin() {
+async function listTestimonialsForAdmin() {
   await requireAdminSession();
   return db.select().from(testimonials).orderBy(desc(testimonials.updatedAt));
 }
 
-export async function listAwardsForAdmin() {
+async function listAwardsForAdmin() {
   await requireAdminSession();
   return db.select().from(awards).orderBy(desc(awards.updatedAt), asc(awards.sortOrder));
 }
@@ -130,7 +130,7 @@ export async function listHighlightTargetOptionsForAdmin(): Promise<{
   };
 }
 
-export async function getHighlightForAdmin(id: number) {
+async function getHighlightForAdmin(id: number) {
   await requireAdminSession();
   const rows = await db.select().from(highlights).where(eq(highlights.id, id)).limit(1);
   return rows[0] ?? null;

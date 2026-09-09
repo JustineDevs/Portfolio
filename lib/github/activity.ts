@@ -11,7 +11,7 @@ import {
 } from "@/lib/github/normalize-activity";
 
 const GITHUB_GRAPHQL_ENDPOINT = "https://api.github.com/graphql";
-export const GITHUB_ACTIVITY_REVALIDATE_SECONDS = 60 * 60 * 6;
+const GITHUB_ACTIVITY_REVALIDATE_SECONDS = 60 * 60 * 6;
 
 function getGithubActivityQuery() {
   return `
@@ -89,7 +89,7 @@ export async function fetchGithubActivityForYear(
   return normalizeGithubActivityPayload(payload, year);
 }
 
-export async function getGithubActivitySnapshot(year: number) {
+async function getGithubActivitySnapshot(year: number) {
   const rows = await db
     .select()
     .from(githubActivitySnapshots)
@@ -113,7 +113,7 @@ export async function saveGithubActivitySnapshot(summary: GithubActivitySummary)
   });
 }
 
-export async function getGithubActivityWithFallback(year: number) {
+async function getGithubActivityWithFallback(year: number) {
   try {
     const live = await fetchGithubActivityForYear(year);
 

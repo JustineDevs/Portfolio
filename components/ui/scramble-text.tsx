@@ -3,15 +3,6 @@
 import { useEffect, useState, useRef, useCallback } from "react"
 import gsap from "gsap"
 
-interface ScrambleTextProps {
-  text: string
-  className?: string
-  /** Delay in milliseconds before animation starts */
-  delayMs?: number
-  /** Duration of the scramble animation in seconds */
-  duration?: number
-}
-
 interface ScrambleTextOnHoverProps {
   text: string
   className?: string
@@ -64,54 +55,6 @@ function runScrambleAnimation(
       onComplete?.()
     },
   })
-}
-
-/**
- * Scramble text animation component - animates on mount.
- */
-export function ScrambleText({ text, className, delayMs = 0, duration = 0.9 }: ScrambleTextProps) {
-  // Initialize with text to avoid flash of empty content
-  const [displayText, setDisplayText] = useState(text)
-  const [hasAnimated, setHasAnimated] = useState(false)
-  const containerRef = useRef<HTMLSpanElement>(null)
-  const animationRef = useRef<gsap.core.Tween | null>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  // Run animation only once on initial mount
-  useEffect(() => {
-    if (hasAnimated || !text) return
-
-    // Start with scrambled text
-    const scrambledStart = text
-      .split("")
-      .map(() => GLYPHS[Math.floor(Math.random() * GLYPHS.length)])
-      .join("")
-    setDisplayText(scrambledStart)
-
-    timeoutRef.current = setTimeout(() => {
-      animationRef.current = runScrambleAnimation(text, duration, setDisplayText, () => {
-        setHasAnimated(true)
-      })
-    }, delayMs)
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
-      if (animationRef.current) animationRef.current.kill()
-    }
-  }, []) // Empty deps - only run on mount
-
-  // Handle text prop changes after initial animation
-  useEffect(() => {
-    if (hasAnimated && displayText !== text) {
-      setDisplayText(text)
-    }
-  }, [text, hasAnimated, displayText])
-
-  return (
-    <span ref={containerRef} className={className}>
-      {displayText || text}
-    </span>
-  )
 }
 
 /**

@@ -110,7 +110,7 @@ export async function getOtherPublishedProjects(currentSlug: string, limit = 2) 
   return all.filter((project) => project.slug !== currentSlug).slice(0, limit);
 }
 
-export async function getFeaturedProjects(limit?: number) {
+async function getFeaturedProjects(limit?: number) {
   const projects = await getPublishedProjects();
   const featured = projects.filter((project) => project.featured);
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
@@ -171,7 +171,7 @@ export async function getPublishedPostBySlug(slug: string): Promise<PublicPost |
   });
 }
 
-export async function getFeaturedPosts(limit?: number) {
+async function getFeaturedPosts(limit?: number) {
   const posts = await getPublishedPosts();
   const featured = posts.filter((post) => post.featured);
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
@@ -192,7 +192,7 @@ export async function getPublishedTestimonials(): Promise<PublicTestimonial[]> {
   });
 }
 
-export async function getFeaturedTestimonials(limit?: number) {
+async function getFeaturedTestimonials(limit?: number) {
   const testimonials = await getPublishedTestimonials();
   const featured = testimonials.filter((testimonial) => testimonial.featured);
   return typeof limit === "number" ? featured.slice(0, limit) : featured;
@@ -215,7 +215,7 @@ export async function getPublishedAwards(): Promise<NormalizedAward[]> {
   });
 }
 
-export async function getPublishedCertificates(): Promise<NormalizedCertificate[]> {
+async function getPublishedCertificates(): Promise<NormalizedCertificate[]> {
   return withPublicContentFallback("getPublishedCertificates", [] as NormalizedCertificate[], async () => {
     const rows = await db
       .select()
@@ -424,7 +424,7 @@ export async function getPublishedHighlights(): Promise<NormalizedHighlight[]> {
   });
 }
 
-export async function getLatestGithubActivitySnapshot(year: number): Promise<PublicGithubActivitySnapshot | null> {
+async function getLatestGithubActivitySnapshot(year: number): Promise<PublicGithubActivitySnapshot | null> {
   return withPublicContentFallback("getLatestGithubActivitySnapshot", null, async () => {
     const rows = await db
       .select()

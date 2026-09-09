@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
@@ -7,7 +8,8 @@ import { ToastProvider } from "@/components/providers/ToastProvider";
 import PageTransitionProvider from "@/components/providers/PageTransitionProvider";
 import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import SkipToContent from "@/components/ui/SkipToContent";
-import PixelCursor from "@/components/ui/PixelCursor";
+import { Pointer } from "@/components/ui/pointer";
+import PublicSocialBar from "@/components/layouts/PublicSocialBar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,20 +28,26 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const host = headers().get("host") || "";
+  const isWorkSite = host.split(":")[0] === "work.jstn.site" || host.endsWith(":3001");
+
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
-      <body className="font-sans antialiased cursor-none">
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${isWorkSite ? "work-site-html" : ""}`}>
+      <body className={`${isWorkSite ? "work-site-root" : "cursor-none"} font-sans antialiased`}>
         <ErrorBoundary>
           <ModeProvider>
-            <SmoothScrollProvider>
-              <ToastProvider>
-                <PageTransitionProvider>
-                  <PixelCursor />
-                  <SkipToContent />
-                  {children}
-                </PageTransitionProvider>
-              </ToastProvider>
-            </SmoothScrollProvider>
+            <ToastProvider>
+              <PageTransitionProvider>
+                {!isWorkSite ? <Pointer /> : null}
+                <SkipToContent />
+                {!isWorkSite ? <PublicSocialBar /> : null}
+                {isWorkSite ? (
+                  children
+                ) : (
+                  <SmoothScrollProvider>{children}</SmoothScrollProvider>
+                )}
+              </PageTransitionProvider>
+            </ToastProvider>
           </ModeProvider>
         </ErrorBoundary>
       </body>

@@ -117,7 +117,7 @@ async function resolveCurrentAdminSession() {
   return { admin, session };
 }
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   session: { strategy: "jwt" },
   pages: {
@@ -264,6 +264,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
 });
+
+export { handlers, signIn, signOut };
 
 export async function requireAdminSession({
   redirectToLogin = true,

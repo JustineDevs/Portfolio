@@ -1,13 +1,20 @@
-import Navbar from '@/components/Navbar'
 import HeroProjectHeader from '@/components/sections/project-showcase/HeroProjectHeader'
 import ResponsibilitiesNetworks from '@/components/sections/project-showcase/ResponsibilitiesNetworks'
 import DescriptionOtherProjects from '@/components/sections/project-showcase/DescriptionOtherProjects'
-import GithubActivitySection from '@/components/sections/GithubActivitySection'
-import Footer from '@/components/Footer'
+import PageLayout from '@/components/layouts/PageLayout'
 import { getProjectDetailPageData } from '@/lib/content/page-data'
 import { notFound } from 'next/navigation'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 
 export default async function ProjectShowcasePage({ params }: { params: { slug: string } }) {
+  const host = headers().get('host') || ''
+  const isWorkSite = host.split(':')[0] === 'work.jstn.site' || host.endsWith(':3001')
+
+  if (isWorkSite) {
+    redirect(`http://localhost:3000/projects/${params.slug}`)
+  }
+
   const { project, otherProjects, legalLinks } = await getProjectDetailPageData(params.slug)
   
   if (!project) {
@@ -15,17 +22,12 @@ export default async function ProjectShowcasePage({ params }: { params: { slug: 
   }
 
   return (
-    <>
-      <Navbar />
+    <PageLayout legalLinks={legalLinks}>
       <main className="bg-[#F8FAFC]">
         <HeroProjectHeader project={project} />
-        <ResponsibilitiesNetworks project={project} />
         <DescriptionOtherProjects project={project} otherProjects={otherProjects} />
-        <div className="max-w-7xl mx-auto">
-          <GithubActivitySection />
-        </div>
+        <ResponsibilitiesNetworks project={project} />
       </main>
-      <Footer legalLinks={legalLinks} />
-    </>
+    </PageLayout>
   )
 }

@@ -7,9 +7,11 @@ import { getVisitorId } from '@/lib/visitor-id'
 
 interface HeartButtonProps {
   className?: string
+  showReminderPopup?: boolean
+  reminderPlacement?: 'above' | 'below'
 }
 
-export default function HeartButton({ className = '' }: HeartButtonProps) {
+export default function HeartButton({ className = '', showReminderPopup = true, reminderPlacement = 'above' }: HeartButtonProps) {
   const [isLiked, setIsLiked] = useState(false)
   const [heartCount, setHeartCount] = useState(0)
   const [showReminder, setShowReminder] = useState(false)
@@ -17,6 +19,25 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [visitorId, setVisitorId] = useState<string | null>(null)
+  const [displayHeartCount, setDisplayHeartCount] = useState(0)
+
+  useEffect(() => {
+    if (isLoading) return
+    const startValue = displayHeartCount
+    const difference = heartCount - startValue
+    const startTime = performance.now()
+    let frame = 0
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - startTime) / 500, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplayHeartCount(Math.round(startValue + difference * eased))
+      if (progress < 1) frame = requestAnimationFrame(animate)
+    }
+
+    frame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(frame)
+  }, [heartCount, isLoading])
 
   const fetchHeartCount = useCallback(async (vid: string) => {
     try {
@@ -40,7 +61,7 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
   }, [fetchHeartCount])
 
   useEffect(() => {
-    if (!isLiked && !hasInteracted && !isLoading) {
+    if (showReminderPopup && !isLiked && !hasInteracted && !isLoading) {
       const timer = setTimeout(() => {
         setShowReminder(true)
         setTimeout(() => {
@@ -50,7 +71,7 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
 
       return () => clearTimeout(timer)
     }
-  }, [isLiked, hasInteracted, isLoading])
+  }, [isLiked, hasInteracted, isLoading, showReminderPopup])
 
   const handleClick = async () => {
     if (isUpdating || !visitorId) return
@@ -127,7 +148,7 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
       </motion.button>
       
       <span className="text-[11px] text-[#666666] font-medium min-w-[20px]">
-        {isLoading ? '' : (heartCount > 0 ? heartCount.toLocaleString() : '')}
+        {isLoading ? '' : (heartCount > 0 ? displayHeartCount.toLocaleString() : '')}
       </span>
 
       <AnimatePresence>
@@ -137,7 +158,7 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.8 }}
             transition={{ duration: 0.3 }}
-            className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#424242] text-white text-[10px] font-medium rounded whitespace-nowrap pointer-events-none z-[9999] shadow-lg"
+            className={`absolute left-1/2 z-[9999] -translate-x-1/2 px-3 py-1.5 text-[10px] font-medium whitespace-nowrap rounded bg-[#424242] text-white shadow-lg ${reminderPlacement === 'below' ? 'top-full mt-2' : 'bottom-full mb-2'}`}
             style={{
               whiteSpace: 'nowrap',
             }}
@@ -146,7 +167,9 @@ export default function HeartButton({ className = '' }: HeartButtonProps) {
               <Heart size={12} className="fill-[#ff6b6b] text-[#ff6b6b]" />
               <span>Love the design? Give it a heart!</span>
             </div>
-            <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-transparent border-t-[#424242]" />
+            <div className={reminderPlacement === 'below'
+              ? 'absolute bottom-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-b-[4px] border-transparent border-b-[#424242]'
+              : 'absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[4px] border-r-[4px] border-t-[4px] border-transparent border-t-[#424242]'} />
           </motion.div>
         )}
       </AnimatePresence>

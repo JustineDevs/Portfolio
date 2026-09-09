@@ -1,11 +1,11 @@
-export interface GithubContributionDay {
+interface GithubContributionDay {
   date: string;
   contributionCount: number;
   color: string;
   weekday: number;
 }
 
-export interface GithubContributionWeek {
+interface GithubContributionWeek {
   contributionDays: GithubContributionDay[];
   firstDay: string;
 }

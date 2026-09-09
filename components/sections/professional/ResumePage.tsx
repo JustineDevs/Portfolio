@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useMemo, useState, useRef, useEffect } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
@@ -10,9 +9,9 @@ import LiquidImage from '@/components/ui/LiquidImage'
 import NeumorphicSocialButton from '@/components/ui/NeumorphicSocialButton'
 import Modal from '@/components/ui/Modal'
 import { useToast } from '@/components/providers/ToastProvider'
-import GithubActivitySection from '@/components/sections/GithubActivitySection'
 import type { PublicProject } from '@/lib/content/types'
-import { getRenderableImageUrl, shouldUseUnoptimizedImage } from '@/lib/asset-urls'
+import TechStackResume from '@/components/sections/professional/TechStackResume'
+import { BadgeLogo } from '@/components/sections/BrandBadgeProjectsSection'
 
 interface CellData {
   level: number
@@ -87,7 +86,7 @@ export default function ResumePage({
       institution: 'National University Dasmariñas',
       degree: 'Bachelor of Science in Information Technology',
       specialization: 'Mobile Web Application Development',
-      status: 'Dropped Out',
+      status: 'Undergraduate',
       period: '2025-Present',
       year: '2nd Year',
     },
@@ -109,41 +108,6 @@ export default function ResumePage({
       period: '2023-2026',
       description: 'Moderated and managed Web3 community discussions, supporting member engagement and conflict resolution.',
       website: 'https://projectonepercent.io/',
-    },
-  ]
-
-  const techCategories = [
-    {
-      title: 'FRONTEND',
-      items: ['Typescript', 'TailwindCSS', 'HTML5', 'Three.js', 'Astro', 'Shadcn/UI', 'Vite', 'Redux', 'PostCSS', 'Next.js', 'CSS3', 'Vue.js', 'Babylon.js', 'Styled Components', 'Radix UI', 'Webpack', 'Prettier', 'Framer Motion'],
-    },
-    {
-      title: 'BACKEND',
-      items: ['Java', 'Python', 'PostgreSQL', 'MySQL', 'MongoDB', 'Firebase DB', 'GraphQL', 'gRPC', 'Websockets', 'OAuth 2.0', 'JWT'],
-    },
-    {
-      title: 'CMS & NO-CODE',
-      items: ['ComfyUI', 'N8N'],
-    },
-    {
-      title: 'DEVOPS & CLOUD',
-      items: ['Vercel', 'GitHub Actions', 'Warp', 'CUP', 'Grafana', 'Docker', 'DegenCloud', 'Pinata IPFS', 'Prometheus'],
-    },
-    {
-      title: 'AI & MACHINE LEARNING',
-      items: ['Anthropic', 'OPENAI', 'Hugging Face', 'LlamaIndex', 'GEMINI', 'GROK AI', 'TensorFlow', 'PyTorch'],
-    },
-    {
-      title: 'BLOCKCHAIN & WEB3',
-      items: ['Move', 'Solana', 'Rust', 'Ethereum', 'Web3.js', 'Viem', 'Wagmi', 'RainbowKit', 'ConnectKit', 'Thirdweb SDK', 'Alchemy SDK', 'ERC-4337', 'ERC-4066', 'ERC-2771'],
-    },
-    {
-      title: 'SECURITY & IDENTITY',
-      items: ['OAuth2.0', 'WebAuthn', 'Multi-Sig', 'AES-256', 'RSA', 'ECDSA', 'SHA-256', 'bcrypt', 'GDPR', 'SOC 2', 'ISO 27001', 'OWASP Top 10', 'Static Analysis', 'OpenZeppelin Contracts'],
-    },
-    {
-      title: 'DEVELOPER TOOLS',
-      items: ['Cursor IDE', 'VS Code', 'Claude', 'Visual Studio', 'Antigravity', 'Unreal Engine 5'],
     },
   ]
 
@@ -295,17 +259,8 @@ export default function ResumePage({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
           {/* Personal Section - Left */}
           <div className="border-r-0 md:border-r border-[#d5d5d5] p-4 sm:p-6 md:p-8 lg:p-12">
-            <div className="flex items-start gap-6">
-              <div className="relative w-[100px] h-[100px] sm:w-[110px] sm:h-[110px] md:w-[120px] md:h-[120px] rounded-lg border-4 border-white shadow-lg overflow-hidden flex-shrink-0">
-                <Image
-                  src="/Profile-transparent.png"
-                  alt="Justine Lupasi"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              <div className="flex-1 min-w-0">
+            <div>
+              <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <h1 className="text-[clamp(24px,3vw,32px)] font-bold text-[#424242] tracking-tight">
                     Justine Lupasi
@@ -322,85 +277,64 @@ export default function ResumePage({
                   <span>Metro Manila, Philippines</span>
                 </div>
                 <p className="text-[14px] font-semibold text-[#424242] mb-4">
-                  Technical Founder | Web3 Architect
+                  2yrs | Software Developer | Website Developer | Entry-Mid Level | Backend / Frontend | AI-native agents | blockchain infra, and developer experience.
                 </p>
                 <div className="mb-4">
                   <NeumorphicSocialButton />
                 </div>
                 <div className="flex items-center gap-3">
                   <a
-                    href="https://cal.com/justinedevs"
+                      href="https://work.jstn.site"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2 bg-[#424242] text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                    aria-label="Schedule a call"
+                      aria-label="Work with me"
                   >
-                    Schedule a Call
+                      Work with me
                   </a>
                   <a
-                    href="https://t.me/TraderGOfficial"
+                    href="https://drive.google.com/file/d/1LDHKFvVeqEgv2PAI8CeOnnrHabaq3qk-/view?usp=drive_link"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2 border border-[#d5d5d5] text-[#424242] text-[13px] font-medium rounded-lg hover:bg-[#f5f5f5] transition-colors focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                    aria-label="Join community on Telegram"
+                    aria-label="View my CV"
                   >
-                    Community
+                    View my CV
                   </a>
                 </div>
-                <div className="mt-10 pt-10 border-t border-[#d5d5d5]">
-                  <h2 className="text-[18px] font-bold text-[#424242] mb-6 tracking-[-0.01em] flex items-center gap-2">
+                </div>
+              </div>
+
+              <div className="mt-10 border-t border-[#d5d5d5] pt-10">
+                <h2 className="mb-6 flex items-center gap-2 text-[18px] font-bold tracking-[-0.01em] text-[#424242]">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#424242] flex-shrink-0">
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"/>
                     </svg>
                     About
                   </h2>
-                  <div className="space-y-4 text-[14px] leading-[1.8] text-[#555555]">
-                    <p>
+                <div className="grid gap-x-8 gap-y-4 text-[14px] leading-[1.8] text-[#555555] md:grid-cols-2">
+                  <p>
                       I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
                       development, responsive web apps, authentication systems, developer tooling, crypto automation, and
                       decentralized systems.
-                    </p>
-                    <p>
+                  </p>
+                  <p>
                       As <span className="font-semibold text-[#1342FF]">Co-Founder of HyperKit Labs</span>, I work on developer
                       infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart
                       contract workflows and product experimentation.
-                    </p>
-                    <p>
+                  </p>
+                  <p className="md:col-span-2">
                       I also bring community experience from{' '}
                       <span className="font-semibold text-[#1342FF]">Web3 moderation</span>, where I&apos;ve supported onboarding,
                       discussions, and technical guidance across Discord communities since 2023. I&apos;m especially interested in{' '}
                       <span className="font-semibold text-[#1342FF]">product architecture, systems thinking</span>, and building tools
                       that are practical, usable, and technically grounded.
-                    </p>
-                  </div>
+                  </p>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Tech Stack Section - Right */}
-          <div className="p-4 sm:p-6 md:p-8 lg:p-12">
-            <h2 className="text-[clamp(18px,2vw,20px)] font-bold text-[#424242] mb-6 tracking-[-0.01em]">Tech stack</h2>
-            <div className="space-y-6">
-              {techCategories.map((category, index) => (
-                <div key={index}>
-                  <h3 className="text-[11px] font-bold text-[#424242] mb-2 uppercase tracking-wide">
-                    {category.title}
-                  </h3>
-                  <div className="flex flex-wrap gap-1.5">
-                    {category.items.map((item, itemIndex) => (
-                      <span
-                        key={itemIndex}
-                        className="px-2 py-1 text-[10px] text-[#555555] bg-[#f5f5f5] rounded border border-[#e0e0e0]"
-                      >
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <div className="border-t border-[#d5d5d5] md:border-t-0 md:border-l"><TechStackResume /></div>
         </div>
       </section>
 
@@ -549,15 +483,7 @@ export default function ResumePage({
                     <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">{award.eventName}</span>
                     <div className="flex items-center justify-between mt-2.5 pb-4 border-b border-[#E5E5E5]">
                       <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                        <div className="relative w-8 h-8">
-                          <Image
-                            src={getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png")}
-                            alt={award.title}
-                            fill
-                            className="object-contain"
-                            unoptimized={shouldUseUnoptimizedImage(award.logoUrl || "/v2/showcase/banner.png")}
-                          />
-                        </div>
+                        <BadgeLogo alt={award.title} />
                         <div className="flex flex-col leading-tight">
                           <span className="text-[10px] text-white/60">Featured on</span>
                           <span className="text-[12px] font-bold text-white">{award.title}</span>
@@ -582,17 +508,7 @@ export default function ResumePage({
                       {featuredCertificates.map((certificate) => (
                         <div key={certificate.slug} className="flex items-center justify-between">
                           <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                            {certificate.logoUrl ? (
-                              <div className="relative w-8 h-8">
-                                <Image
-                                  src={getRenderableImageUrl(certificate.logoUrl)}
-                                  alt={certificate.title}
-                                  fill
-                                  className="object-contain"
-                                  unoptimized={shouldUseUnoptimizedImage(certificate.logoUrl)}
-                                />
-                              </div>
-                            ) : null}
+                            <BadgeLogo alt={certificate.title} />
                             <div className="flex flex-col leading-tight">
                               <span className="text-[10px] text-white/60">Featured on</span>
                               <span className="text-[12px] font-bold text-white">{certificate.title}</span>
@@ -616,7 +532,6 @@ export default function ResumePage({
         </div>
       </section>
 
-      <GithubActivitySection />
 
       {/* Badge Details Modal */}
       <Modal

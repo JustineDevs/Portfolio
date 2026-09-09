@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Github, Twitter, Globe, Share2, ExternalLink, ChevronDown, Calendar } from 'lucide-react'
+import { Github, Twitter, Share2, ExternalLink, Calendar } from 'lucide-react'
 import LiquidImage from '@/components/ui/LiquidImage'
 import CornerDot from '@/components/ui/CornerDot'
 import type { PublicProject } from '@/lib/content/types'
@@ -15,6 +15,14 @@ interface HeroProjectHeaderProps {
 
 export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
   const detailsRef = useRef<HTMLDivElement>(null)
+
+  const publishedDate = project.publishedAt
+    ? new Intl.DateTimeFormat('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      }).format(new Date(project.publishedAt))
+    : null
 
   const handleShare = () => {
     if (navigator.share) {
@@ -78,7 +86,7 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
 
         {/* Banner Image Area */}
         <div className="border-l border-r border-b border-[#d5d5d5] bg-white relative overflow-hidden">
-          <div className="relative h-[280px] sm:h-[350px] md:h-[450px] lg:h-[600px] bg-gray-50">
+          <div className="relative h-[240px] bg-gray-50 sm:h-[320px] md:h-[390px] lg:h-[440px]">
             {project.bannerImageUrl ? (
               <LiquidImage
                 src={project.bannerImageUrl}
@@ -105,7 +113,7 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
           <div className="p-4 sm:p-6 md:p-8 lg:p-12 xl:p-16">
             <div className="flex items-center gap-2 mb-4 sm:mb-6">
               <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[#1342FF]"></span>
-              <span className="text-xs sm:text-sm text-[#666666] font-bold uppercase tracking-widest">{project.publishedAt ?? ""}</span>
+              <span className="text-xs sm:text-sm text-[#666666] font-bold uppercase tracking-widest">{publishedDate ?? ""}</span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-8xl font-bold text-[#424242] mb-4 sm:mb-6 md:mb-8 tracking-tight leading-[0.95]">
@@ -128,50 +136,36 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
                   Visit Website
                 </a>
               )}
-                <a
-                  href="https://cal.com/justinedevs"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 sm:px-8 py-3 sm:py-4 border border-[#d5d5d5] text-[#424242] font-bold rounded-xl hover:bg-[#F8FAFC] transition flex items-center justify-center gap-2 min-h-[48px]"
-                >
-                  <Calendar className="w-4 sm:w-5 h-4 sm:h-5" />
-                  Schedule a Call
-                </a>
               <button
                 onClick={handleShare}
-                className="px-6 sm:px-8 py-3 sm:py-4 border border-[#d5d5d5] text-[#424242] font-bold rounded-xl hover:bg-[#F8FAFC] transition flex items-center justify-center gap-2 min-h-[48px]"
+                className="order-2 px-6 sm:px-8 py-3 sm:py-4 border border-[#d5d5d5] text-[#424242] font-bold rounded-xl hover:bg-[#F8FAFC] transition flex items-center justify-center gap-2 min-h-[48px]"
               >
                 <Share2 className="w-4 sm:w-5 h-4 sm:h-5" />
                 Share Project
               </button>
+              <a
+                href="https://work.jstn.site"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="order-3 px-6 sm:px-8 py-3 sm:py-4 border border-transparent text-[#666666] font-bold hover:text-[#424242] transition flex items-center justify-center gap-2 min-h-[48px]"
+              >
+                <Calendar className="w-4 sm:w-5 h-4 sm:h-5" />
+                Work with me
+              </a>
             </div>
           </div>
         </div>
 
         {/* Structured Meta Grid */}
         <div ref={detailsRef} className="border-l border-r border-b border-[#d5d5d5] bg-white scroll-mt-20">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="p-4 sm:p-6 md:p-8 border-b sm:border-b lg:border-b-0 sm:border-r border-[#d5d5d5]">
+          <div className="grid grid-cols-1 sm:grid-cols-3">
+            <div className="p-4 sm:p-6 md:p-8 border-b sm:border-b-0 sm:border-r border-[#d5d5d5]">
               <span className="text-[10px] text-[#666666] uppercase tracking-[0.2em] font-black block mb-3 sm:mb-4">Category</span>
               <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-[#424242] text-white text-[11px] sm:text-[12px] font-bold rounded-lg inline-block uppercase tracking-wider">
                 {project.category}
               </span>
             </div>
             
-            <div className="p-4 sm:p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-[#d5d5d5]">
-              <span className="text-[10px] text-[#666666] uppercase tracking-[0.2em] font-black block mb-3 sm:mb-4">Tags</span>
-              <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                {project.tags.map((tag, i) => (
-                  <span
-                    key={i}
-                    className="px-2 sm:px-3 py-1 sm:py-1.5 border border-[#d5d5d5] text-[#424242] text-[11px] sm:text-[12px] font-bold rounded-lg bg-[#F8FAFC]"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-
             <div className="p-4 sm:p-6 md:p-8 border-b sm:border-b-0 sm:border-r border-[#d5d5d5]">
               <span className="text-[10px] text-[#666666] uppercase tracking-[0.2em] font-black block mb-3 sm:mb-4">Author</span>
               <div className="flex items-center gap-2 sm:gap-3">
@@ -193,11 +187,23 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
                 {(project.authorUrl || "").replace('https://', '').replace('www.', '')}
               </a>
             </div>
+            {project.tags.length > 0 && (
+              <div className="col-span-full border-t border-[#d5d5d5] p-4 sm:p-6 md:p-8">
+                <span className="text-[10px] text-[#666666] uppercase tracking-[0.2em] font-black block mb-3">Tags</span>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag, i) => (
+                    <span key={i} className="border border-[#d5d5d5] bg-[#F8FAFC] px-3 py-1.5 text-xs font-bold text-[#424242]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Networks Section */}
-        <div className="border-l border-r border-b border-[#d5d5d5] bg-white relative">
+        {project.networks.length > 0 && <div className="border-l border-r border-b border-[#d5d5d5] bg-white relative">
           <div className="p-4 sm:p-6 md:p-8 lg:p-12">
             <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
               <h3 className="text-[10px] sm:text-xs font-black text-[#666666] uppercase tracking-[0.2em] sm:tracking-[0.3em] whitespace-nowrap">Integrated Networks</h3>
@@ -218,7 +224,7 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
               </div>
             )}
           </div>
-        </div>
+        </div>}
       </div>
     </section>
   )

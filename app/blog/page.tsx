@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import PageIntro from "@/components/layouts/PageIntro";
 import PageLayout from "@/components/layouts/PageLayout";
 import { getBlogIndexPageData } from "@/lib/content/page-data";
 
@@ -8,18 +7,7 @@ export default async function BlogPage() {
   const { posts, legalLinks } = await getBlogIndexPageData();
 
   return (
-    <PageLayout legalLinks={legalLinks}>
-      <PageIntro
-        tone="soft"
-        kicker="Writing & Signals"
-        title="Notes, proof points, and public thinking behind the work."
-        description="A running index of native writing and external posts that explain how I ship interfaces, structure product work, and evaluate technical systems in practice."
-        actions={[
-          { label: "Browse Projects", href: "/projects" },
-          { label: "Open GitHub", href: "https://github.com/JustineDevs/Portfolio", external: true, emphasis: "primary" },
-        ]}
-      />
-
+    <PageLayout legalLinks={legalLinks} fullWidth>
       <section className="page-frame page-panel">
         <div className="border-b border-[#d5d5d5] px-4 py-4 xs:px-5 sm:px-6 md:px-8 lg:px-12">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -32,13 +20,13 @@ export default async function BlogPage() {
           </div>
         </div>
 
-        <div className="grid gap-0">
-          {posts.map((post, index) => (
+        <div className="grid gap-px bg-[#d5d5d5] md:grid-cols-2">
+          {posts.map((post) => (
             <article
               key={post.slug}
-              className={`px-4 py-5 xs:px-5 sm:px-6 md:px-8 lg:px-10 ${index < posts.length - 1 ? "border-b border-[#d5d5d5]" : ""}`}
+              className="bg-white px-4 py-5 transition-colors hover:bg-[#fafafa] xs:px-5 sm:px-6 md:flex md:min-h-[310px] md:flex-col md:p-8 lg:p-10"
             >
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+              <div className="flex h-full flex-col">
                 <div className="max-w-3xl">
                   <div className="mb-3 flex flex-wrap items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#6a7280]">
                     <span>{post.postType === "native" ? "Article" : "External Post"}</span>
@@ -53,7 +41,7 @@ export default async function BlogPage() {
                   </p>
                 </div>
 
-                <div className="flex gap-3 lg:pt-1">
+                <div className="mt-8 flex gap-3 md:mt-auto md:pt-10">
                   <Link
                     href={`/blog/${post.slug}`}
                     className="page-action-chip"

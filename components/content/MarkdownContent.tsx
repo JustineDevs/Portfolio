@@ -1,6 +1,7 @@
 "use client";
 
 import type { Components } from "react-markdown";
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkBreaks from "remark-breaks";
@@ -60,6 +61,19 @@ function resolveMaybeRelativeUrl(value: string, baseUrl?: string) {
   }
 }
 
+function headingId(children: React.ReactNode) {
+  const text = React.Children.toArray(children)
+    .map((child) => (typeof child === "string" || typeof child === "number" ? String(child) : ""))
+    .join(" ")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+
+  return text || undefined;
+}
+
 function getMarkdownComponents(
   variant: Variant,
   { linkBaseUrl, imageBaseUrl }: { linkBaseUrl?: string; imageBaseUrl?: string },
@@ -70,15 +84,15 @@ function getMarkdownComponents(
 
   return {
     h1: ({ children }) => (
-      <h1 className="mt-8 border-b border-[#e5e5e5] pb-2 text-3xl font-bold tracking-tight text-[#222222] first:mt-0">
+      <h1 id={headingId(children)} className="mt-8 border-b border-[#e5e5e5] pb-2 text-3xl font-bold tracking-tight text-[#222222] first:mt-0">
         {children}
       </h1>
     ),
     h2: ({ children }) => (
-      <h2 className="mt-7 text-2xl font-bold tracking-tight text-[#2a2a2a] first:mt-0">{children}</h2>
+      <h2 id={headingId(children)} className="mt-7 text-2xl font-bold tracking-tight text-[#2a2a2a] first:mt-0">{children}</h2>
     ),
     h3: ({ children }) => (
-      <h3 className="mt-6 text-xl font-semibold tracking-tight text-[#333333] first:mt-0">{children}</h3>
+      <h3 id={headingId(children)} className="mt-6 text-xl font-semibold tracking-tight text-[#333333] first:mt-0">{children}</h3>
     ),
     h4: ({ children }) => <h4 className="mt-5 text-lg font-semibold text-[#333333] first:mt-0">{children}</h4>,
     p: ({ className, children }) => {

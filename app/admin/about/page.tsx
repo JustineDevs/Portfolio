@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminErrorBanner } from "@/components/admin/FormPrimitives";
 import { getAboutSectionConfig } from "@/lib/about-section-config";
 import { listAvailableAboutSectionKeysForAdmin, listPageSectionsForAdmin } from "@/lib/content/admin";
@@ -43,26 +44,27 @@ export default async function AdminAboutPage({
       </section>
 
       <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <div className="grid grid-cols-[1.4fr_1fr_140px_120px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
+        <div className="grid grid-cols-[1.4fr_1fr_140px_170px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
           <div>Section</div>
           <div>Key</div>
           <div>Status</div>
-          <div>Edit</div>
+          <div>Actions</div>
         </div>
         {sections.map((section) => {
           const config = getAboutSectionConfig(section.sectionKey);
           return (
-            <div key={section.id} className="grid grid-cols-[1.4fr_1fr_140px_120px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
+            <div key={section.id} className="grid grid-cols-[1.4fr_1fr_140px_170px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
               <div>
                 <div className="font-semibold text-[#424242]">{config.label}</div>
                 <div className="text-[#666666]">{config.description}</div>
               </div>
               <div className="text-[#555555]">{section.sectionKey}</div>
               <div className="capitalize text-[#555555]">{section.status}</div>
-              <div>
+              <div className="flex flex-wrap items-center gap-3">
                 <Link href={`/admin/about/${section.id}`} className="text-[#1342FF] hover:underline">
                   Edit
                 </Link>
+                <AdminDeleteButton type="about" id={section.id} />
               </div>
             </div>
           );

@@ -9,7 +9,7 @@ import { ScrambleTextOnHover } from '@/components/ui/scramble-text';
 import { ScrollReveal } from '@/components/ui/scroll-reveal';
 import Modal from '@/components/ui/Modal';
 import type { PublicProject } from '@/lib/content/types';
-import { getRenderableImageUrl, shouldUseUnoptimizedImage } from '@/lib/asset-urls';
+import { Trophy } from 'lucide-react';
 
 type Theme = 'black' | 'white' | 'iridescent';
 
@@ -21,6 +21,12 @@ interface AwardLike {
   year: string
   proofUrl?: string | null
   logoUrl?: string | null
+}
+
+export function BadgeLogo({ alt }: { alt: string }) {
+  return <div role="img" className="flex h-6 w-6 items-center justify-center rounded border border-white/20 bg-white/10 xs:h-8 xs:w-8" aria-label={`${alt} award trophy`}>
+    <Trophy className="h-3.5 w-3.5 text-white/80 xs:h-4 xs:w-4" strokeWidth={1.8} aria-hidden="true" />
+  </div>
 }
 
 export default function BrandBadgeProjectsSection({
@@ -221,15 +227,7 @@ export default function BrandBadgeProjectsSection({
                   <span className="text-[9px] xs:text-[10px] font-bold text-[#666666] tracking-wider uppercase">{award.eventName}</span>
                   <div className="flex flex-col xs:flex-row xs:items-center justify-between mt-2 xs:mt-2.5 pb-3 xs:pb-4 border-b border-[#E5E5E5] gap-2 xs:gap-0">
                     <div className="bg-[#424242] rounded-lg px-3 xs:px-4 py-2 xs:py-2.5 flex items-center gap-2 xs:gap-3 shadow-sm">
-                      <div className="relative w-6 h-6 xs:w-8 xs:h-8">
-                        <Image 
-                          src={getRenderableImageUrl(award.logoUrl || "/v2/showcase/banner.png")}
-                          alt={award.title} 
-                          fill 
-                          className="object-contain" 
-                          unoptimized={shouldUseUnoptimizedImage(award.logoUrl || "/v2/showcase/banner.png")}
-                        />
-                      </div>
+                      <BadgeLogo alt={award.title} />
                       <div className="flex flex-col leading-tight">
                         <span className="text-[9px] xs:text-[10px] text-white/60">Featured on</span>
                         <span className="text-[11px] xs:text-[12px] font-bold text-white">{award.title}</span>
@@ -281,9 +279,9 @@ export default function BrandBadgeProjectsSection({
               <Link
                 href="/projects"
                 className="px-4 xs:px-5 sm:px-6 py-1.5 xs:py-2 bg-[#424242] text-white text-[10px] xs:text-[11px] sm:text-[12px] font-medium rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                aria-label="View more projects"
+                aria-label="See more projects"
               >
-                See more
+                See more projects
               </Link>
             </div>
           </div>

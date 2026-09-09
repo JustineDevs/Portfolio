@@ -80,19 +80,19 @@ const Hero = () => {
             </p>
           </div>
 
-          <div className="relative z-20 border-t border-[#d5d5d5] flex flex-col sm:flex-row bg-white/50 backdrop-blur-sm">
-            <div className="py-4 xs:py-5 sm:py-6 px-4 xs:px-6 sm:px-8 border-b sm:border-b-0 border-[#d5d5d5] flex items-center min-w-[140px] xs:min-w-[160px] sm:min-w-[200px]">
+          <div className="relative z-20 grid grid-cols-[minmax(120px,42%)_minmax(0,1fr)] border-t border-[#d5d5d5] bg-white/50 backdrop-blur-sm sm:grid-cols-[minmax(200px,42%)_minmax(0,1fr)]">
+            <div className="flex min-w-0 items-center border-r border-[#d5d5d5] px-4 py-4 xs:px-6 xs:py-5 sm:px-8 sm:py-6">
               <span className={`text-lg xs:text-xl sm:text-2xl text-[#424242] tracking-tight ${GeistSans.className}`}>
                 Associated
               </span>
             </div>
 
-            <div className="flex-1 flex items-center justify-between gap-2 xs:gap-3 sm:gap-4 px-4 xs:px-6 sm:px-8 py-4 xs:py-5 sm:py-6 overflow-x-auto">
+            <div className="flex min-w-0 items-center justify-center gap-2 overflow-x-auto px-4 py-4 xs:gap-3 xs:px-6 xs:py-5 sm:gap-4 sm:px-8 sm:py-6">
               <a
                 href="https://projectonepercent.io/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[100px] xs:max-w-[120px] sm:max-w-[140px] min-w-[60px] block shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] rounded-sm"
+                className="relative block h-5 w-[clamp(72px,55%,140px)] shrink-0 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] xs:h-6"
               >
                 <Image
                   src="/Logo/one percent/one percent.jpg"
@@ -104,37 +104,6 @@ const Hero = () => {
                 />
               </a>
 
-              <a
-                href="https://avax.network/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[120px] xs:max-w-[140px] sm:max-w-[160px] min-w-[80px] block shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] rounded-sm"
-              >
-                <Image
-                  src="/Logo/avalanche/Avalanche Logos/Avalanche Logos/_PNG/AvalancheLogo_Horizontal_1C_Black.png"
-                  alt="Avalanche"
-                  fill
-                  sizes="(max-width: 640px) 33vw, 160px"
-                  loading="lazy"
-                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all"
-                />
-              </a>
-
-              <a
-                href="https://metis.io/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative h-4 xs:h-5 sm:h-6 flex-1 max-w-[90px] xs:max-w-[100px] sm:max-w-[120px] min-w-[50px] block shrink-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] rounded-sm"
-              >
-                <Image
-                  src="/Logo/metis/metis-black-horizontal.png"
-                  alt="Metis"
-                  fill
-                  sizes="(max-width: 640px) 25vw, 120px"
-                  loading="lazy"
-                  className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all"
-                />
-              </a>
             </div>
           </div>
         </div>

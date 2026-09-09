@@ -35,6 +35,7 @@ export default function InteractiveDotGrid({
   const mousePos = useRef({ x: -1000, y: -1000 })
   const targetMousePos = useRef({ x: -1000, y: -1000 })
   const animationFrameRef = useRef<number>()
+  const isVisibleRef = useRef(true)
 
   useEffect(() => {
     setMounted(true)
@@ -44,6 +45,7 @@ export default function InteractiveDotGrid({
     if (!mounted || !canvasRef.current || !containerRef.current) return
 
     const canvas = canvasRef.current
+    const container = containerRef.current
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -79,6 +81,10 @@ export default function InteractiveDotGrid({
 
     const draw = () => {
       if (!ctx || !canvas || !containerRef.current) return
+      if (!isVisibleRef.current) {
+        animationFrameRef.current = undefined
+        return
+      }
 
       const rect = containerRef.current.getBoundingClientRect()
       const width = rect.width
@@ -157,6 +163,12 @@ export default function InteractiveDotGrid({
       animationFrameRef.current = requestAnimationFrame(draw)
     }
 
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      isVisibleRef.current = entry.isIntersecting
+      if (entry.isIntersecting && animationFrameRef.current === undefined) draw()
+    }, { threshold: 0.05 })
+    visibilityObserver.observe(container)
+
     draw()
 
     return () => {
@@ -165,6 +177,7 @@ export default function InteractiveDotGrid({
       if (containerRef.current) {
         containerRef.current.removeEventListener('mouseleave', handleMouseLeave)
       }
+      visibilityObserver.disconnect()
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
       }

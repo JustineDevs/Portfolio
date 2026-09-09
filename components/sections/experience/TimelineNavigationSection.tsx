@@ -8,7 +8,7 @@ import {
   N8nIcon, FramerIcon, FigmaIcon, RustIcon, MoveIcon,
   VisualBasicIcon, CIcon, JavaScriptIcon, JavaIcon, MySQLIcon,
   UnrealIcon, HTML5Icon, TailwindIcon,
-  SolidityIcon, PythonIcon, TypeScriptIcon, ReactIcon, NodeIcon, MongoIcon, SupabaseIcon
+  SolidityIcon, PythonBrandIcon, TypeScriptIcon, ReactIcon, NodeIcon, MongoIcon, SupabaseIcon
 } from '@/components/ui/TechIcons'
 
 export default function TimelineNavigationSection() {
@@ -47,7 +47,7 @@ export default function TimelineNavigationSection() {
       milestoneLabel: '',
       icons: [
         { name: 'Solidity', icon: SolidityIcon },
-        { name: 'Python', icon: PythonIcon },
+        { name: 'Python', icon: PythonBrandIcon },
         { name: 'TypeScript', icon: TypeScriptIcon },
         { name: 'JavaScript', icon: JavaScriptIcon },
         { name: 'React', icon: ReactIcon },

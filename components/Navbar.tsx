@@ -9,7 +9,7 @@ import CornerDot from './ui/CornerDot';
 import { useMode } from '@/components/providers/ModeProvider';
 import { tokens } from '@/lib/design-tokens';
 
-const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience', '/collection'] as const
+const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience', '/blog'] as const
 const PROFESSIONAL_MODE_PAGE = '/'
 const isPersonalOnlyPage = (value: string) =>
   (PERSONAL_ONLY_PAGES as readonly string[]).includes(value)
@@ -53,7 +53,7 @@ export default function Navbar() {
     { name: 'About', href: '/about' },
     { name: 'Projects', href: '/projects' },
     { name: 'Experience', href: '/experience' },
-    { name: 'Collection', href: '/collection' },
+    { name: 'Blog', href: '/blog' },
   ];
 
   const handleNavLinkClick = (href: string, e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -180,26 +180,24 @@ export default function Navbar() {
 
             <div className="hidden sm:block w-px h-4 bg-gray-300" />
 
-            <a 
-              href="https://t.me/TraderGOfficial" 
-              target="_blank" 
+            <a
+              href="https://t.me/TraderGOfficial"
+              target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-1.5 sm:gap-2 rounded-full border border-transparent px-2 py-1 text-[10px] sm:text-xs font-medium text-gray-600 hover:border-[#d5d5d5] hover:text-[#424242] transition-colors whitespace-nowrap"
+              className="hidden items-center gap-1.5 rounded-full border border-transparent px-2 py-1 text-[10px] font-medium text-gray-600 transition-colors hover:border-[#d5d5d5] hover:text-[#424242] sm:flex sm:gap-2 sm:text-xs"
               aria-label="Shoot a DM on Telegram"
             >
-              <span className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full bg-[#0055FF]" />
-              <span className="hidden xs:inline">Shoot a DM</span>
-              <span className="xs:hidden">DM</span>
+              <span className="h-1 w-1 rounded-full bg-[#0055FF] sm:h-1.5 sm:w-1.5" />
+              <span>Shoot a DM</span>
             </a>
-
-            <a 
-              href="https://cal.com/justinedevs" 
-              target="_blank" 
+            <a
+              href="https://work.jstn.site"
+              target="_blank"
               rel="noopener noreferrer"
-              className="hidden xs:block bg-[#424242] text-white text-[10px] sm:text-xs font-medium px-3 py-2 sm:px-4 sm:py-2.5 lg:px-5 lg:py-3 min-h-[36px] sm:min-h-[40px] lg:min-h-[44px] rounded-md hover:bg-[#333333] transition-colors shadow-sm tracking-[0.04em] focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2 whitespace-nowrap flex items-center justify-center"
-              aria-label="Schedule a call"
+              className="hidden min-h-[36px] items-center justify-center whitespace-nowrap rounded-md bg-[#424242] px-3 py-2 text-[10px] font-medium tracking-[0.04em] text-white shadow-sm transition-colors hover:bg-[#333333] xs:flex sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:text-xs lg:min-h-[44px] lg:px-5 lg:py-3"
+              aria-label="Work with me"
             >
-              Schedule a Call
+              Work with me
             </a>
 
             <button
@@ -293,14 +291,14 @@ export default function Navbar() {
 
                 <div className="flex flex-col gap-3">
                   <a
-                    href="https://cal.com/justinedevs"
+                    href="https://work.jstn.site"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex min-h-[44px] items-center justify-center rounded-md bg-[#424242] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
                     onClick={() => setMobileMenuOpen(false)}
-                    aria-label="Schedule a call"
+                    aria-label="Work with me"
                   >
-                    Schedule a Call
+                    Work with me
                   </a>
                   <a
                     href="https://t.me/TraderGOfficial"

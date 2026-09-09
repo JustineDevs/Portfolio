@@ -148,12 +148,7 @@ export function normalizeAssetUrl(input: string): string {
   }
 }
 
-export function normalizeOptionalAssetUrl<T extends string | null | undefined>(input: T): T {
-  if (input == null) return input;
-  return normalizeAssetUrl(input) as T;
-}
-
-export function isDirectImageAssetUrl(input: string): boolean {
+function isDirectImageAssetUrl(input: string): boolean {
   const value = normalizeAssetUrl(input).toLowerCase();
   if (!value) return false;
   if (value.startsWith("data:image/")) return true;
@@ -251,7 +246,7 @@ export async function normalizeAssetFieldsInObjectAsync<T>(input: T): Promise<T>
   return input;
 }
 
-export function normalizeAssetFieldsInObject<T>(input: T): T {
+function normalizeAssetFieldsInObject<T>(input: T): T {
   if (Array.isArray(input)) {
     return input.map((value) => normalizeAssetFieldsInObject(value)) as T;
   }

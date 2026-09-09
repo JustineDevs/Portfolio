@@ -39,8 +39,4 @@ export function getVisitorId(): string {
 /**
  * Checks if visitor ID exists (for testing/debugging)
  */
-export function hasVisitorId(): boolean {
-  if (typeof window === 'undefined') return false
-  return !!localStorage.getItem(VISITOR_ID_KEY)
-}
 

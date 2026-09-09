@@ -1,4 +1,4 @@
-export const ABOUT_SECTION_KEY_ALIASES = {
+const ABOUT_SECTION_KEY_ALIASES = {
   hero: "hero",
   sidebar_intro: "reading_map",
   reading_map: "reading_map",

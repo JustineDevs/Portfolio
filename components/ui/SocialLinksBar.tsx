@@ -4,6 +4,8 @@ import { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import HeartButton from './HeartButton'
+import BrandIcon from './BrandIcon'
+import ElasticStack from './ElasticStack'
 import { getVisitorId } from '@/lib/visitor-id'
 import {
   Instagram,
@@ -12,18 +14,15 @@ import {
   Music,
   MessageCircle,
   Send,
-  Eye,
   Star,
   Mail,
-  Activity,
+  UserRound,
 } from 'lucide-react'
 
 const PORTFOLIO_REPO_URL = 'https://github.com/JustineDevs/Portfolio'
 const PORTFOLIO_RELEASES_URL = `${PORTFOLIO_REPO_URL}/releases`
 const PORTFOLIO_TAGS_URL = `${PORTFOLIO_REPO_URL}/tags`
 const PORTFOLIO_STARGAZERS_URL = 'https://github.com/JustineDevs/portfolio/stargazers'
-
-type BackendHealth = 'loading' | 'up' | 'down'
 
 interface SocialLink {
   platform: 'instagram' | 'x' | 'linkedin' | 'github' | 'tiktok' | 'threads' | 'telegram' | 'email'
@@ -83,6 +82,45 @@ const XIcon = ({ size = 14, className = '' }: { size?: number; className?: strin
   </svg>
 )
 
+type PublicationBrand = 'coderlegion' | 'peerlist' | 'devto' | 'medium'
+
+const publicationLinks: { brand: PublicationBrand; label: string; href: string; src?: string }[] = [
+  { brand: 'coderlegion', label: 'CoderLegion', href: 'https://coderlegion.com/user/JustineDevs' },
+  { brand: 'peerlist', label: 'Peerlist', href: 'https://peerlist.io/jstndevs', src: 'https://cdn.brandfetch.io/idNU2eDEh8/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1781763714360' },
+  { brand: 'devto', label: 'DEV.to', href: 'https://dev.to/justinedevs', src: 'https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fthepracticaldev.s3.amazonaws.com%2Fi%2F78hs31fax49uwy6kbxyw.png' },
+  { brand: 'medium', label: 'Medium', href: 'https://medium.com/@justinedevs', src: 'https://logos-world.net/wp-content/uploads/2023/07/Medium-Logo.png' },
+]
+
+const viewerStack = [
+  { id: 'viewer-1', name: 'Viewer', icon: <UserRound size={11} strokeWidth={2} aria-hidden /> },
+  { id: 'viewer-2', name: 'Viewer', icon: <UserRound size={11} strokeWidth={2} aria-hidden /> },
+  { id: 'viewer-3', name: 'Viewer', icon: <UserRound size={11} strokeWidth={2} aria-hidden /> },
+]
+
+function AnimatedCount({ value }: { value: number | null }) {
+  const [displayValue, setDisplayValue] = useState(0)
+
+  useEffect(() => {
+    if (value === null) return
+    const startValue = displayValue
+    const difference = value - startValue
+    const startTime = performance.now()
+    let frame = 0
+
+    const animate = (time: number) => {
+      const progress = Math.min((time - startTime) / 700, 1)
+      const eased = 1 - Math.pow(1 - progress, 3)
+      setDisplayValue(Math.round(startValue + difference * eased))
+      if (progress < 1) frame = requestAnimationFrame(animate)
+    }
+
+    frame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(frame)
+  }, [value])
+
+  return <>{value === null ? '' : displayValue.toLocaleString()}</>
+}
+
 // Icon components mapping
 const iconComponents: Record<string, React.ComponentType<any>> = {
   instagram: Instagram,
@@ -104,10 +142,9 @@ export default function SocialLinksBar({
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0, width: 0 })
   const [mounted, setMounted] = useState(false)
-  const [siteViews, setSiteViews] = useState<number | null>(null)
-  const [repoStars, setRepoStars] = useState<number | null>(null)
-  const [backendHealth, setBackendHealth] = useState<BackendHealth>('loading')
-  const [backendLatencyMs, setBackendLatencyMs] = useState<number | null>(null)
+  const [siteViews, setSiteViews] = useState<number>(0)
+  const [repoStars, setRepoStars] = useState<number>(0)
+  const [showViewerReminder, setShowViewerReminder] = useState(false)
   const tooltipRef = useRef<HTMLDivElement>(null)
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([])
 
@@ -122,26 +159,36 @@ export default function SocialLinksBar({
         if (typeof window !== 'undefined') {
           if (sessionStorage.getItem('portfolio_site_view_recorded') !== '1') {
             sessionStorage.setItem('portfolio_site_view_recorded', '1')
-            await fetch('/api/engagement', {
+            void fetch('/api/engagement', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ type: 'view' }),
-            })
+            }).catch(() => undefined)
           }
         }
         const vid = typeof window !== 'undefined' ? getVisitorId() : ''
-        const res = await fetch(
-          `/api/engagement?visitorId=${encodeURIComponent(vid)}`,
-          { cache: 'no-store' }
-        )
+        const controller = new AbortController()
+        const timeout = window.setTimeout(() => controller.abort(), 5000)
+        let res: Response
+        try {
+          res = await fetch(
+            `/api/engagement?visitorId=${encodeURIComponent(vid)}`,
+            { cache: 'no-store', signal: controller.signal }
+          )
+        } finally {
+          window.clearTimeout(timeout)
+        }
+        if (!res.ok) throw new Error(`Engagement request failed: ${res.status}`)
         const data = await res.json()
         if (cancelled) return
         setSiteViews(typeof data.views === 'number' ? data.views : 0)
-        setRepoStars(typeof data.stars === 'number' ? data.stars : null)
+        setRepoStars(typeof data.stars === 'number' ? data.stars : 0)
+        setShowViewerReminder(true)
       } catch {
         if (!cancelled) {
           setSiteViews(0)
-          setRepoStars(null)
+          setRepoStars(0)
+          setShowViewerReminder(true)
         }
       }
     })()
@@ -151,41 +198,10 @@ export default function SocialLinksBar({
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    const ping = async () => {
-      const t0 = typeof performance !== 'undefined' ? performance.now() : 0
-      try {
-        const res = await fetch('/api/health', { cache: 'no-store' })
-        const data = (await res.json().catch(() => ({}))) as {
-          ok?: boolean
-          latencyMs?: number
-        }
-        if (cancelled) return
-        if (res.ok && data.ok === true) {
-          setBackendHealth('up')
-          setBackendLatencyMs(
-            typeof data.latencyMs === 'number'
-              ? data.latencyMs
-              : Math.round(performance.now() - t0)
-          )
-        } else {
-          setBackendHealth('down')
-          setBackendLatencyMs(null)
-        }
-      } catch {
-        if (!cancelled) {
-          setBackendHealth('down')
-          setBackendLatencyMs(null)
-        }
-      }
-    }
-    void ping()
-    const id = setInterval(ping, 120_000)
-    return () => {
-      cancelled = true
-      clearInterval(id)
-    }
-  }, [])
+    if (!showViewerReminder) return
+    const timeout = window.setTimeout(() => setShowViewerReminder(false), 5000)
+    return () => window.clearTimeout(timeout)
+  }, [showViewerReminder])
 
   // Default social links if none provided
   const defaultLinks: SocialLink[] = [
@@ -219,60 +235,52 @@ export default function SocialLinksBar({
   const hoveredLink = hoveredIndex !== null ? enabledLinks[hoveredIndex] : null
   const hoveredLabel = hoveredLink ? platformLabels[hoveredLink.platform] || hoveredLink.platform : ''
 
-  const backendStatusTitle =
-    backendHealth === 'loading'
-      ? 'Checking backend (database)…'
-      : backendHealth === 'up'
-        ? `Backend OK — database reachable${
-            backendLatencyMs !== null ? ` (${backendLatencyMs} ms)` : ''
-          }`
-        : 'Backend unreachable — database check failed'
-
-  const backendStatusLabel =
-    backendHealth === 'loading'
-      ? 'Server status: checking'
-      : backendHealth === 'up'
-        ? 'Server status: backend OK'
-        : 'Server status: backend unavailable'
-
   return (
     <>
-      <div className="h-[32px] xs:h-[36px] border-b border-[#d5d5d5] bg-white relative overflow-visible z-[100]">
+      <div className="h-[52px] xs:h-[56px] border-b border-[#d5d5d5] bg-white relative overflow-visible z-[100]">
         <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-full flex items-center justify-between gap-2 xs:gap-3 flex-wrap relative overflow-visible px-2 xs:px-0">
-          <span
-            role="status"
-            aria-live="polite"
-            aria-label={backendStatusLabel}
-            title={backendStatusTitle}
-            className="inline-flex shrink-0 cursor-default items-center gap-1.5 rounded-md py-0.5 pr-1 text-gray-400"
+          <a
+            href="https://www.producthunt.com/@justindevs/submitted"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mr-4 inline-flex shrink-0 items-center rounded-md px-1 py-0.5 text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
+            aria-label="Open JustineDevs on Product Hunt"
+            title="Product Hunt submissions"
           >
-            <span
-              className={`size-1.5 shrink-0 rounded-full ${
-                backendHealth === 'up'
-                  ? 'bg-emerald-500'
-                  : backendHealth === 'down'
-                    ? 'bg-red-500'
-                    : 'animate-pulse bg-gray-300'
-              }`}
-              aria-hidden
-            />
-            <Activity
-              size={14}
-              className={`shrink-0 ${
-                backendHealth === 'down' ? 'text-red-500/90' : ''
-              }`}
-              aria-hidden
-            />
-            <span className="text-[11px] font-medium tabular-nums leading-none sm:hidden">Status</span>
-            <span className="hidden text-[11px] font-medium leading-none sm:inline">Server status</span>
-          </span>
+            <BrandIcon src="https://ph-static.imgix.net/ph-logo-1.png?auto=format" alt="Product Hunt logo" width={66} height={40} className="h-10 w-auto max-w-none object-contain" />
+          </a>
+          <div className="flex shrink-0 items-center gap-2.5 border-l border-[#e5e5e5] pl-3" aria-label="Writing profiles">
+            {publicationLinks.map(({ brand, label, href, src }) => (
+              <a
+                key={brand}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-11 w-14 shrink-0 items-center justify-center text-[#666666] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
+                aria-label={`Open ${label} profile`}
+                title={label}
+              >
+                {brand === 'coderlegion' ? (
+                  <span className="flex items-center text-[10px] font-black leading-none tracking-[-0.1em]" aria-label="CoderLegion logo">
+                    <span>CODER</span><span className="text-[#b43727]">LEGION</span>
+                  </span>
+                ) : brand === 'devto' ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-7 w-7" aria-label="DEV.to logo">
+                    <path d="M14.5 3.5H1.5A1 1 0 0 0 .5 4.5v7a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V4.5a1 1 0 0 0-1-1Zm0 8H1.5V4.5h13v7Zm-6.5-5v1h.5a.5.5 0 0 1 0 1H8v1h1a.5.5 0 0 1 0 1H7.5a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5H9a.5.5 0 0 1 0 1H8Zm5.48125-.364375-1.125 4a.5.5 0 0 1-.9625 0l-1.125-4a.5.5 0 0 1 .9625-.27125l.64375 2.28875.64375-2.28875a.5.5 0 1 1 .9625.27125ZM4 5.5h-.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H4a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2Zm1 3a1 1 0 0 1-1 1v-3a1 1 0 0 1 1 1v1Z" />
+                  </svg>
+                ) : (
+                  <BrandIcon src={src} alt={`${label} logo`} width={56} height={32} className="max-h-8 max-w-14 object-contain" />
+                )}
+              </a>
+            ))}
+          </div>
           <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-2 xs:gap-2.5">
           <div className="flex items-center gap-2 xs:gap-2.5 pr-1.5 xs:pr-2 border-r border-[#e5e5e5] mr-1.5 xs:mr-2">
             <div
               className="flex items-center gap-1.5 text-gray-400"
               title="GitHub releases and tags. Site visit count."
             >
-              <span className="inline-flex items-center gap-1 text-[8px] xs:text-[9px] font-semibold text-gray-400 leading-none">
+              <span className="inline-flex items-center gap-1 text-[8px] xs:text-[9px] font-semibold text-[#666666] leading-none">
                 <a
                   href={PORTFOLIO_RELEASES_URL}
                   target="_blank"
@@ -295,16 +303,49 @@ export default function SocialLinksBar({
                   tags
                 </a>
               </span>
-              <Eye size={14} className="shrink-0 text-gray-400" aria-hidden />
+              <div
+                className="group/viewers relative flex items-center"
+                tabIndex={0}
+                aria-label="Total viewers"
+                onMouseEnter={() => setShowViewerReminder(true)}
+                onMouseLeave={() => setShowViewerReminder(false)}
+                onFocus={() => setShowViewerReminder(true)}
+                onBlur={() => setShowViewerReminder(false)}
+              >
+                <ElasticStack
+                  items={viewerStack}
+                  itemSize={18}
+                  overlap={7}
+                  pushForce={4}
+                  role="img"
+                  aria-label="Recent site viewers"
+                />
+                <AnimatePresence>
+                  {showViewerReminder && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -3, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -3, scale: 0.96 }}
+                      transition={{ duration: 0.2 }}
+                      className="pointer-events-none absolute right-0 top-full z-[120] mt-2 rounded-md bg-[#424242] px-2 py-1.5 text-[10px] font-medium leading-none text-white shadow-lg"
+                      role="status"
+                    >
+                      <span className="whitespace-nowrap">Total viewers</span>
+                      <span className="ml-1 text-white/70">{siteViews.toLocaleString()}</span>
+                      <span className="absolute bottom-full right-2 border-x-[4px] border-b-[4px] border-x-transparent border-b-[#424242]" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <span
                 className="inline-flex h-[14px] min-h-[14px] items-center text-[11px] text-[#666666] font-medium tabular-nums leading-none min-w-[1.25rem]"
-                aria-label={`Site visits: ${siteViews === null ? 'loading' : siteViews}`}
+                aria-label={`Site visits: ${siteViews}`}
               >
-                {siteViews === null ? '' : siteViews.toLocaleString()}
+                <AnimatedCount value={siteViews} />
               </span>
             </div>
             <div className="hidden xs:block w-px h-3.5 bg-[#e5e5e5]" aria-hidden />
-            <HeartButton />
+            <HeartButton showReminderPopup reminderPlacement="below" />
             <div className="hidden xs:block w-px h-3.5 bg-[#e5e5e5]" aria-hidden />
             <a
               href={PORTFOLIO_STARGAZERS_URL}
@@ -312,11 +353,11 @@ export default function SocialLinksBar({
               rel="noopener noreferrer"
               className="flex items-center gap-1 rounded-md px-0.5 py-0.5 text-gray-400 transition-colors hover:text-[#424242] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
               title="View repo stargazers on GitHub"
-              aria-label={`Portfolio stargazers on GitHub${repoStars !== null ? `, ${repoStars} stargazers` : ''}`}
+              aria-label={`Portfolio stargazers on GitHub, ${repoStars} stargazers`}
             >
               <Star size={14} className="shrink-0" aria-hidden />
               <span className="text-[11px] text-[#666666] font-medium tabular-nums min-w-[1rem]">
-                {repoStars === null ? '' : repoStars.toLocaleString()}
+                {repoStars.toLocaleString()}
               </span>
             </a>
           </div>
@@ -333,6 +374,8 @@ export default function SocialLinksBar({
                  key={`${link.platform}-${index}`}
                  ref={(el) => { linkRefs.current[index] = el }}
                  href={url}
+                 aria-label={platformLabels[link.platform] || link.platform}
+                 title={platformLabels[link.platform] || link.platform}
                  {...(isMailto
                    ? {}
                    : { target: '_blank', rel: 'noopener noreferrer' })}

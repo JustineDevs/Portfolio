@@ -7,7 +7,6 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import Hero from '@/components/Hero'
 import AsciiBackground from '@/components/ui/AsciiBackground'
-import SocialLinksBar from '@/components/ui/SocialLinksBar'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import PreLoading from '@/components/PreLoading'
 import { useMode } from '@/components/providers/ModeProvider'
@@ -130,20 +129,19 @@ export default function HomePageClient({
 
       <AsciiBackground />
 
-      <SocialLinksBar />
       <Navbar />
 
       <main id="main-content" className="site-main">
         <AnimatePresence mode="wait">
           {mode === 'personal' ? (
-            <motion.div key="personal" {...animations.modeSwitch}>
+            <motion.div key="personal" {...animations.modeSwitch} initial={false}>
               <Hero />
               <TechAndDescriptionSection />
               <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
               <GithubActivitySection />
             </motion.div>
           ) : (
-            <motion.div key="professional" {...animations.modeSwitch}>
+            <motion.div key="professional" {...animations.modeSwitch} initial={false}>
               <ResumePage
                 featuredProjects={featuredProjects}
                 featuredAwards={featuredAwards}

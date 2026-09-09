@@ -1,5 +1,4 @@
 import { getPublicLegalLinks } from "@/lib/legal-links";
-import { getCollectionIndex } from "@/lib/github/public-collection";
 import {
   placementMatches,
   type HighlightType,
@@ -19,7 +18,7 @@ import {
   getPublishedTestimonials,
 } from "@/lib/content/public";
 
-export type HomeFeaturedAward = {
+type HomeFeaturedAward = {
   slug: string;
   title: string;
   eventName: string;
@@ -29,7 +28,7 @@ export type HomeFeaturedAward = {
   logoUrl?: string | null;
 };
 
-export type HomePageData = {
+type HomePageData = {
   featuredProjects: Awaited<ReturnType<typeof getPublishedProjects>>;
   featuredAwards: HomeFeaturedAward[];
   featuredCertificates: [];
@@ -66,7 +65,7 @@ export type AboutPageData = {
   legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
 };
 
-export type ProofProjectCard = {
+type ProofProjectCard = {
   key: string;
   typeLabel: string;
   title: string;
@@ -75,7 +74,7 @@ export type ProofProjectCard = {
   imageUrl?: string | null;
 };
 
-export type ProofWritingCard = {
+type ProofWritingCard = {
   key: string;
   label: string;
   title: string;
@@ -84,14 +83,14 @@ export type ProofWritingCard = {
   imageUrl?: string | null;
 };
 
-export type ProofTestimonialCard = {
+type ProofTestimonialCard = {
   key: string;
   label: string;
   title?: string | null;
   quote: string;
 };
 
-export type ProofAwardCard = {
+type ProofAwardCard = {
   slug: string;
   title: string;
   summary: string;
@@ -101,7 +100,7 @@ export type ProofAwardCard = {
   sourceLabel: string;
 };
 
-export type ProofCertificateCard = Awaited<ReturnType<typeof getFeaturedCertificateCards>>[number];
+type ProofCertificateCard = Awaited<ReturnType<typeof getFeaturedCertificateCards>>[number];
 
 export type ExperiencePageData = {
   legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
@@ -155,13 +154,23 @@ function buildWritingCards(
   return cards.slice(0, 3);
 }
 
+function isTestimonialHighlight(highlight: HighlightRow) {
+  if (highlight.highlightType === "testimonial") return true;
+  if (highlight.highlightType !== "custom") return false;
+
+  const content = `${highlight.titleOverride || ""} ${highlight.summaryOverride || ""}`.toLowerCase();
+  return !/(?:hackathon|hack2build|hyperhack|\b\d+(?:st|nd|rd|th)\s+place\b|\baward\b|event id:|\bcertificate\b)/i.test(
+    content,
+  );
+}
+
 function buildTestimonialCards(
   testimonials: Awaited<ReturnType<typeof getPublishedTestimonials>>,
   highlights: HighlightRow[],
 ) {
   const testimonialHighlights = highlights.filter(
     (highlight) =>
-      (highlight.highlightType === "testimonial" || highlight.highlightType === "custom") &&
+      isTestimonialHighlight(highlight) &&
       placementMatches(
         highlight.placementKey,
         highlight.highlightType as HighlightType,
@@ -224,7 +233,12 @@ function buildExperienceAwardCards(
   highlights: HighlightRow[],
 ) {
   const cards = toProofAwardCards(awards);
-  const seen = new Set(cards.map((award) => `${award.title.toLowerCase()}|${award.href || ""}`));
+  const seen = new Set(
+    cards.flatMap((award) => [
+      `${award.title.toLowerCase()}|${award.href || ""}`,
+      ...(award.href ? [`|${award.href}`] : []),
+    ]),
+  );
 
   for (const highlight of highlights.filter(
     (row) =>
@@ -236,8 +250,9 @@ function buildExperienceAwardCards(
     if (!title) continue;
 
     const dedupeKey = `${title.toLowerCase()}|${href || ""}`;
-    if (seen.has(dedupeKey)) continue;
+    if (seen.has(dedupeKey) || (href && seen.has(`|${href}`))) continue;
     seen.add(dedupeKey);
+    if (href) seen.add(`|${href}`);
 
     cards.push({
       slug: `manual-award-${highlight.id ?? dedupeKey}`,
@@ -366,13 +381,4 @@ export async function getExperiencePageData(): Promise<ExperiencePageData> {
       certificates: certificates.slice(0, 3),
     },
   };
-}
-
-export async function getCollectionPageData() {
-  const [collectionIndex, legalLinks] = await Promise.all([
-    getCollectionIndex(),
-    getPublicLegalLinks(),
-  ]);
-
-  return { collectionIndex, legalLinks };
 }

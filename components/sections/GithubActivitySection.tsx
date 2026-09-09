@@ -196,12 +196,12 @@ export default function GithubActivitySection() {
           <div className="flex-1 min-w-0 bg-white border border-[#e0e0e0] rounded-xl p-3 xs:p-4 sm:p-5 w-full">
             <div className="w-full min-w-0 overflow-x-auto">
               <div className="relative min-w-[700px]">
-                <div className="flex ml-[28px] xs:ml-[32px] sm:ml-[36px] mb-1.5 xs:mb-2 relative h-4">
+                <div className="relative ml-[28px] mb-1.5 h-4 [--heatmap-label-offset:28px] [--heatmap-cell-step:13px] xs:ml-[32px] xs:mb-2 xs:[--heatmap-label-offset:34px] xs:[--heatmap-cell-step:14px] sm:ml-[36px] sm:[--heatmap-label-offset:40px] sm:[--heatmap-cell-step:15px]">
                   {monthLabels.map((label, i) => (
                     <span
                       key={`${label.month}-${i}`}
                       className="text-[9px] xs:text-[10px] sm:text-[11px] text-[#666666] font-medium absolute"
-                      style={{ left: `${label.weekIndex * 13}px` }}
+                      style={{ left: `calc(var(--heatmap-label-offset) + ${label.weekIndex} * var(--heatmap-cell-step))` }}
                     >
                       {label.month}
                     </span>

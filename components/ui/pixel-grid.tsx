@@ -9,22 +9,11 @@ interface PixelState {
 }
 
 export default function PixelGrid() {
-  const [gridSize, setGridSize] = useState({ rows: 32, cols: 32 })
+  // Keep the decorative grid dimensions stable after hydration. Replacing a
+  // large grid when the viewport is measured causes a visible layout shift.
+  const [gridSize] = useState({ rows: 32, cols: 32 })
   const [litPixels, setLitPixels] = useState<Map<string, PixelState>>(new Map())
   const fadeOutDuration = 300
-
-  useEffect(() => {
-    const updateGridSize = () => {
-      const pixelSize = 20
-      const rows = Math.floor((window.innerHeight * 2) / pixelSize)
-      const cols = Math.floor((window.innerWidth * 2) / pixelSize)
-      setGridSize({ rows, cols })
-    }
-
-    updateGridSize()
-    window.addEventListener('resize', updateGridSize)
-    return () => window.removeEventListener('resize', updateGridSize)
-  }, [])
 
   const getRandomColor = () => {
     const hue = Math.floor(Math.random() * 360)

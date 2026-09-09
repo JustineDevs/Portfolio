@@ -8,7 +8,7 @@ import {
 
 const STATS_ROW_ID = 1;
 
-export async function ensurePortfolioStatsRow(): Promise<void> {
+async function ensurePortfolioStatsRow(): Promise<void> {
   await db
     .insert(portfolioSiteStats)
     .values({ id: STATS_ROW_ID, totalViews: 0 })

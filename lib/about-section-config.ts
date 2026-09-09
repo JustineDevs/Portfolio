@@ -10,7 +10,7 @@ export type AboutSectionConfig = {
   metaHint?: string;
 };
 
-export const ABOUT_SECTION_CONFIG: Record<AboutSectionKey, AboutSectionConfig> = {
+const ABOUT_SECTION_CONFIG: Record<AboutSectionKey, AboutSectionConfig> = {
   hero: {
     label: "Hero",
     description: "Personal opener. Use this for who you are, the page framing, and the image that sets the tone.",

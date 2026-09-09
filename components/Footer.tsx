@@ -76,7 +76,7 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
                     target="_blank"
                     rel="noopener noreferrer"
                     className={resourceLinkClass}
-                    aria-label="Report a bug or provide feedback on GitHub"
+                    aria-label="Bug Report / Feedback on GitHub"
                   >
                     Bug Report / Feedback
                   </a>

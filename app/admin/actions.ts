@@ -410,6 +410,108 @@ export async function savePostAction(formData: FormData) {
   redirect(`/admin/writing/${postId}`);
 }
 
+export async function deleteProjectAction(formData: FormData) {
+  await requireAdminSession();
+
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  if (!id) redirectWithError("/admin/projects", "A valid project is required.");
+
+  const project = await db
+    .select({ slug: projects.slug })
+    .from(projects)
+    .where(eq(projects.id, id))
+    .limit(1);
+
+  if (!project[0]) redirectWithError("/admin/projects", "Project not found.");
+
+  await db.delete(projects).where(eq(projects.id, id));
+  revalidateProjects(project[0].slug);
+  revalidateHome();
+  revalidateExperience();
+  redirect("/admin/projects");
+}
+
+export async function deletePostAction(formData: FormData) {
+  await requireAdminSession();
+
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  if (!id) redirectWithError("/admin/writing", "A valid post is required.");
+
+  const post = await db
+    .select({ slug: posts.slug })
+    .from(posts)
+    .where(eq(posts.id, id))
+    .limit(1);
+
+  if (!post[0]) redirectWithError("/admin/writing", "Post not found.");
+
+  await db.delete(posts).where(eq(posts.id, id));
+  revalidatePosts(post[0].slug);
+  revalidateHome();
+  revalidateExperience();
+  redirect("/admin/writing");
+}
+
+export async function deleteCertificateAction(formData: FormData) {
+  await requireAdminSession();
+
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  if (!id) redirectWithError("/admin/certificates", "A valid certificate is required.");
+
+  const certificate = await db
+    .select({ slug: certificates.slug })
+    .from(certificates)
+    .where(eq(certificates.id, id))
+    .limit(1);
+
+  if (!certificate[0]) redirectWithError("/admin/certificates", "Certificate not found.");
+
+  await db.delete(certificates).where(eq(certificates.id, id));
+  revalidateHome();
+  revalidateExperience();
+  redirect("/admin/certificates");
+}
+
+export async function deleteHighlightAction(formData: FormData) {
+  await requireAdminSession();
+
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  if (!id) redirectWithError("/admin/highlights", "A valid highlight is required.");
+
+  const highlight = await db
+    .select({ id: highlights.id })
+    .from(highlights)
+    .where(eq(highlights.id, id))
+    .limit(1);
+
+  if (!highlight[0]) redirectWithError("/admin/highlights", "Highlight not found.");
+
+  await db.delete(highlights).where(eq(highlights.id, id));
+  revalidateHome();
+  revalidateExperience();
+  redirect("/admin/highlights");
+}
+
+export async function deletePageSectionAction(formData: FormData) {
+  await requireAdminSession();
+
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  if (!id) redirectWithError("/admin/about", "A valid About section is required.");
+
+  const section = await db
+    .select({ pageKey: pageSections.pageKey })
+    .from(pageSections)
+    .where(eq(pageSections.id, id))
+    .limit(1);
+
+  if (!section[0]) redirectWithError("/admin/about", "About section not found.");
+
+  await db.delete(pageSections).where(eq(pageSections.id, id));
+  if (section[0].pageKey === "about") revalidateAbout();
+  revalidateHome();
+  redirect("/admin/about");
+}
+
 export async function saveCertificateAction(formData: FormData) {
   await requireAdminSession();
 

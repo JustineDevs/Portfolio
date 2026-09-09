@@ -1,4 +1,4 @@
-export const HIGHLIGHT_PLACEMENT_KEYS = [
+const HIGHLIGHT_PLACEMENT_KEYS = [
   "experience.testimonials",
   "experience.awards",
   "experience.certificates",
@@ -6,7 +6,7 @@ export const HIGHLIGHT_PLACEMENT_KEYS = [
 
 export type HighlightPlacementKey = (typeof HIGHLIGHT_PLACEMENT_KEYS)[number];
 
-export const HIGHLIGHT_PLACEMENT_OPTIONS = [
+const HIGHLIGHT_PLACEMENT_OPTIONS = [
   { value: "experience.testimonials", label: "Experience / Testimonials" },
   { value: "experience.awards", label: "Experience / Awards" },
   { value: "experience.certificates", label: "Experience / Certificates" },
@@ -40,7 +40,7 @@ export function isPlacementCompatibleWithType(
   return PLACEMENTS_BY_TYPE[highlightType].includes(placementKey as HighlightPlacementKey);
 }
 
-export function inferLegacyPlacementKey(highlightType: HighlightType): HighlightPlacementKey {
+function inferLegacyPlacementKey(highlightType: HighlightType): HighlightPlacementKey {
   return getDefaultPlacementKeyForType(highlightType);
 }
 

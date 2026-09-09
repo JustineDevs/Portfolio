@@ -33,7 +33,7 @@ export function computeAdminEmailHash(email: string) {
   return createHmac("sha256", getLookupKey()).update(normalized).digest("hex");
 }
 
-export async function findAdminUserByEmail(email: string) {
+async function findAdminUserByEmail(email: string) {
   const emailHash = computeAdminEmailHash(email);
   const rows = await db
     .select()
@@ -43,7 +43,7 @@ export async function findAdminUserByEmail(email: string) {
   return rows[0] ?? null;
 }
 
-export async function findAdminUserById(id: number) {
+async function findAdminUserById(id: number) {
   const rows = await db.select().from(adminUsers).where(eq(adminUsers.id, id)).limit(1);
   return rows[0] ?? null;
 }

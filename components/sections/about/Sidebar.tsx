@@ -36,7 +36,7 @@ export default function Sidebar({
 
   return (
     <>
-      <aside className="hidden lg:block w-[280px] shrink-0 border-r border-[#d5d5d5] bg-white sticky top-[101px] h-[calc(100vh-101px)] overflow-y-auto">
+      <aside className="hidden lg:block lg:w-[280px] shrink-0 border-r border-[#d5d5d5] bg-white sticky top-0 h-fit max-h-[calc(100vh-101px)] overflow-y-auto">
         <div className="p-6 border-b border-[#d5d5d5]">
           {dateLabel ? (
             <div className="mb-2 text-[12px] text-[#666666]">
@@ -47,7 +47,7 @@ export default function Sidebar({
           <h3 className="text-[16px] font-semibold text-[#424242] mt-4">{subheading}</h3>
         </div>
 
-        <nav className="p-6 space-y-6">
+        {navSections.length > 0 ? <nav className="p-6 space-y-6">
           {navSections.map((section) => (
             <div
               key={section.id}
@@ -65,9 +65,9 @@ export default function Sidebar({
               </span>
             </div>
           ))}
-        </nav>
+        </nav> : null}
 
-        <div className="p-6 border-t border-[#d5d5d5] mt-auto">
+        <div className="p-6 border-t border-[#d5d5d5]">
           <h3 className="text-[14px] font-semibold text-[#424242]">Blogs</h3>
           {recentPosts.length > 0 ? (
             <div className="mt-4 space-y-4">

@@ -1,27 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { BadgeCheck, FileText, FolderKanban, Quote, Trophy } from "lucide-react";
 
 import CornerDot from "@/components/ui/CornerDot";
-import { getRenderableImageUrl, shouldUseUnoptimizedImage } from "@/lib/asset-urls";
 import type { ExperiencePageData } from "@/lib/content/page-data";
 
-function AssetThumb({ src, alt }: { src?: string | null; alt: string }) {
-  if (!src) return null;
-
-  const renderableSrc = getRenderableImageUrl(src);
-  const unoptimized = shouldUseUnoptimizedImage(src);
-
+function CardIcon({ kind }: { kind: "project" | "writing" | "testimonial" | "award" | "certificate" }) {
+  const icons = {
+    project: FolderKanban,
+    writing: FileText,
+    testimonial: Quote,
+    award: Trophy,
+    certificate: BadgeCheck,
+  } as const;
+  const Icon = icons[kind];
   return (
-    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-lg bg-[#f8f8f8]">
-      <Image
-        src={renderableSrc}
-        alt={alt}
-        fill
-        className="object-contain p-1.5"
-        unoptimized={unoptimized}
-      />
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#f8f8f8] text-[#424242]" aria-hidden="true">
+      <Icon className="h-5 w-5" strokeWidth={1.8} />
     </div>
   );
 }
@@ -56,7 +52,7 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
                 href={highlight.href || "#"}
                 target={highlight.href?.startsWith("http") ? "_blank" : undefined}
                 rel={highlight.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="block rounded-xl border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
+                className="block border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
@@ -64,7 +60,7 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
                   </span>
                 </div>
                 <div className="mt-3 flex items-start gap-3">
-                  <AssetThumb src={highlight.imageUrl} alt={highlight.title} />
+                  <CardIcon kind="project" />
                   <div className="min-w-0 flex-1">
                     <h4 className="text-[16px] font-bold text-[#424242]">{highlight.title}</h4>
                     <p className="mt-2 text-[13px] leading-[1.7] text-[#555555]">{highlight.summary}</p>
@@ -102,10 +98,10 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
                     href={post.href}
                     target={post.href.startsWith("http") ? "_blank" : undefined}
                     rel={post.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className="block rounded-xl border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
+                    className="block border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
                   >
                     <div className="flex items-start gap-3">
-                      <AssetThumb src={post.imageUrl} alt={post.title} />
+                      <CardIcon kind="writing" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
                           {post.label}
@@ -125,8 +121,9 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
               </h4>
               <div className="space-y-4">
                 {featuredTestimonials.map((testimonial) => (
-                  <div key={testimonial.key} className="rounded-xl border border-[#d5d5d5] bg-white p-4">
-                    <div className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
+                  <div key={testimonial.key} className="border border-[#d5d5d5] bg-white p-4">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#666666]">
+                      <CardIcon kind="testimonial" />
                       {testimonial.label}
                     </div>
                     <p className="text-[13px] leading-[1.8] text-[#424242]">&ldquo;{testimonial.quote}&rdquo;</p>
@@ -151,19 +148,9 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
                     href={award.href || "#"}
                     target={award.href ? "_blank" : undefined}
                     rel={award.href ? "noopener noreferrer" : undefined}
-                    className="flex items-start gap-3 rounded-xl border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
+                    className="flex items-start gap-3 border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
                   >
-                    <div className="relative mt-0.5 h-10 w-10 shrink-0 overflow-hidden rounded-lg border border-[#d5d5d5] bg-[#f8f8f8]">
-                      {award.logoUrl ? (
-                        <Image
-                          src={getRenderableImageUrl(award.logoUrl)}
-                          alt={award.title}
-                          fill
-                          className="object-contain p-1.5"
-                          unoptimized={shouldUseUnoptimizedImage(award.logoUrl)}
-                        />
-                      ) : null}
-                    </div>
+                    <CardIcon kind="award" />
                     <div className="min-w-0 flex-1">
                       <div className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
                         {award.sourceLabel}
@@ -180,9 +167,9 @@ export default function ProofOfWorkSection({ payload }: { payload: ExperiencePag
                     href={certificate.proofUrl || "#"}
                     target={certificate.proofUrl ? "_blank" : undefined}
                     rel={certificate.proofUrl ? "noopener noreferrer" : undefined}
-                    className="flex items-start gap-3 rounded-xl border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
+                    className="flex items-start gap-3 border border-[#d5d5d5] bg-white p-4 transition hover:bg-[#fafafa]"
                   >
-                    <AssetThumb src={certificate.logoUrl || null} alt={certificate.title} />
+                    <CardIcon kind="certificate" />
                     <div className="min-w-0 flex-1">
                       <div className="text-[10px] uppercase tracking-[0.2em] text-[#666666]">
                         Certificate

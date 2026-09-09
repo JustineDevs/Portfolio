@@ -1,164 +1,115 @@
-'use client';
+'use client'
 
-import React from 'react';
-import CornerDot from '@/components/ui/CornerDot';
-import { ScrambleTextOnHover } from '@/components/ui/scramble-text';
-import { ScrollReveal } from '@/components/ui/scroll-reveal';
-import Link from 'next/link';
-import { CursorIcon } from '@/components/ui/CursorIcon';
+import React from 'react'
+import Link from 'next/link'
+import CornerDot from '@/components/ui/CornerDot'
+import { ScrambleTextOnHover } from '@/components/ui/scramble-text'
+import { StackedLogos } from '@/components/ui/stacked-logos'
+import { CursorIcon } from '@/components/ui/TechIcons'
 import {
-  TypeScriptIcon, JavaScriptIcon, GrokIcon, SolidityIcon,
-  HTML5Icon, PythonIcon, RustIcon, VisualStudioIcon,
-  ReactIcon, CIcon, TailwindIcon, MoveIcon, PerplexityIcon, ClaudeIcon,
-  OpenAIIcon, AnthropicIcon, VisualBasicIcon,
-  UnrealIcon, SupabaseIcon, MongoIcon, GitIcon, DockerIcon, FirebaseIcon,
-  ResendIcon, VercelIcon, NgrokIcon, N8nIcon, FramerIcon, FigmaIcon, NodeIcon, CloudflareIcon,
-  LuaIcon, RobloxIcon,
-} from '@/components/ui/TechIcons';
+  TypeScriptIcon, JavaScriptIcon, NextJsIcon, ReactIcon, SolidityIcon, RustIcon, PythonBrandIcon, HTML5Icon,
+  TailwindIcon, GrokIcon, ClaudeIcon, OpenAIIcon, PerplexityIcon, VercelIcon, DockerIcon, GitIcon,
+  FirebaseIcon, CloudflareIcon, MoveIcon, LuaIcon, RobloxIcon, VpsIcon, EcsIcon,
+} from '@/components/ui/TechIcons'
+
+type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>
+
+const groups: { title: string; items: { name: string; summary: string; icon: IconComponent }[] }[] = [
+  { title: 'Language & Frameworks', items: [
+    { name: 'TypeScript', summary: 'Typed JavaScript for reliable product code.', icon: TypeScriptIcon },
+    { name: 'JavaScript', summary: 'The runtime language behind the interactive web.', icon: JavaScriptIcon },
+    { name: 'React', summary: 'Component architecture for expressive interfaces.', icon: ReactIcon },
+    { name: 'Next.js', summary: 'Full-stack React framework used for this portfolio.', icon: NextJsIcon },
+    { name: 'Python', summary: 'Automation, agents, and data-oriented tooling.', icon: PythonBrandIcon },
+    { name: 'Lua', summary: 'Scripting for lightweight interactive systems.', icon: LuaIcon },
+    { name: 'Rust', summary: 'Systems language for performance-critical tooling.', icon: RustIcon },
+    { name: 'Tailwind CSS', summary: 'Utility-first styling for fast, consistent UI work.', icon: TailwindIcon },
+    { name: 'HTML5', summary: 'Semantic structure for accessible web experiences.', icon: HTML5Icon },
+  ] },
+  { title: 'Tools & Agents', items: [
+    { name: 'OpenAI', summary: 'Models and APIs for AI-assisted product features.', icon: OpenAIIcon },
+    { name: 'Cursor', summary: 'AI-powered IDE for focused product development.', icon: CursorIcon },
+    { name: 'Claude', summary: 'A daily partner for research and implementation.', icon: ClaudeIcon },
+    { name: 'Grok', summary: 'Fast exploratory model for product iteration.', icon: GrokIcon },
+    { name: 'Perplexity', summary: 'Search and research workflows with cited answers.', icon: PerplexityIcon },
+    { name: 'Roblox Studio', summary: 'Roblox Studio for creative tooling and interactive world building.', icon: RobloxIcon },
+  ] },
+  { title: 'Infrastructure', items: [
+    { name: 'Vercel', summary: 'Deployment and edge delivery for web products.', icon: VercelIcon },
+    { name: 'Docker', summary: 'Reproducible development and deployment environments.', icon: DockerIcon },
+    { name: 'Git', summary: 'Version control and collaborative delivery.', icon: GitIcon },
+    { name: 'Firebase', summary: 'Managed services for rapid product prototypes.', icon: FirebaseIcon },
+    { name: 'Cloudflare', summary: 'Workers, edge infrastructure, and production delivery.', icon: CloudflareIcon },
+    { name: 'VPS', summary: 'Flexible virtual servers for self-managed deployments.', icon: VpsIcon },
+    { name: 'ECS', summary: 'Container orchestration for scalable cloud services.', icon: EcsIcon },
+  ] },
+  { title: 'Blockchain & Web3', items: [
+    { name: 'Move', summary: 'Resource-oriented smart contract development.', icon: MoveIcon },
+    { name: 'Solidity', summary: 'Smart contract language for EVM networks.', icon: SolidityIcon },
+  ] },
+]
+
+const platformLogoGroups = [
+  [
+    <img key="platform-1" src="https://cdn.brandfetch.io/idsSceG8fK/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <img key="platform-2" src="https://cdn.brandfetch.io/idJ3Cg8ymG/theme/dark/idRpwHe9Zf.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <img key="platform-3" src="https://cdn.brandfetch.io/idFEnp00Rl/theme/dark/idXGMr_wi3.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+  ],
+  [
+    <img key="platform-4" src="https://cdn.brandfetch.io/idTVdakwPY/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <img key="platform-5" src="https://cdn.brandfetch.io/idDpCfN4VD/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <img key="platform-6" src="https://cdn.brandfetch.io/id0BqaqET6/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+  ],
+  [
+    <img key="platform-7" src="https://cdn.brandfetch.io/id6O2oGzv-/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Google Cloud" width="120" height="32" loading="lazy" />,
+    <img key="platform-8" src="https://cdn.brandfetch.io/id8LeMTX5r/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+  ],
+]
+
+function TechItem({ name, summary, icon: Icon, index }: { name: string; summary: string; icon: IconComponent; index: number }) {
+  const mobileStart = index % 3 === 0
+  const mobileEnd = index % 3 === 2
+  const desktopStart = index % 4 === 0
+  const desktopEnd = index % 4 === 3
+  const tooltipPosition = [
+    mobileStart ? 'left-0 translate-x-0' : mobileEnd ? 'left-auto right-0 translate-x-0' : 'left-1/2 -translate-x-1/2',
+    desktopStart ? 'sm:left-0 sm:right-auto sm:translate-x-0' : desktopEnd ? 'sm:left-auto sm:right-0 sm:translate-x-0' : 'sm:left-1/2 sm:right-auto sm:-translate-x-1/2',
+  ].join(' ')
+
+  return <div className="group relative flex min-w-0 flex-col items-center gap-2 rounded-xl p-2 text-center transition hover:bg-[#fafafa] focus-visible:ring-2 focus-visible:ring-[#1342FF]" tabIndex={0}>
+    <Icon className="h-8 w-8 text-[#424242] opacity-75 transition group-hover:scale-110 group-hover:opacity-100" aria-hidden="true" />
+    <span className="text-[10px] font-medium leading-tight text-[#555555]">{name}</span>
+    <span className={`pointer-events-none absolute top-full z-50 mt-2 w-44 rounded-lg bg-[#222] px-3 py-2 text-left text-[10px] leading-[1.45] text-white opacity-0 shadow-lg transition group-hover:opacity-100 group-focus-within:opacity-100 ${tooltipPosition}`}>{summary}</span>
+  </div>
+}
 
 export default function TechAndDescriptionSection() {
-  return (
-    <section className="w-full">
-      <div className="relative border-l border-r border-b border-[#d5d5d5] flex flex-col lg:flex-row">
-        <div className="lg:w-1/2 shrink-0 border-b lg:border-b-0 lg:border-r border-[#d5d5d5] h-[48px] xs:h-[52px] sm:h-[56px] flex items-center px-4 xs:px-5 sm:px-6">
-          <h2 className="text-[16px] xs:text-[18px] sm:text-[20px] font-bold text-[#424242] tracking-[-0.01em]">
-            <ScrambleTextOnHover text="Tech Stack" as="span" />
-          </h2>
-        </div>
-        <div className="flex-1 h-[48px] xs:h-[52px] sm:h-[56px] flex items-center px-4 xs:px-5 sm:px-6">
-          <h2 className="text-[16px] xs:text-[18px] sm:text-[20px] font-bold text-[#424242] tracking-[-0.01em]">
-            <ScrambleTextOnHover text="Description" as="span" />
-          </h2>
+  return <section className="w-full">
+    <div className="relative flex flex-col border-l border-r border-b border-[#d5d5d5] lg:flex-row">
+      <div className="h-[56px] shrink-0 border-b border-[#d5d5d5] px-4 flex items-center lg:w-1/2 lg:border-b-0 lg:border-r"><h2 className="text-[18px] font-bold text-[#424242]"><ScrambleTextOnHover text="Language & Frameworks" as="span" /></h2></div>
+      <div className="h-[56px] flex items-center px-4"><h2 className="text-[18px] font-bold text-[#424242]"><ScrambleTextOnHover text="How I work" as="span" /></h2></div>
+    </div>
+    <div className="relative flex flex-col border-l border-r border-b border-[#d5d5d5] lg:flex-row">
+      <CornerDot position="bl" className="hidden xs:block" /><CornerDot position="br" className="hidden xs:block" />
+      <div className="relative isolate grid gap-6 border-b border-[#d5d5d5] p-4 sm:p-6 lg:w-1/2 lg:grid-cols-2 lg:border-b-0 lg:border-r">
+        {groups.map((group) => <div key={group.title}><h3 className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#666]">{group.title}</h3><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{group.items.map((item, index) => <TechItem key={item.name} {...item} index={index} />)}</div></div>)}
+      </div>
+      <div className="w-full self-start p-4 sm:p-5 lg:w-1/2 lg:p-6">
+        <p className="max-w-2xl text-[14px] leading-[1.8] text-[#555]">I build practical systems at the intersection of product design, AI, blockchain, and the web. The through-line is simple: make complex technology useful, legible, and ready to ship.</p>
+        <p className="mt-4 max-w-2xl text-[14px] leading-[1.8] text-[#555]">As co-founder of HyperKit Labs, I work on developer infrastructure and AI-native tooling for multi-chain workflows, while continuing to build focused tools and interfaces for real people.</p>
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e5e5e5] pt-4"><span className="text-xs text-[#666666]">Want the longer version?</span><Link href="/about" className="rounded-lg bg-[#424242] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#222]">Read the story</Link></div>
+        <div className="mt-8 border-t border-[#d5d5d5] pt-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#666666]">Platforms</p>
+              <p className="mt-2 max-w-md text-[13px] leading-[1.6] text-[#555555]">Platforms and cloud services I use to build, ship, and operate products.</p>
+            </div>
+          </div>
+          <div className="mt-4 overflow-x-auto">
+            <StackedLogos logoGroups={platformLogoGroups} duration={8} className="mx-auto max-w-full" logoWidth="min(26vw, 150px)" />
+          </div>
         </div>
       </div>
-
-      <div className="relative border-l border-r border-b border-[#d5d5d5] flex flex-col lg:flex-row min-w-0">
-        <CornerDot position="bl" className="hidden xs:block" />
-        <CornerDot position="br" className="hidden xs:block" />
-
-        <div className="lg:w-1/2 shrink-0 min-w-0 border-b lg:border-b-0 lg:border-r border-[#d5d5d5] p-3 xs:p-4 sm:p-5 md:p-6">
-          <ScrollReveal
-            direction="left"
-            stagger={0.05}
-            className="grid min-w-0 w-full grid-cols-2 gap-x-3 gap-y-5 xs:gap-x-4 xs:gap-y-6 sm:gap-x-6 sm:gap-y-8"
-          >
-            {/* Row 1, Col 1 — Language */}
-            <div className="flex flex-col gap-2 xs:gap-3 min-w-0">
-              <h3 className="text-[11px] xs:text-[12px] sm:text-[13px] font-semibold text-[#424242]">Language</h3>
-              <ScrollReveal direction="fade" stagger={0.03} className="grid grid-cols-4 gap-2 xs:gap-3 w-fit max-w-full">
-                <TypeScriptIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <JavaScriptIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <NodeIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <ReactIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <SolidityIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <RustIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <MoveIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <PythonIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <LuaIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <HTML5Icon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <TailwindIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <CIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <VisualBasicIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-              </ScrollReveal>
-            </div>
-
-            {/* Row 1, Col 2 — Agents & IDE */}
-            <div className="flex flex-col gap-2 xs:gap-3 min-w-0">
-              <h3 className="text-[11px] xs:text-[12px] sm:text-[13px] font-semibold text-[#424242]">Agents & IDE</h3>
-              <div className="flex flex-col gap-3 xs:gap-4 min-w-0">
-                <ScrollReveal direction="fade" stagger={0.05} className="flex flex-wrap gap-2 xs:gap-3">
-                  <GrokIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <PerplexityIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <ClaudeIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <OpenAIIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <AnthropicIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <RobloxIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                </ScrollReveal>
-                <ScrollReveal direction="fade" stagger={0.05} className="flex flex-wrap gap-2 xs:gap-3">
-                  <CursorIcon className="w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8" />
-                  <VisualStudioIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                  <UnrealIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                </ScrollReveal>
-              </div>
-            </div>
-
-            {/* Row 2, Col 1 — Others */}
-            <div className="flex flex-col gap-2 xs:gap-3 min-w-0">
-              <h3 className="text-[11px] xs:text-[12px] sm:text-[13px] font-semibold text-[#424242]">Others</h3>
-              <ScrollReveal direction="fade" stagger={0.03} className="grid grid-cols-3 gap-2 xs:gap-3 w-fit max-w-full">
-                <VercelIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <MongoIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <SupabaseIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <DockerIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <GitIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <ResendIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <FirebaseIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <NgrokIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-                <CloudflareIcon className="text-[#424242] w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 opacity-80 hover:opacity-100 transition-opacity" />
-              </ScrollReveal>
-            </div>
-
-            {/* Row 2, Col 2 — In progress */}
-            <div className="bg-[#222222] rounded-xl p-3 xs:p-4 sm:p-5 min-w-0 max-w-full flex flex-col gap-4 xs:gap-5 sm:gap-6 h-fit self-start w-full">
-              <h3 className="text-[11px] xs:text-[12px] sm:text-[13px] font-medium text-white/80">In progress</h3>
-
-              <div className="flex flex-col gap-3 xs:gap-4">
-                <div className="flex items-center gap-2 xs:gap-3 flex-wrap">
-                  <div className="w-5 h-5 xs:w-6 xs:h-6 flex items-center justify-center shrink-0">
-                    <N8nIcon className="text-white w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8" />
-                  </div>
-                  <span className="text-[12px] xs:text-[13px] sm:text-[14px] font-bold text-white tracking-wide">n8n</span>
-                  <div className="flex gap-1.5 xs:gap-2 ml-0 xs:ml-1 shrink-0">
-                    <FramerIcon className="text-white w-5 h-5 xs:w-6 xs:h-6" />
-                    <FigmaIcon className="text-[#f8f8f8] w-5 h-5 xs:w-6 xs:h-6" />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 xs:gap-3">
-                  <div className="flex flex-col shrink-0">
-                    <div className="flex gap-0.5">
-                      <MoveIcon className="text-white w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-6" />
-                    </div>
-                    <span className="text-[9px] xs:text-[10px] sm:text-[11px] font-medium text-white/80 leading-none mt-0.5">Move</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-
-        <div className="flex-1 min-w-0 p-3 xs:p-4 sm:p-5 md:p-6 relative">
-          <CornerDot position="bl" className="hidden lg:block" />
-          <ScrollReveal direction="right" stagger={0.1} className="space-y-3 xs:space-y-4 sm:space-y-5 text-[12px] xs:text-[13px] sm:text-[14px] leading-[1.7] text-[#555555]">
-            <p>
-              I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
-              development, responsive web apps, authentication systems, developer tooling, crypto automation, and
-              decentralized systems.
-            </p>
-            <p>
-              As <span className="font-semibold text-[#1342FF]">Co-Founder of HyperKit Labs</span>, I work on developer
-              infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart
-              contract workflows and product experimentation.
-            </p>
-            <p>
-              I also bring community experience from{' '}
-              <span className="font-semibold text-[#1342FF]">Web3 moderation</span>, where I&apos;ve supported onboarding,
-              discussions, and technical guidance across Discord communities since 2023. I&apos;m especially interested in{' '}
-              <span className="font-semibold text-[#1342FF]">product architecture, systems thinking</span>, and building tools
-              that are practical, usable, and technically grounded.
-            </p>
-          </ScrollReveal>
-
-            <div className="mt-5 xs:mt-6 sm:mt-8 flex items-center justify-end gap-2 xs:gap-3 sm:gap-4">
-              <span className="text-[10px] xs:text-[11px] sm:text-[12px] text-[#666666]">If you want read more.</span>
-              <Link href="/about">
-                <button className="bg-[#424242] text-white px-3 py-2 xs:px-4 xs:py-2.5 sm:px-6 sm:py-3 min-h-[36px] xs:min-h-[40px] sm:min-h-[44px] rounded-lg text-[10px] xs:text-[11px] sm:text-[12px] font-medium hover:opacity-90 transition-opacity">
-                  Story
-                </button>
-              </Link>
-            </div>
-        </div>
-      </div>
-    </section>
-  );
+    </div>
+  </section>
 }

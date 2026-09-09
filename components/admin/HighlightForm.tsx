@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { saveHighlightAction } from "@/app/admin/actions";
+import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminFormSubmitButton } from "@/components/admin/AdminFormSubmitButton";
 import {
   AdminErrorBanner,
@@ -194,7 +195,10 @@ export function HighlightForm({
         Highlights now support only `testimonial`, `award`, and `manual card`, and they feed only the Experience testimonials/awards lanes.
       </p>
       <CheckboxField label="Pinned" name="pinned" defaultChecked={value?.pinned} />
-      <AdminFormSubmitButton>{value ? "Save highlight" : "Create highlight"}</AdminFormSubmitButton>
+      <div className="flex flex-wrap items-center gap-3">
+        <AdminFormSubmitButton>{value ? "Save highlight" : "Create highlight"}</AdminFormSubmitButton>
+        {value?.id ? <AdminDeleteButton type="highlight" id={value.id} /> : null}
+      </div>
     </form>
   );
 }

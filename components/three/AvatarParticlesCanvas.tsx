@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import AvatarParticles from "./AvatarParticles";
 import { setAvatarCursorHover } from "@/lib/cursor-avatar";
 
@@ -15,6 +15,8 @@ type NavigatorWithConnection = Navigator & {
 export default function AvatarParticlesCanvas() {
   const [canRenderWebgl, setCanRenderWebgl] = useState(false);
   const [hoverActive, setHoverActive] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -40,30 +42,56 @@ export default function AvatarParticlesCanvas() {
   }, [hoverActive]);
 
   useEffect(() => {
+    const container = canvasContainerRef.current;
+    if (!container) return;
+
+    const updateActivity = () => {
+      setIsActive(document.visibilityState === "visible");
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsActive(entry.isIntersecting && document.visibilityState === "visible"),
+      { threshold: 0.05 },
+    );
+
+    observer.observe(container);
+    document.addEventListener("visibilitychange", updateActivity);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", updateActivity);
+    };
+  }, [canRenderWebgl]);
+
+  useEffect(() => {
     return () => setAvatarCursorHover(false);
   }, []);
 
   if (!canRenderWebgl) {
     return (
-      <div
-        className="relative z-20 w-full h-full min-h-[250px] xs:min-h-[300px] sm:min-h-[350px] md:min-h-0 bg-[#424242]"
-        aria-hidden
-      />
+      <>
+        <div
+          className="relative z-20 w-full h-full min-h-[250px] xs:min-h-[300px] sm:min-h-[350px] md:min-h-0 bg-[#424242]"
+          role="img"
+          aria-label="Interactive particle avatar"
+        />
+      </>
     );
   }
 
   return (
+    <>
     <div
+      ref={canvasContainerRef}
       className="w-full h-full absolute inset-0 z-20"
       onPointerEnter={() => setHoverActive(true)}
       onPointerLeave={() => setHoverActive(false)}
+      role="img"
+      aria-label="Interactive particle avatar"
     >
       <Canvas
+        frameloop={isActive ? "always" : "never"}
+        dpr={[1, 1.25]}
         camera={{ position: [-0.28, -0.48, -0.82], fov: 58 }}
-        gl={{ antialias: true, alpha: true }}
-        onCreated={({ gl }) => {
-          gl.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
-        }}
+        gl={{ antialias: false, alpha: true }}
       >
         <Suspense fallback={null}>
           <AvatarParticles hoverActive={hoverActive} />
@@ -79,5 +107,6 @@ export default function AvatarParticlesCanvas() {
         </Suspense>
       </Canvas>
     </div>
+    </>
   );
 }
