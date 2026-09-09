@@ -41,6 +41,7 @@
     "@phosphor-icons/react": "^2.1.10",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@vercel/analytics": "^2.0.1",
     "antd": "^6.2.0",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.44.2",

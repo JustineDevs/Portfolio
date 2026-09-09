@@ -10,6 +10,7 @@ import ErrorBoundary from "@/components/ui/ErrorBoundary";
 import SkipToContent from "@/components/ui/SkipToContent";
 import { Pointer } from "@/components/ui/pointer";
 import PublicSocialBar from "@/components/layouts/PublicSocialBar";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -46,6 +47,7 @@ export default function RootLayout({
                 ) : (
                   <SmoothScrollProvider>{children}</SmoothScrollProvider>
                 )}
+                <Analytics />
               </PageTransitionProvider>
             </ToastProvider>
           </ModeProvider>
