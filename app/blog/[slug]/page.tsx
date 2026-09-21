@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 
 import MarkdownContent from "@/components/content/MarkdownContent";
@@ -87,7 +88,7 @@ export default async function BlogPostPage({
 
           <div className="relative min-h-[360px] overflow-hidden border-t border-[#d5d5d5] bg-[#f1f3f6] lg:border-l lg:border-t-0">
             {post.coverImageUrl ? (
-              <img src={post.coverImageUrl} alt={post.title} className="absolute inset-0 h-full w-full object-cover grayscale" />
+              <Image src={post.coverImageUrl} alt={post.title} fill sizes="(min-width: 1024px) 50vw, 100vw" unoptimized className="object-cover grayscale" />
             ) : (
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_35%_35%,rgba(19,66,255,0.08),transparent_24%),linear-gradient(135deg,#f8f9fb_0%,#eef1f5_55%,#e4e8ee_100%)]">
                 <div className="absolute inset-8 border border-[#d5d5d5] bg-[linear-gradient(135deg,transparent_49%,rgba(66,66,66,0.08)_50%,transparent_51%)] bg-[length:34px_34px]" />

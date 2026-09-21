@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { ReactLenis, type LenisRef } from 'lenis/react'
 import { Trophy } from 'lucide-react'
 import AwwwardsNav from '@/components/ui/awwwards-nav'
@@ -136,10 +137,10 @@ export default function HorizontalScrollPage({ workData }: HorizontalScrollPageP
             <div className="horizontal-panel-content horizontal-panel-content--home">
               <div className="home-page-header">
                 <div className="home-page-header__banner" aria-hidden="true">
-                  <img src="/justine-header-web-dev.png" alt="Justine Lupasi — web developer" />
+                  <Image src="/justine-header-web-dev.png" width={1200} height={360} unoptimized alt="Justine Lupasi — web developer" />
                 </div>
                 <div className="home-page-header__avatar-wrap">
-                  <img className="home-page-header__avatar" src="/profile-dark-gray.png" alt="Justine Lupasi" />
+                  <Image className="home-page-header__avatar" src="/profile-dark-gray.png" width={320} height={320} unoptimized alt="Justine Lupasi" />
                 </div>
                 <div className="home-page-header__body">
                   <p className="horizontal-panel-kicker">Manila / Remote</p>
@@ -161,9 +162,12 @@ export default function HorizontalScrollPage({ workData }: HorizontalScrollPageP
                   <p className="horizontal-panel-label">Selected projects</p>
                   <div className="horizontal-project-feature">
                     <span>01 / 05</span>
-                    <img
+                    <Image
                       className="horizontal-project-feature__logo"
                       src="/UVS/UVS_logo_landscape.png"
+                      width={160}
+                      height={48}
+                      unoptimized
                       alt="Universal Music Store logo"
                     />
                     <p>E-commerce guitar shop</p>
@@ -193,7 +197,7 @@ export default function HorizontalScrollPage({ workData }: HorizontalScrollPageP
                           <Trophy aria-hidden="true" />
                           <div>
                             <p>{award.title}</p>
-                            <small>{award.sourceLabel} · {award.year}</small>
+                            <small>{award.eventName} · {award.year}</small>
                           </div>
                         </div>
                       ))}

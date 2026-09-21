@@ -174,9 +174,7 @@ export default function InteractiveDotGrid({
     return () => {
       window.removeEventListener('resize', updateCanvasSize)
       window.removeEventListener('mousemove', handleMouseMove)
-      if (containerRef.current) {
-        containerRef.current.removeEventListener('mouseleave', handleMouseLeave)
-      }
+      container.removeEventListener('mouseleave', handleMouseLeave)
       visibilityObserver.disconnect()
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)

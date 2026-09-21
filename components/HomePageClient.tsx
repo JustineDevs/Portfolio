@@ -3,17 +3,21 @@
 import { useState, useEffect, useLayoutEffect } from 'react'
 import dynamic from 'next/dynamic'
 import { motion, AnimatePresence } from 'framer-motion'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import Hero from '@/components/Hero'
-import AsciiBackground from '@/components/ui/AsciiBackground'
-import ScrollToTop from '@/components/ui/ScrollToTop'
-import PreLoading from '@/components/PreLoading'
 import { useMode } from '@/components/providers/ModeProvider'
 import { animations } from '@/lib/design-tokens'
 
-import type { PublicProject } from '@/lib/content/types'
+import type { PublicAwardCard, PublicCertificateCard, PublicProject } from '@/lib/content/types'
 import type { PublicLegalLinks } from '@/lib/legal-links-shared'
+import type { AboutRecentPost } from '@/lib/content/page-data'
+
+const Navbar = dynamic(() => import('@/components/Navbar'))
+const Footer = dynamic(() => import('@/components/Footer'))
+const Hero = dynamic(() => import('@/components/Hero'), {
+  loading: () => <div className="min-h-[400px] w-full rounded-t-lg border border-[#d5d5d5] bg-white" aria-busy aria-label="Loading hero" />,
+})
+const AsciiBackground = dynamic(() => import('@/components/ui/AsciiBackground'))
+const ScrollToTop = dynamic(() => import('@/components/ui/ScrollToTop'))
+const PreLoading = dynamic(() => import('@/components/PreLoading'))
 
 const TechAndDescriptionSection = dynamic(
   () => import('@/components/sections/TechAndDescriptionSection'),
@@ -67,63 +71,106 @@ const ResumePage = dynamic(
   }
 )
 
-interface AwardLike {
-  slug: string
-  title: string
-  eventName: string
-  description: string
-  year: string
-  proofUrl?: string | null
-  logoUrl?: string | null
+interface HomePageData {
+  featuredProjects: PublicProject[]
+  featuredAwards: PublicAwardCard[]
+  featuredPosts: AboutRecentPost[]
+  featuredCertificates: PublicCertificateCard[]
+  legalLinks: PublicLegalLinks
 }
 
-interface CertificateLike {
-  slug: string
-  title: string
-  description: string
-  proofUrl?: string | null
-  logoUrl?: string | null
+const emptyHomePageData: HomePageData = {
+  featuredProjects: [],
+  featuredAwards: [],
+  featuredPosts: [],
+  featuredCertificates: [],
+  legalLinks: { privacyPolicyUrl: null, termsUrl: null },
 }
 
 export default function HomePageClient({
-  featuredProjects,
-  featuredAwards,
-  featuredCertificates,
-  legalLinks,
+  initialData,
+  onLoadingComplete,
 }: {
-  featuredProjects: PublicProject[]
-  featuredAwards: AwardLike[]
-  featuredCertificates: CertificateLike[]
-  legalLinks: PublicLegalLinks
+  initialData?: HomePageData
+  onLoadingComplete?: () => void
 }) {
+  const [pageData, setPageData] = useState<HomePageData>(initialData ?? emptyHomePageData)
+  const [contentDataReady, setContentDataReady] = useState(Boolean(initialData))
+  const [contentReady, setContentReady] = useState(false)
   /** Desktop-only intro overlay; mobile always sees content (Speed Insights / LCP). */
   const [deskSplash, setDeskSplash] = useState(false)
   const { mode } = useMode()
 
+  useEffect(() => {
+    if (initialData) return
+
+    const controller = new AbortController()
+    fetch('/api/home', { signal: controller.signal })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Home content request failed: ${response.status}`)
+        return response.json() as Promise<HomePageData>
+      })
+      .then((data) => {
+        setPageData(data)
+        setContentDataReady(true)
+      })
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        console.error('[home] content request failed', error)
+        setContentDataReady(true)
+      })
+
+    return () => controller.abort()
+  }, [initialData])
+
+  useEffect(() => {
+    if (!contentDataReady) return
+
+    let cancelled = false
+    const deadline = performance.now() + 8000
+
+    const waitForDynamicSections = () => {
+      const pendingSections = document.querySelectorAll('#main-content [aria-busy="true"]').length
+
+      if (pendingSections === 0 || performance.now() >= deadline) {
+        if (!cancelled) setContentReady(true)
+        return
+      }
+
+      window.requestAnimationFrame(waitForDynamicSections)
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(waitForDynamicSections)
+    })
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frame)
+    }
+  }, [contentDataReady, mode])
+
+  const { featuredProjects, featuredAwards, featuredPosts, featuredCertificates, legalLinks } = pageData
+
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
-    if (sessionStorage.getItem('has-seen-preloading') === 'true') return
     if (window.matchMedia('(max-width: 767px)').matches) {
-      sessionStorage.setItem('has-seen-preloading', 'true')
       return
     }
     setDeskSplash(true)
   }, [])
 
-  useEffect(() => {
-    if (!deskSplash) return
-    const id = window.setTimeout(() => {
-      setDeskSplash(false)
-      sessionStorage.setItem('has-seen-preloading', 'true')
-    }, 3200)
-    return () => window.clearTimeout(id)
-  }, [deskSplash])
-
   return (
     <div className="min-h-screen bg-[#F8F8F8] relative overflow-x-hidden">
       {deskSplash && (
         <div className="pointer-events-auto fixed inset-0 z-[9999] hidden md:block" aria-hidden={false}>
-          <PreLoading />
+          <PreLoading
+            ready={contentReady}
+            onComplete={() => {
+              setDeskSplash(false)
+              onLoadingComplete?.()
+            }}
+          />
         </div>
       )}
 
@@ -137,7 +184,7 @@ export default function HomePageClient({
             <motion.div key="personal" {...animations.modeSwitch} initial={false}>
               <Hero />
               <TechAndDescriptionSection />
-              <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} />
+              <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} featuredPosts={featuredPosts} />
               <GithubActivitySection />
             </motion.div>
           ) : (

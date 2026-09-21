@@ -76,12 +76,12 @@ export default function Navbar() {
   return (
     <div className="w-full font-sans">
       <nav className={`tier-1-navbar sticky top-0 z-50 w-full border-b border-[#d5d5d5] backdrop-blur-md ${tokens.transitions.default} bg-[#FAFAFA]/92 overflow-hidden`}>
-        <div className="relative w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-[56px] xs:h-[60px] sm:h-[65px] flex items-center justify-between overflow-hidden px-2 xs:px-0">
+        <div className="relative w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-[56px] xs:h-[60px] sm:h-[65px] flex min-w-0 items-center justify-between overflow-hidden px-2 xs:px-0">
           <CornerDot position="bl" className="hidden sm:block" />
           <CornerDot position="br" className="hidden sm:block" />
           
-          <div className="flex items-center h-full gap-2 xs:gap-4">
-            <div className="relative navbar-logo-div h-full flex items-center pr-2 xs:pr-4">
+          <div className="flex min-w-0 flex-1 items-center h-full gap-2 xs:gap-4">
+            <div className="relative navbar-logo-div h-full shrink-0 flex items-center pr-2 xs:pr-4">
               <CornerDot position="br" className="hidden lg:block opacity-0" />
               <Link 
                 href="/" 
@@ -90,7 +90,6 @@ export default function Navbar() {
                   if (pathname !== '/') {
                     e.preventDefault()
                     saveCurrentPage(pathname)
-                    sessionStorage.setItem('has-seen-preloading', 'true')
                     router.push('/')
                   }
                 }}
@@ -108,7 +107,7 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="navbar-menu-div hidden lg:flex items-center gap-4 xl:gap-8 ml-2 xl:ml-4">
+            <div className="navbar-menu-div hidden xl:flex items-center gap-4 2xl:gap-8 ml-2 2xl:ml-4">
               {navLinks.map((link) => (
                 <Link 
                   key={link.name} 
@@ -133,8 +132,8 @@ export default function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
-            <div className="hidden md:flex items-center p-0.5 sm:p-1 bg-white border border-[#d5d5d5] rounded-full">
+          <div className="flex shrink-0 items-center gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
+            <div className="hidden xl:flex items-center p-0.5 sm:p-1 bg-white border border-[#d5d5d5] rounded-full">
               <button 
                 onClick={() => {
                   if (mode === 'personal') return;
@@ -178,13 +177,13 @@ export default function Navbar() {
               </button>
             </div>
 
-            <div className="hidden sm:block w-px h-4 bg-gray-300" />
+            <div className="hidden xl:block w-px h-4 bg-gray-300" />
 
             <a
               href="https://t.me/TraderGOfficial"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden items-center gap-1.5 rounded-full border border-transparent px-2 py-1 text-[10px] font-medium text-gray-600 transition-colors hover:border-[#d5d5d5] hover:text-[#424242] sm:flex sm:gap-2 sm:text-xs"
+              className="hidden items-center gap-1.5 rounded-full border border-transparent px-2 py-1 text-[10px] font-medium text-gray-600 transition-colors hover:border-[#d5d5d5] hover:text-[#424242] xl:flex xl:gap-2 xl:text-xs"
               aria-label="Shoot a DM on Telegram"
             >
               <span className="h-1 w-1 rounded-full bg-[#0055FF] sm:h-1.5 sm:w-1.5" />
@@ -194,7 +193,7 @@ export default function Navbar() {
               href="https://work.jstn.site"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden min-h-[36px] items-center justify-center whitespace-nowrap rounded-md bg-[#424242] px-3 py-2 text-[10px] font-medium tracking-[0.04em] text-white shadow-sm transition-colors hover:bg-[#333333] xs:flex sm:min-h-[40px] sm:px-4 sm:py-2.5 sm:text-xs lg:min-h-[44px] lg:px-5 lg:py-3"
+              className="hidden min-h-[36px] items-center justify-center whitespace-nowrap rounded-md bg-[#424242] px-3 py-2 text-[10px] font-medium tracking-[0.04em] text-white shadow-sm transition-colors hover:bg-[#333333] xl:flex xl:min-h-[44px] xl:px-5 xl:py-3 xl:text-xs"
               aria-label="Work with me"
             >
               Work with me
@@ -202,7 +201,7 @@ export default function Navbar() {
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 xs:p-2 text-[#424242] hover:bg-gray-100 rounded-md transition-colors"
+              className="xl:hidden p-1.5 xs:p-2 text-[#424242] hover:bg-gray-100 rounded-md transition-colors"
               aria-label="Toggle mobile menu"
               aria-expanded={mobileMenuOpen}
             >
@@ -219,7 +218,7 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white/98 backdrop-blur-md border-b border-[#d5d5d5] overflow-hidden"
+            className="xl:hidden bg-white/98 backdrop-blur-md border-b border-[#d5d5d5] overflow-hidden"
           >
             <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] mx-auto px-2 xs:px-4 py-4 space-y-4">
               <div className="flex flex-col gap-3">

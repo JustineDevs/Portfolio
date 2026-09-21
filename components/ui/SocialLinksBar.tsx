@@ -99,10 +99,11 @@ const viewerStack = [
 
 function AnimatedCount({ value }: { value: number | null }) {
   const [displayValue, setDisplayValue] = useState(0)
+  const displayValueRef = useRef(0)
 
   useEffect(() => {
     if (value === null) return
-    const startValue = displayValue
+    const startValue = displayValueRef.current
     const difference = value - startValue
     const startTime = performance.now()
     let frame = 0
@@ -110,7 +111,9 @@ function AnimatedCount({ value }: { value: number | null }) {
     const animate = (time: number) => {
       const progress = Math.min((time - startTime) / 700, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setDisplayValue(Math.round(startValue + difference * eased))
+      const nextValue = Math.round(startValue + difference * eased)
+      displayValueRef.current = nextValue
+      setDisplayValue(nextValue)
       if (progress < 1) frame = requestAnimationFrame(animate)
     }
 
@@ -237,19 +240,19 @@ export default function SocialLinksBar({
 
   return (
     <>
-      <div className="h-[52px] xs:h-[56px] border-b border-[#d5d5d5] bg-white relative overflow-visible z-[100]">
-        <div className="w-[95%] xs:w-[92%] sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px] mx-auto h-full flex items-center justify-between gap-2 xs:gap-3 flex-wrap relative overflow-visible px-2 xs:px-0">
+      <div className="social-links-bar relative z-[100] h-[52px] border-b border-[#d5d5d5] bg-white xs:h-[56px]">
+        <div className="social-links-bar__inner relative mx-auto flex h-full w-[95%] items-center justify-between gap-2 overflow-visible px-2 xs:w-[92%] xs:gap-3 xs:px-0 sm:w-[90%] md:w-[88%] lg:w-[82%] xl:w-[75%] 2xl:w-[70%] 3xl:max-w-[1600px]">
           <a
             href="https://www.producthunt.com/@justindevs/submitted"
             target="_blank"
             rel="noopener noreferrer"
-            className="mr-4 inline-flex shrink-0 items-center rounded-md px-1 py-0.5 text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
+            className="social-links-bar__product mr-4 inline-flex shrink-0 items-center rounded-md px-1 py-0.5 text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#424242] focus-visible:ring-offset-1"
             aria-label="Open JustineDevs on Product Hunt"
             title="Product Hunt submissions"
           >
             <BrandIcon src="https://ph-static.imgix.net/ph-logo-1.png?auto=format" alt="Product Hunt logo" width={66} height={40} className="h-10 w-auto max-w-none object-contain" />
           </a>
-          <div className="flex shrink-0 items-center gap-2.5 border-l border-[#e5e5e5] pl-3" aria-label="Writing profiles">
+          <div className="social-links-bar__publications flex shrink-0 items-center gap-2.5 border-l border-[#e5e5e5] pl-3" aria-label="Writing profiles">
             {publicationLinks.map(({ brand, label, href, src }) => (
               <a
                 key={brand}
@@ -274,7 +277,7 @@ export default function SocialLinksBar({
               </a>
             ))}
           </div>
-          <div className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-2 xs:gap-2.5">
+          <div className="social-links-bar__controls flex min-w-0 flex-1 flex-nowrap items-center justify-end gap-2 overflow-x-auto xs:gap-2.5">
           <div className="flex items-center gap-2 xs:gap-2.5 pr-1.5 xs:pr-2 border-r border-[#e5e5e5] mr-1.5 xs:mr-2">
             <div
               className="flex items-center gap-1.5 text-gray-400"

@@ -1,11 +1,11 @@
 {
   "version": 1,
   "active": false,
-  "skill": "cancel",
+  "skill": "ralph",
   "keyword": "stop",
-  "phase": "inactive",
-  "activated_at": "2026-05-16T10:26:06.100Z",
-  "updated_at": "2026-06-08T08:00:21.537Z",
+  "phase": "executing",
+  "activated_at": "2026-09-20T10:48:54.124Z",
+  "updated_at": "2026-09-20T11:04:49.225Z",
   "source": "keyword-detector",
   "thread_id": "019e300d-c272-7350-bbb5-6a9effe89d87",
   "turn_id": "019e3052-567a-76e3-859b-fd5fbab9af38",
@@ -13,5 +13,6 @@
   "last_turn_at": "2026-05-16T13:39:37.979Z",
   "active_skills": [],
   "reconciled_at": "2026-06-08T08:00:21.537Z",
-  "reconciliation_reason": "stop_hook_session_state_terminal"
+  "reconciliation_reason": "stop_hook_session_state_terminal",
+  "session_id": "01a0932f-15c3-7212-ac38-a37995b3883f"
 }

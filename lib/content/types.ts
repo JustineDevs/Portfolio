@@ -37,3 +37,35 @@ export interface PublicPost {
   featured?: boolean;
   publishedAt?: string | null;
 }
+
+export interface PublicAwardCard {
+  id?: number;
+  slug: string;
+  title: string;
+  eventName: string;
+  description: string;
+  year: string;
+  proofUrl?: string | null;
+  logoUrl?: string | null;
+}
+
+export interface PublicCertificateCard {
+  id?: number;
+  slug: string;
+  title: string;
+  issuer?: string | null;
+  description: string;
+  proofUrl?: string | null;
+  logoUrl?: string | null;
+}
+
+export interface PublicProofOfWork {
+  slug: string;
+  title: string;
+  summary: string;
+  href?: string | null;
+  brandName: string;
+  brandLogoUrl?: string | null;
+  startedAt?: string | null;
+  endedAt?: string | null;
+}

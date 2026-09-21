@@ -252,6 +252,8 @@ export default function LiquidImage({
   if (!shouldUseCanvas) {
     return (
       <div className={`relative w-full h-full overflow-hidden ${className}`}>
+        {/* This fallback accepts arbitrary runtime URLs and must preserve native error replacement. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={hasError ? fallbackSrc : renderableSrc}
           alt={alt}

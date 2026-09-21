@@ -6,17 +6,17 @@ import gsap from 'gsap'
 import { List, X } from '@phosphor-icons/react'
 import { cn } from '@/lib/utils'
 
-export interface AwwwardsNavLink {
+interface AwwwardsNavLink {
   label: string
   href: string
 }
 
-export interface AwwwardsNavColumn {
+interface AwwwardsNavColumn {
   title: string
   links: AwwwardsNavLink[]
 }
 
-export interface AwwwardsNavProps {
+interface AwwwardsNavProps {
   items?: AwwwardsNavLink[]
   columns?: AwwwardsNavColumn[]
   moreLabel?: string
@@ -70,7 +70,7 @@ const DEFAULT_COLUMNS: AwwwardsNavColumn[] = [
 const COLLAPSED_HEIGHT = 60
 const EXPANDED_HEIGHT = 370
 
-export function AwwwardsNav({
+function AwwwardsNav({
   items = DEFAULT_ITEMS,
   columns = DEFAULT_COLUMNS,
   moreLabel = 'More',
@@ -190,7 +190,7 @@ export function AwwwardsNav({
     <nav
       ref={navRef}
       className={cn(
-        'fixed bottom-6 left-1/2 z-50 h-[60px] w-[min(680px,92vw)] -translate-x-1/2 overflow-hidden rounded-xl border backdrop-blur-xl',
+        'awwwards-nav fixed bottom-6 left-1/2 z-50 h-[60px] w-[min(680px,92vw)] -translate-x-1/2 overflow-hidden rounded-xl border backdrop-blur-xl',
         'border-black/10 bg-white/70 dark:border-white/25 dark:bg-black/75',
         className,
       )}

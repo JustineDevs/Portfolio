@@ -16,6 +16,13 @@ interface HoveredCell {
 
 const fallbackYears = [2026, 2025, 2024, 2023];
 
+function contributionColor(count: number) {
+  if (count <= 0) return "#E1E3E6";
+  if (count <= 3) return "#B8BDC3";
+  if (count <= 8) return "#7B8188";
+  return "#424242";
+}
+
 export default function GithubActivitySection() {
   const [activityByYear, setActivityByYear] = useState<Record<number, GithubActivitySummary>>({});
   const [selectedYear, setSelectedYear] = useState<number>(fallbackYears[0]);
@@ -59,7 +66,7 @@ export default function GithubActivitySection() {
   }, [activityByYear]);
 
   const summary = activityByYear[selectedYear];
-  const weeks = summary?.weeks ?? [];
+  const weeks = useMemo(() => summary?.weeks ?? [], [summary?.weeks]);
   const totalRepos = 0;
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const monthLabels = useMemo(() => {
@@ -122,6 +129,12 @@ export default function GithubActivitySection() {
     };
   }, [summary, weeks]);
 
+  const activePercentage = useMemo(() => {
+    if (!weeks.length) return 0;
+    const totalDays = weeks.reduce((count, week) => count + week.contributionDays.length, 0);
+    return totalDays ? Math.round((stats.activeDays / totalDays) * 100) : 0;
+  }, [stats.activeDays, weeks]);
+
   const handleCellHover = (
     contributionCount: number,
     date: string,
@@ -168,7 +181,7 @@ export default function GithubActivitySection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 xs:gap-3 mb-3 xs:mb-4 sm:mb-5">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px overflow-hidden border border-[#D5D5D5] rounded-none mb-4 xs:mb-5 sm:mb-6 bg-[#D5D5D5]">
           {[
             ["Total Contributions", stats.totalContributions.toLocaleString(), "#424242"],
             ["Active Days", String(stats.activeDays), "#424242"],
@@ -180,7 +193,7 @@ export default function GithubActivitySection() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * (index + 1) }}
-              className="bg-white border border-[#e0e0e0] rounded-lg p-2 xs:p-2.5 sm:p-3"
+              className="bg-[#EEF0F2] p-2.5 xs:p-3 sm:p-3.5 min-h-[62px]"
             >
               <div className="text-[9px] xs:text-[10px] text-[#666666] font-medium mb-0.5 xs:mb-1">
                 {label}
@@ -193,7 +206,7 @@ export default function GithubActivitySection() {
         </div>
 
         <div className="flex gap-3 xs:gap-4 sm:gap-5 items-start flex-col lg:flex-row">
-          <div className="flex-1 min-w-0 bg-white border border-[#e0e0e0] rounded-xl p-3 xs:p-4 sm:p-5 w-full">
+          <div className="flex-1 min-w-0 bg-[#EEF0F2] border border-[#D5D5D5] rounded-none p-3 xs:p-4 sm:p-5 w-full">
             <div className="w-full min-w-0 overflow-x-auto">
               <div className="relative min-w-[700px]">
                 <div className="relative ml-[28px] mb-1.5 h-4 [--heatmap-label-offset:28px] [--heatmap-cell-step:13px] xs:ml-[32px] xs:mb-2 xs:[--heatmap-label-offset:34px] xs:[--heatmap-cell-step:14px] sm:ml-[36px] sm:[--heatmap-label-offset:40px] sm:[--heatmap-cell-step:15px]">
@@ -237,7 +250,7 @@ export default function GithubActivitySection() {
                                 ? "cursor-pointer hover:ring-2 hover:ring-[#424242] hover:ring-offset-1"
                                 : ""
                             }`}
-                            style={{ backgroundColor: day.contributionCount > 0 ? day.color : "#EBEDF0" }}
+                            style={{ backgroundColor: contributionColor(day.contributionCount) }}
                             whileHover={day.contributionCount > 0 ? { scale: 1.3, zIndex: 10 } : {}}
                           />
                         ))}
@@ -246,19 +259,24 @@ export default function GithubActivitySection() {
                   </div>
                 </div>
 
-                <div className="mt-3 xs:mt-4 flex justify-end items-center gap-1.5 xs:gap-2">
+                <div className="mt-3 xs:mt-4 flex justify-between items-center gap-1.5 xs:gap-2">
+                  <span className="text-[9px] xs:text-[10px] sm:text-[11px] text-[#666666] font-medium">
+                    {activePercentage}% of days active in the last year
+                  </span>
+                  <div className="flex items-center gap-1.5 xs:gap-2">
                   <span className="text-[8px] xs:text-[9px] sm:text-[10px] text-[#666666] font-medium">
                     Less
                   </span>
                   <div className="flex gap-[3px]">
-                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#EBEDF0]" />
-                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#9BE9A8]" />
-                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#30A14E]" />
-                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#216E39]" />
+                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#E1E3E6]" />
+                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#B8BDC3]" />
+                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#7B8188]" />
+                    <div className="w-[10px] h-[10px] xs:w-[11px] xs:h-[11px] sm:w-[12px] sm:h-[12px] rounded-[2px] bg-[#424242]" />
                   </div>
                   <span className="text-[8px] xs:text-[9px] sm:text-[10px] text-[#666666] font-medium">
                     More
                   </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -273,8 +291,8 @@ export default function GithubActivitySection() {
                 whileTap={{ scale: 0.95 }}
                 className={`text-center lg:text-left px-2 xs:px-3 sm:px-4 py-1.5 xs:py-2 rounded-lg text-[10px] xs:text-[11px] sm:text-[12px] font-semibold transition-all whitespace-nowrap flex-1 lg:flex-none ${
                   year === selectedYear
-                    ? "bg-[#1342FF] text-white"
-                    : "text-[#666666] hover:bg-white hover:text-[#424242]"
+                    ? "bg-[#424242] text-white"
+                    : "text-[#666666] hover:bg-white hover:text-[#1342FF]"
                 }`}
               >
                 {year}

@@ -5,36 +5,17 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createPortal } from 'react-dom'
 import CornerDot from '@/components/ui/CornerDot'
-import LiquidImage from '@/components/ui/LiquidImage'
 import NeumorphicSocialButton from '@/components/ui/NeumorphicSocialButton'
-import Modal from '@/components/ui/Modal'
 import { useToast } from '@/components/providers/ToastProvider'
-import type { PublicProject } from '@/lib/content/types'
+import type { PublicAwardCard, PublicCertificateCard, PublicProject } from '@/lib/content/types'
 import TechStackResume from '@/components/sections/professional/TechStackResume'
-import { BadgeLogo } from '@/components/sections/BrandBadgeProjectsSection'
+import { ProjectCard } from '@/components/sections/projects/ProjectsGrid'
+import { AwardsList, CertificatesTable } from '@/components/sections/experience/ExperienceProofCards'
 
 interface CellData {
   level: number
   contributions: number
   date: Date
-}
-
-interface AwardLike {
-  slug: string
-  title: string
-  eventName: string
-  description: string
-  year: string
-  proofUrl?: string | null
-  logoUrl?: string | null
-}
-
-interface CertificateLike {
-  slug: string
-  title: string
-  description: string
-  proofUrl?: string | null
-  logoUrl?: string | null
 }
 
 export default function ResumePage({
@@ -43,43 +24,12 @@ export default function ResumePage({
   featuredCertificates = [],
 }: {
   featuredProjects?: PublicProject[]
-  featuredAwards?: AwardLike[]
-  featuredCertificates?: CertificateLike[]
+  featuredAwards?: PublicAwardCard[]
+  featuredCertificates?: PublicCertificateCard[]
 }) {
   const { info } = useToast()
-  const [selectedBadge, setSelectedBadge] = useState<string | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-
   const awardsData = featuredAwards
-  const badgeData = Object.fromEntries(
-    [
-      ...awardsData.map((award) => [
-        award.slug,
-        {
-          title: award.title,
-          event: award.eventName,
-          description: award.description,
-          date: award.year,
-          link: award.proofUrl || '',
-        },
-      ]),
-      ...featuredCertificates.map((certificate) => [
-        certificate.slug,
-        {
-          title: certificate.title,
-          event: 'CERTIFICATES',
-          description: certificate.description,
-          date: '',
-          link: certificate.proofUrl || '',
-        },
-      ]),
-    ]
-  )
-
-  const handleBadgeClick = (badgeId: string) => {
-    setSelectedBadge(badgeId)
-    setIsModalOpen(true)
-  }
+  const certificatesData = featuredCertificates
 
   const education = [
     {
@@ -110,14 +60,6 @@ export default function ResumePage({
       website: 'https://projectonepercent.io/',
     },
   ]
-
-  const projects = featuredProjects.map((project) => ({
-    slug: project.slug,
-    title: project.title.toUpperCase(),
-    subtitle: project.category,
-    description: project.summary,
-    image: project.bannerImageUrl || project.coverImageUrl || '/v2/showcase/banner.png',
-  }))
 
   // Activity Heatmap State
   const [selectedYear, setSelectedYear] = useState(2026)
@@ -378,41 +320,9 @@ export default function ResumePage({
           {/* Recent Projects Section - Right */}
           <div className="p-4 sm:p-6 md:p-8 lg:p-12">
             <h2 className="text-[20px] font-bold text-[#424242] mb-6 tracking-[-0.01em]">Recent Projects</h2>
-            <div className="space-y-4">
-              {projects.map((project) => (
-                <Link
-                  key={project.slug}
-                  href={`/projects/${project.slug}`}
-                  className="group relative overflow-hidden rounded-lg bg-[#424242] h-[200px] border border-[#d5d5d5] block"
-                >
-                  <div className="absolute inset-0 z-0">
-                    <LiquidImage
-                      src={project.image}
-                      alt={project.title}
-                      strength={0.4}
-                      speed={0.6}
-                      size={0.8}
-                    />
-                  </div>
-                  <div className="absolute inset-0 z-10 p-4 flex flex-col justify-between pointer-events-none">
-                    <div>
-                      <h3 className="text-white text-[18px] font-bold mb-1">{project.title}</h3>
-                      {project.subtitle && (
-                        <p className="text-white/90 text-[11px] mb-1">{project.subtitle}</p>
-                      )}
-                      {project.description && (
-                        <p className="text-white/80 text-[10px] leading-tight">{project.description}</p>
-                      )}
-                    </div>
-                    <div className="flex items-end justify-end">
-                      <button className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-medium text-white rounded-full bg-white/15 backdrop-blur-sm border border-white/20 hover:bg-white/25 transition-all pointer-events-auto">
-                        &lt; View
-                      </button>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <ul className="space-y-10">
+              {featuredProjects.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}
+            </ul>
           </div>
         </div>
       </section>
@@ -476,105 +386,15 @@ export default function ResumePage({
                 <h2 className="text-[clamp(18px,2vw,20px)] font-bold text-[#424242] mb-1 tracking-[-0.01em]">Featured Badge & Certificates</h2>
                 <p className="text-[clamp(11px,1.2vw,12px)] text-[#666666]">Badges earned from hackathon wins</p>
               </div>
-
-              <div className="space-y-5">
-                {awardsData.map((award) => (
-                  <div key={award.slug}>
-                    <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">{award.eventName}</span>
-                    <div className="flex items-center justify-between mt-2.5 pb-4 border-b border-[#E5E5E5]">
-                      <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                        <BadgeLogo alt={award.title} />
-                        <div className="flex flex-col leading-tight">
-                          <span className="text-[10px] text-white/60">Featured on</span>
-                          <span className="text-[12px] font-bold text-white">{award.title}</span>
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => handleBadgeClick(award.slug)}
-                        className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                        aria-label={`View ${award.title} badge details`}
-                      >
-                        Details
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Certificates */}
-                {featuredCertificates.length > 0 ? (
-                  <div>
-                    <span className="text-[10px] font-bold text-[#666666] tracking-wider uppercase">CERTIFICATES</span>
-                    <div className="space-y-3 mt-2.5">
-                      {featuredCertificates.map((certificate) => (
-                        <div key={certificate.slug} className="flex items-center justify-between">
-                          <div className="bg-[#424242] rounded-lg px-4 py-2.5 flex items-center gap-3 shadow-sm">
-                            <BadgeLogo alt={certificate.title} />
-                            <div className="flex flex-col leading-tight">
-                              <span className="text-[10px] text-white/60">Featured on</span>
-                              <span className="text-[12px] font-bold text-white">{certificate.title}</span>
-                            </div>
-                          </div>
-                          <button
-                            onClick={() => handleBadgeClick(certificate.slug)}
-                            className="bg-[#424242] text-white text-[11px] px-5 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                            aria-label={`View ${certificate.title} certificate details`}
-                          >
-                            Details
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ) : null}
+              <div>
+                <AwardsList awards={awardsData} />
+                {certificatesData.length > 0 ? <CertificatesTable certificates={certificatesData} compact /> : null}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-
-      {/* Badge Details Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false)
-          setSelectedBadge(null)
-        }}
-        title={selectedBadge ? badgeData[selectedBadge as keyof typeof badgeData]?.title : ''}
-        size="md"
-      >
-        {selectedBadge && badgeData[selectedBadge as keyof typeof badgeData] && (
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-[#666666] mb-2">
-                {badgeData[selectedBadge as keyof typeof badgeData].description}
-              </p>
-              <div className="flex items-center gap-4 text-sm text-[#666666]">
-                <span>
-                  <strong className="text-[#424242]">Event:</strong>{' '}
-                  {badgeData[selectedBadge as keyof typeof badgeData].event}
-                </span>
-                <span>
-                  <strong className="text-[#424242]">Date:</strong>{' '}
-                  {badgeData[selectedBadge as keyof typeof badgeData].date}
-                </span>
-              </div>
-            </div>
-            {badgeData[selectedBadge as keyof typeof badgeData].link && (
-              <div className="pt-4 border-t border-[#d5d5d5]">
-                <a
-                  href={badgeData[selectedBadge as keyof typeof badgeData].link || '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#1342FF] hover:underline text-sm font-medium"
-                >
-                  Learn more →
-                </a>
-              </div>
-            )}
-          </div>
-        )}
-      </Modal>
     </>
   )
 }

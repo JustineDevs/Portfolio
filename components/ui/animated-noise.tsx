@@ -21,11 +21,12 @@ export function AnimatedNoise({ opacity = 0.05, className }: AnimatedNoiseProps)
     let frame = 0
 
     const resize = () => {
-      canvas.width = canvas.offsetWidth / 2
-      canvas.height = canvas.offsetHeight / 2
+      canvas.width = Math.max(1, Math.floor(canvas.offsetWidth / 2))
+      canvas.height = Math.max(1, Math.floor(canvas.offsetHeight / 2))
     }
 
     const generateNoise = () => {
+      if (canvas.width < 1 || canvas.height < 1) return
       const imageData = ctx.createImageData(canvas.width, canvas.height)
       const data = imageData.data
 

@@ -1,4 +1,4 @@
-export const CURSOR_AVATAR_HOVER = "portfolio:cursor-avatar-hover" as const
+const CURSOR_AVATAR_HOVER = "portfolio:cursor-avatar-hover" as const
 
 export type CursorAvatarHoverDetail = { over: boolean }
 

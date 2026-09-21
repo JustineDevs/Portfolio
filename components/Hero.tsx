@@ -7,7 +7,6 @@ import InteractiveDotGrid from './ui/InteractiveDotGrid';
 import PixelGrid from './ui/pixel-grid';
 import { SplitFlapText } from './ui/split-flap-text';
 import { AnimatedNoise } from './ui/animated-noise';
-import { ScrambleTextOnHover } from './ui/scramble-text';
 
 const AvatarParticlesCanvas = dynamic(() => import('./three/AvatarParticlesCanvas'), {
   ssr: false,
@@ -27,10 +26,10 @@ const Hero = () => {
       <CornerDot position="bl" className="hidden xs:block" />
       <CornerDot position="br" className="hidden xs:block" />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.1fr_1fr] min-h-[400px] xs:min-h-[450px] sm:min-h-[500px] md:min-h-[550px] lg:min-h-[600px] min-w-0">
+      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] min-h-[400px] xs:min-h-[450px] sm:min-h-[500px] lg:min-h-[600px] min-w-0">
         
-        <div className="relative w-full h-[250px] xs:h-[300px] sm:h-[350px] md:h-full overflow-hidden border-b md:border-b-0 md:border-r border-[#d5d5d5]">
-          <CornerDot position="br" className="hidden md:block" />
+        <div className="relative w-full h-[250px] xs:h-[300px] sm:h-[350px] lg:h-full overflow-hidden border-b lg:border-b-0 lg:border-r border-[#d5d5d5]">
+          <CornerDot position="br" className="hidden lg:block" />
           
           <div className="absolute inset-0 z-0">
             <InteractiveDotGrid 
@@ -58,25 +57,21 @@ const Hero = () => {
           <PixelGrid />
           <AnimatedNoise opacity={0.03} />
 
-          <div className="flex-1 flex flex-col justify-center relative z-10 px-4 xs:px-5 sm:px-6 md:px-8 lg:px-12 py-6 xs:py-8 sm:py-10 md:py-12 lg:py-0">
-            <h1 className="text-[32px] xs:text-[36px] sm:text-[48px] md:text-[56px] lg:text-[72px] xl:text-[86px] text-[#424242] mb-4 xs:mb-5 sm:mb-6 leading-[0.9] tracking-tighter font-black flex items-center flex-wrap">
+          <div className="min-w-0 flex-1 flex flex-col justify-center relative z-10 px-4 xs:px-5 sm:px-6 md:px-8 lg:px-12 py-6 xs:py-8 sm:py-10 md:py-12 lg:py-0">
+            <h1 className="flex max-w-full flex-wrap items-center gap-x-1 text-[32px] xs:text-[36px] sm:text-[48px] lg:text-[56px] xl:text-[64px] 2xl:text-[86px] text-[#424242] mb-4 xs:mb-5 sm:mb-6 leading-[0.9] tracking-tighter font-black break-words">
               <span>I&apos;m </span>
               <span className="inline-flex items-center">
                 <SplitFlapText 
                   text="JUSTINE" 
                   speed={80} 
                   skipEntrance={false}
-                  className="text-[32px] xs:text-[36px] sm:text-[48px] md:text-[56px] lg:text-[72px] xl:text-[86px]"
+                  className="max-w-full text-[32px] xs:text-[36px] sm:text-[48px] lg:text-[56px] xl:text-[64px] 2xl:text-[86px]"
                 />
               </span>
             </h1>
             
-            <p className="text-[14px] xs:text-[15px] sm:text-[16px] md:text-[18px] lg:text-[20px] text-[#444444] font-medium leading-[1.5] max-w-lg mb-6 xs:mb-8 sm:mb-10">
-              <ScrambleTextOnHover 
-                text="a software developer specializing in blockchain and web technologies with a strong portfolio of projects." 
-                as="span"
-                duration={0.6}
-              />
+            <p className="max-w-lg break-words text-[14px] xs:text-[15px] sm:text-[16px] lg:text-[18px] xl:text-[20px] text-[#444444] font-medium leading-[1.5] mb-6 xs:mb-8 sm:mb-10">
+              a software developer specializing in blockchain and web technologies with a strong portfolio of projects.
             </p>
           </div>
 

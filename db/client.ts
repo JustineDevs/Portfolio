@@ -1,27 +1,25 @@
-import { createClient } from "@libsql/client";
-import "@libsql/client/web";
-import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client/web";
+import { drizzle } from "drizzle-orm/libsql/web";
+import { resolveDatabaseUrl } from "@/db/config";
 
 const globalForDb = globalThis as typeof globalThis & {
   __portfolioDb?: ReturnType<typeof drizzle>;
 };
 
-type DatabaseEnv = {
-  TURSO_DATABASE_URL?: string;
-  NODE_ENV?: string;
-};
-
-export function resolveDatabaseUrl(env: DatabaseEnv = process.env) {
-  const configuredUrl = env.TURSO_DATABASE_URL?.trim();
-  if (configuredUrl) return configuredUrl;
-  if (env.NODE_ENV === "production") {
-    throw new Error("TURSO_DATABASE_URL is required in production.");
-  }
-  return "file:./db/local.db";
-}
+export { resolveDatabaseUrl } from "@/db/config";
 
 function createDb() {
   const url = resolveDatabaseUrl();
+
+  // The web transport is the production path and avoids bundling libSQL's
+  // optional native addon into Turbopack route chunks. Keep the native node
+  // transport only for the local file database used by tests and local tools.
+  if (url.startsWith("file:")) {
+    const nodeRequire = eval("require") as NodeRequire;
+    const { createClient: createNodeClient } = nodeRequire("@libsql/client/node") as typeof import("@libsql/client/node");
+    const { drizzle: drizzleNode } = nodeRequire("drizzle-orm/libsql/node") as typeof import("drizzle-orm/libsql/node");
+    return drizzleNode(createNodeClient({ url, authToken: process.env.TURSO_AUTH_TOKEN }));
+  }
 
   const client = createClient({
     url,

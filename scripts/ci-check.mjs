@@ -31,13 +31,22 @@ function run(cmd, args, env = baseEnv) {
   }
 }
 
+function runPnpm(args, env = baseEnv) {
+  if (process.platform === "linux") {
+    run("nice", ["-n", "19", "pnpm", ...args], env);
+    return;
+  }
+
+  run("pnpm", args, env);
+}
+
 console.log("ci:check — lint\n");
-run("pnpm", ["run", "lint"]);
+runPnpm(["run", "lint"]);
 
 console.log("\nci:check — unit tests\n");
-run("pnpm", ["run", "test"]);
+runPnpm(["run", "test"]);
 
 console.log("\nci:check — production build\n");
-run("pnpm", ["run", "build"], { ...baseEnv, NODE_ENV: "production" });
+runPnpm(["run", "build"], { ...baseEnv, NODE_ENV: "production" });
 
 console.log("\nci:check OK\n");

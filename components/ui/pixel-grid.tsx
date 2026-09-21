@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 interface PixelState {
   id: string
@@ -13,6 +13,7 @@ export default function PixelGrid() {
   // large grid when the viewport is measured causes a visible layout shift.
   const [gridSize] = useState({ rows: 32, cols: 32 })
   const [litPixels, setLitPixels] = useState<Map<string, PixelState>>(new Map())
+  const litPixelsRef = useRef(litPixels)
   const fadeOutDuration = 300
 
   const getRandomColor = () => {
@@ -24,7 +25,7 @@ export default function PixelGrid() {
 
   const handleMouseEnter = (row: number, col: number) => {
     const pixelId = `${row}-${col}`
-    const currentPixel = litPixels.get(pixelId)
+    const currentPixel = litPixelsRef.current.get(pixelId)
     
     if (currentPixel?.timeout) {
       clearTimeout(currentPixel.timeout)
@@ -32,23 +33,25 @@ export default function PixelGrid() {
     
     setLitPixels(prev => {
       const next = new Map(prev)
-      next.set(pixelId, { 
+      next.set(pixelId, {
         id: pixelId, 
         color: currentPixel?.color || getRandomColor()
       })
+      litPixelsRef.current = next
       return next
     })
   }
 
   const handleMouseLeave = (row: number, col: number) => {
     const pixelId = `${row}-${col}`
-    const pixel = litPixels.get(pixelId)
+    const pixel = litPixelsRef.current.get(pixelId)
     
     if (pixel) {
       const timeout = setTimeout(() => {
         setLitPixels(prev => {
           const next = new Map(prev)
           next.delete(pixelId)
+          litPixelsRef.current = next
           return next
         })
       }, fadeOutDuration)
@@ -56,6 +59,7 @@ export default function PixelGrid() {
       setLitPixels(prev => {
         const next = new Map(prev)
         next.set(pixelId, { ...pixel, timeout })
+        litPixelsRef.current = next
         return next
       })
     }
@@ -63,7 +67,7 @@ export default function PixelGrid() {
 
   useEffect(() => {
     return () => {
-      litPixels.forEach(pixel => {
+      litPixelsRef.current.forEach(pixel => {
         if (pixel.timeout) clearTimeout(pixel.timeout)
       })
     }

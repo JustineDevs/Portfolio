@@ -17,23 +17,12 @@ import {
   getPublishedProjects,
   getPublishedTestimonials,
 } from "@/lib/content/public";
-
-type HomeFeaturedAward = {
-  slug: string;
-  title: string;
-  eventName: string;
-  description: string;
-  year: string;
-  proofUrl?: string | null;
-  logoUrl?: string | null;
-};
-
-type HomePageData = {
-  featuredProjects: Awaited<ReturnType<typeof getPublishedProjects>>;
-  featuredAwards: HomeFeaturedAward[];
-  featuredCertificates: [];
-  legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
-};
+import type {
+  PublicAwardCard,
+  PublicCertificateCard,
+  PublicProofOfWork,
+  PublicProject,
+} from "@/lib/content/types";
 
 export type AboutRecentPost = {
   slug: string;
@@ -65,14 +54,7 @@ export type AboutPageData = {
   legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
 };
 
-type ProofProjectCard = {
-  key: string;
-  typeLabel: string;
-  title: string;
-  summary: string;
-  href?: string | null;
-  imageUrl?: string | null;
-};
+type ProofProjectCard = PublicProject;
 
 type ProofWritingCard = {
   key: string;
@@ -90,26 +72,15 @@ type ProofTestimonialCard = {
   quote: string;
 };
 
-type ProofAwardCard = {
-  slug: string;
-  title: string;
-  summary: string;
-  year: string;
-  href?: string | null;
-  logoUrl?: string | null;
-  sourceLabel: string;
-};
-
-type ProofCertificateCard = Awaited<ReturnType<typeof getFeaturedCertificateCards>>[number];
-
 export type ExperiencePageData = {
   legalLinks: Awaited<ReturnType<typeof getPublicLegalLinks>>;
   proofOfWork: {
+    items: PublicProofOfWork[];
     projects: ProofProjectCard[];
     writing: ProofWritingCard[];
     testimonials: ProofTestimonialCard[];
-    awards: ProofAwardCard[];
-    certificates: ProofCertificateCard[];
+    awards: PublicAwardCard[];
+    certificates: PublicCertificateCard[];
   };
 };
 
@@ -118,20 +89,7 @@ type HighlightRow = Awaited<ReturnType<typeof getPublishedHighlights>>[number];
 function buildProjectProofCards(
   projects: Awaited<ReturnType<typeof getPublishedProjects>>,
 ) {
-  const cards: ProofProjectCard[] = [];
-
-  for (const project of projects) {
-    cards.push({
-      key: project.slug,
-      typeLabel: project.category || "Project",
-      title: project.title,
-      summary: project.summary,
-      href: `/projects/${project.slug}`,
-      imageUrl: project.bannerImageUrl || project.coverImageUrl || null,
-    });
-  }
-
-  return cards.slice(0, 4);
+  return projects.slice(0, 4) as ProofProjectCard[];
 }
 
 function buildWritingCards(
@@ -216,79 +174,25 @@ function buildTestimonialCards(
   return cards.slice(0, 2);
 }
 
-function toProofAwardCards(awards: Awaited<ReturnType<typeof getFeaturedAwardCards>>) {
-  return awards.slice(0, 3).map<ProofAwardCard>((award) => ({
-    slug: award.slug,
-    title: award.title,
-    summary: award.description,
-    year: award.year,
-    href: award.proofUrl,
-    logoUrl: award.logoUrl,
-    sourceLabel: award.eventName || award.year || "Award",
-  }));
-}
-
 function buildExperienceAwardCards(
-  awards: Awaited<ReturnType<typeof getFeaturedAwardCards>>,
-  highlights: HighlightRow[],
+  awards: PublicAwardCard[],
 ) {
-  const cards = toProofAwardCards(awards);
-  const seen = new Set(
-    cards.flatMap((award) => [
-      `${award.title.toLowerCase()}|${award.href || ""}`,
-      ...(award.href ? [`|${award.href}`] : []),
-    ]),
-  );
-
-  for (const highlight of highlights.filter(
-    (row) =>
-      row.highlightType === "custom" &&
-      placementMatches(row.placementKey, row.highlightType as HighlightType, "experience.awards"),
-  )) {
-    const title = highlight.titleOverride?.trim();
-    const href = highlight.linkOverride?.trim() || null;
-    if (!title) continue;
-
-    const dedupeKey = `${title.toLowerCase()}|${href || ""}`;
-    if (seen.has(dedupeKey) || (href && seen.has(`|${href}`))) continue;
-    seen.add(dedupeKey);
-    if (href) seen.add(`|${href}`);
-
-    cards.push({
-      slug: `manual-award-${highlight.id ?? dedupeKey}`,
-      title,
-      summary: highlight.summaryOverride?.trim() || "Manual card",
-      year: "",
-      href,
-      logoUrl: highlight.imageUrlOverride || null,
-      sourceLabel: "Manual card",
-    });
-  }
-
-  return cards.slice(0, 3);
+  return awards.slice(0, 3);
 }
 
-export async function getHomePageData() {
-  const [projects, awards, legalLinks] = await Promise.all([
-    getPublishedProjects(),
-    getPublishedAwards(),
-    getPublicLegalLinks(),
-  ]);
-
-  return {
-    featuredProjects: projects.slice(0, 2),
-    featuredAwards: awards.slice(0, 2).map((award) => ({
-      slug: award.slug,
-      title: award.title,
-      eventName: award.eventName,
-      description: award.description,
-      year: award.year,
-      proofUrl: award.proofUrl,
-      logoUrl: award.logoUrl,
-    })),
-    featuredCertificates: [],
-    legalLinks,
-  } satisfies HomePageData;
+function buildProofOfWorkCards(): PublicProofOfWork[] {
+  return [
+    {
+      slug: "project-one-percent-discord-moderator",
+      title: "Discord Moderator: Community",
+      summary:
+        "Web3 Community Moderator | Project One Percent · Moderated a 30,000+ member Web3 community, handled daily discussions, support requests, and conflict resolution across Discord channels.",
+      href: "https://projectonepercent.io/",
+      brandName: "Project One Percent",
+      brandLogoUrl: "/Logo/one percent/one percent.jpg",
+      startedAt: "July 2023",
+    },
+  ];
 }
 
 export async function getAboutPageData(): Promise<AboutPageData> {
@@ -327,7 +231,7 @@ export async function getProjectsPageData() {
 export async function getProjectDetailPageData(slug: string) {
   const [project, otherProjects, legalLinks] = await Promise.all([
     getPublishedProjectBySlug(slug),
-    getOtherPublishedProjects(slug, 2),
+    getOtherPublishedProjects(slug, 6),
     getPublicLegalLinks(),
   ]);
 
@@ -374,10 +278,11 @@ export async function getExperiencePageData(): Promise<ExperiencePageData> {
   return {
     legalLinks,
     proofOfWork: {
+      items: buildProofOfWorkCards(),
       projects: buildProjectProofCards(projects),
       writing: buildWritingCards(posts),
       testimonials: buildTestimonialCards(testimonials, highlights),
-      awards: buildExperienceAwardCards(awards, highlights),
+      awards: buildExperienceAwardCards(awards),
       certificates: certificates.slice(0, 3),
     },
   };

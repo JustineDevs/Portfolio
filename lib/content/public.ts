@@ -1,6 +1,11 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 
-import type { PublicPost, PublicProject } from "@/lib/content/types";
+import type {
+  PublicAwardCard,
+  PublicCertificateCard,
+  PublicPost,
+  PublicProject,
+} from "@/lib/content/types";
 import { db } from "@/db/client";
 import {
   normalizeAssetFieldsInObjectAsync,
@@ -31,26 +36,7 @@ import {
 
 export type { PublicPost, PublicProject } from "@/lib/content/types";
 
-export type FeaturedAwardCard = {
-  id?: number;
-  slug: string;
-  title: string;
-  eventName: string;
-  description: string;
-  year: string;
-  proofUrl?: string | null;
-  logoUrl?: string | null;
-};
-
-export type FeaturedCertificateCard = {
-  id?: number;
-  slug: string;
-  title: string;
-  issuer?: string | null;
-  description: string;
-  proofUrl?: string | null;
-  logoUrl?: string | null;
-};
+export type { PublicAwardCard, PublicCertificateCard } from "@/lib/content/types";
 
 type PublicTestimonial = typeof testimonials.$inferSelect;
 type PublicAward = typeof awards.$inferSelect;
@@ -235,7 +221,7 @@ async function getPublishedCertificates(): Promise<NormalizedCertificate[]> {
 export async function getFeaturedAwardCards(
   limit?: number,
   placementKey?: HighlightPlacementKey,
-): Promise<FeaturedAwardCard[]> {
+): Promise<PublicAwardCard[]> {
   const [awardRows, highlightRows] = await Promise.all([
     getPublishedAwards(),
     getPublishedHighlights(),
@@ -244,7 +230,7 @@ export async function getFeaturedAwardCards(
   const featuredAwardRows = awardRows.filter((award) => award.featured);
   const awardById = new Map(awardRows.map((award) => [award.id, award]));
   const prioritizedAwardRows = [...featuredAwardRows, ...awardRows.filter((award) => !award.featured)];
-  const cards: FeaturedAwardCard[] = [];
+  const cards: PublicAwardCard[] = [];
   const seen = new Set<string>();
 
   for (const highlight of highlightRows.filter(
@@ -295,7 +281,7 @@ export async function getFeaturedAwardCards(
 export async function getFeaturedCertificateCards(
   limit?: number,
   placementKey?: HighlightPlacementKey,
-): Promise<FeaturedCertificateCard[]> {
+): Promise<PublicCertificateCard[]> {
   const [certificateRows, highlightRows] = await Promise.all([
     getPublishedCertificates(),
     getPublishedHighlights(),
@@ -307,7 +293,7 @@ export async function getFeaturedCertificateCards(
       (!placementKey || placementMatches(row.placementKey, row.highlightType as HighlightType, placementKey)),
   );
   const certificateById = new Map(certificateRows.map((certificate) => [certificate.id, certificate]));
-  const cards: FeaturedCertificateCard[] = [];
+  const cards: PublicCertificateCard[] = [];
   const seen = new Set<string>();
 
   for (const highlight of highlightedCertificates) {

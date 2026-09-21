@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Heart } from 'lucide-react'
 import { getVisitorId } from '@/lib/visitor-id'
@@ -20,10 +20,11 @@ export default function HeartButton({ className = '', showReminderPopup = true, 
   const [isLoading, setIsLoading] = useState(true)
   const [visitorId, setVisitorId] = useState<string | null>(null)
   const [displayHeartCount, setDisplayHeartCount] = useState(0)
+  const displayHeartCountRef = useRef(0)
 
   useEffect(() => {
     if (isLoading) return
-    const startValue = displayHeartCount
+    const startValue = displayHeartCountRef.current
     const difference = heartCount - startValue
     const startTime = performance.now()
     let frame = 0
@@ -31,7 +32,9 @@ export default function HeartButton({ className = '', showReminderPopup = true, 
     const animate = (time: number) => {
       const progress = Math.min((time - startTime) / 500, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setDisplayHeartCount(Math.round(startValue + difference * eased))
+      const nextValue = Math.round(startValue + difference * eased)
+      displayHeartCountRef.current = nextValue
+      setDisplayHeartCount(nextValue)
       if (progress < 1) frame = requestAnimationFrame(animate)
     }
 

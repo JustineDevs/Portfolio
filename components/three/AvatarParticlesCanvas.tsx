@@ -91,7 +91,7 @@ export default function AvatarParticlesCanvas() {
         frameloop={isActive ? "always" : "never"}
         dpr={[1, 1.25]}
         camera={{ position: [-0.28, -0.48, -0.82], fov: 58 }}
-        gl={{ antialias: false, alpha: true }}
+        gl={{ antialias: false, alpha: true, powerPreference: "low-power" }}
       >
         <Suspense fallback={null}>
           <AvatarParticles hoverActive={hoverActive} />

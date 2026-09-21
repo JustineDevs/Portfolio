@@ -1,3 +1,6 @@
+// Seed-only compatibility fixtures. Runtime pages read the normalized content
+// repository in lib/content; keep this module isolated until the seed migration
+// no longer needs to backfill legacy records.
 import { projects } from "./projects";
 
 const legacyAboutPanels = [

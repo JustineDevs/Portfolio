@@ -96,5 +96,3 @@ export const StackedLogos = ({
 };
 
 StackedLogos.displayName = "StackedLogos";
-
-export default StackedLogos;

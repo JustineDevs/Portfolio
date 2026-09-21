@@ -1,72 +1,35 @@
-'use client'
-
+import Image from 'next/image'
+import Link from 'next/link'
 import type { PublicProject } from '@/lib/content/types'
+import { getRenderableImageUrl, shouldUseUnoptimizedImage } from '@/lib/asset-urls'
 
 interface ResponsibilitiesNetworksProps {
   project: PublicProject
+  otherProjects: PublicProject[]
 }
 
-export default function ResponsibilitiesNetworks({ project }: ResponsibilitiesNetworksProps) {
-  return (
-    <section className="bg-[#F8FAFC]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-0">
-        <div className="border-l border-r border-b border-[#d5d5d5]">
-          <div>
-            <div className="border-b border-[#d5d5d5] px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-lg sm:text-xl font-bold text-[#424242]">Responsibilities</h2>
-            </div>
-            <div className="p-4 sm:p-6">
-              {project.responsibilities.length > 0 ? (
-                <ul className="space-y-2 sm:space-y-3">
-                  {project.responsibilities.map((responsibility, index) => (
-                    <li key={index} className="flex items-start gap-2 sm:gap-3 text-sm sm:text-base text-[#666666]">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#424242] mt-1.5 sm:mt-2 shrink-0"></span>
-                      <span>{responsibility}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-sm leading-7 text-[#666666]">Responsibilities for this project are being documented.</p>
-              )}
-              {project.technologies.length > 0 && (
-                <div className="mt-8 border-t border-[#e5e5e5] pt-6">
-                  <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">Technologies</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {project.technologies.map((technology, index) => (
-                      <span key={`${technology}-${index}`} className="inline-flex min-h-[36px] items-center border border-[#d5d5d5] bg-[#424242] px-3 py-1.5 text-xs font-semibold text-white">
-                        {technology}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+function ProjectCatalogCard({ project, index }: { project: PublicProject; index: number }) {
+  const imageUrl = project.bannerImageUrl || project.coverImageUrl
 
-        {project.links.length > 0 && (
-          <div className="border-l border-r border-b border-[#d5d5d5]">
-            <div className="border-b border-[#d5d5d5] px-4 sm:px-6 py-3 sm:py-4">
-              <h2 className="text-lg sm:text-xl font-bold text-[#424242]">Project Links</h2>
-              <p className="text-xs sm:text-sm text-[#666666] mt-1">Key links and references for this project.</p>
-            </div>
-            <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-              {project.links.map((link, index) => (
-                <a
-                  key={`${link.type}-${index}`}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between gap-3 rounded-lg border border-[#d5d5d5] px-4 py-3 text-sm text-[#424242] transition hover:bg-white"
-                >
-                  <span className="font-medium">{link.label || link.type}</span>
-                  <span className="text-xs uppercase tracking-[0.2em] text-[#666666]">{link.type}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
+  return (
+    <Link href={`/projects/${project.slug}`} className="group block">
+      <div className="relative aspect-[1.5] overflow-hidden bg-[#202020]">
+        {imageUrl ? <Image src={getRenderableImageUrl(imageUrl)} alt={project.title} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-500 ease-out group-hover:scale-[1.04]" unoptimized={shouldUseUnoptimizedImage(imageUrl)} /> : <div className="absolute inset-0 bg-[#202020]" />}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent" />
+        <div className="absolute inset-x-5 bottom-4 flex items-center justify-between"><span className="font-mono text-[10px] text-white/70">0{index + 1}</span><span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/75">{project.category}</span></div>
+      </div>
+      <div className="border-b border-[#d5d5d5] py-5"><div className="flex items-start justify-between gap-5"><h3 className="max-w-xl text-xl font-semibold leading-tight tracking-[-0.035em] text-[#383838] transition group-hover:text-[#1342FF] sm:text-2xl">{project.title}</h3><span className="shrink-0 pt-1 text-xs uppercase tracking-[0.16em] text-[#777777]">View ↗</span></div><p className="mt-3 line-clamp-2 max-w-xl text-sm leading-6 text-[#777777]">{project.summary}</p></div>
+    </Link>
+  )
+}
+
+export default function ResponsibilitiesNetworks({ otherProjects }: ResponsibilitiesNetworksProps) {
+  return otherProjects.length > 0 ? (
+    <section className="border-t border-[#d5d5d5] bg-[#F8FAFC]">
+      <div className="mx-auto max-w-[1440px] px-5 py-16 sm:px-8 sm:py-24 lg:px-12 lg:py-32">
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-6"><div><p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#777777]">Archive</p><h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] text-[#383838] sm:text-6xl">Explore the catalogue.</h2></div><Link href="/projects" className="text-xs font-semibold uppercase tracking-[0.18em] text-[#777777] transition hover:text-[#1342FF]">All projects ↗</Link></div>
+        <div className="grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 lg:grid-cols-3">{otherProjects.map((otherProject, index) => <ProjectCatalogCard key={otherProject.slug} project={otherProject} index={index} />)}</div>
       </div>
     </section>
-  )
+  ) : null
 }

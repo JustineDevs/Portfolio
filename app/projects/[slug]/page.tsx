@@ -22,11 +22,11 @@ export default async function ProjectShowcasePage({ params }: { params: { slug: 
   }
 
   return (
-    <PageLayout legalLinks={legalLinks}>
+    <PageLayout legalLinks={legalLinks} fullWidth>
       <main className="bg-[#F8FAFC]">
         <HeroProjectHeader project={project} />
-        <DescriptionOtherProjects project={project} otherProjects={otherProjects} />
-        <ResponsibilitiesNetworks project={project} />
+        <DescriptionOtherProjects project={project} />
+        <ResponsibilitiesNetworks project={project} otherProjects={otherProjects} />
       </main>
     </PageLayout>
   )

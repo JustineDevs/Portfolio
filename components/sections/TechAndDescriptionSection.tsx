@@ -2,6 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import CornerDot from '@/components/ui/CornerDot'
 import { ScrambleTextOnHover } from '@/components/ui/scramble-text'
 import { StackedLogos } from '@/components/ui/stacked-logos'
@@ -51,18 +52,18 @@ const groups: { title: string; items: { name: string; summary: string; icon: Ico
 
 const platformLogoGroups = [
   [
-    <img key="platform-1" src="https://cdn.brandfetch.io/idsSceG8fK/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
-    <img key="platform-2" src="https://cdn.brandfetch.io/idJ3Cg8ymG/theme/dark/idRpwHe9Zf.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
-    <img key="platform-3" src="https://cdn.brandfetch.io/idFEnp00Rl/theme/dark/idXGMr_wi3.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <Image key="platform-1" src="https://cdn.brandfetch.io/idsSceG8fK/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
+    <Image key="platform-2" src="https://cdn.brandfetch.io/idJ3Cg8ymG/theme/dark/idRpwHe9Zf.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
+    <Image key="platform-3" src="https://cdn.brandfetch.io/idFEnp00Rl/theme/dark/idXGMr_wi3.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
   ],
   [
-    <img key="platform-4" src="https://cdn.brandfetch.io/idTVdakwPY/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
-    <img key="platform-5" src="https://cdn.brandfetch.io/idDpCfN4VD/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
-    <img key="platform-6" src="https://cdn.brandfetch.io/id0BqaqET6/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <Image key="platform-4" src="https://cdn.brandfetch.io/idTVdakwPY/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
+    <Image key="platform-5" src="https://cdn.brandfetch.io/idDpCfN4VD/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
+    <Image key="platform-6" src="https://cdn.brandfetch.io/id0BqaqET6/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
   ],
   [
-    <img key="platform-7" src="https://cdn.brandfetch.io/id6O2oGzv-/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Google Cloud" width="120" height="32" loading="lazy" />,
-    <img key="platform-8" src="https://cdn.brandfetch.io/id8LeMTX5r/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width="120" height="32" loading="lazy" />,
+    <Image key="platform-7" src="https://cdn.brandfetch.io/id6O2oGzv-/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Google Cloud" width={120} height={32} unoptimized />,
+    <Image key="platform-8" src="https://cdn.brandfetch.io/id8LeMTX5r/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
   ],
 ]
 

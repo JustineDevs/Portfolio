@@ -115,13 +115,15 @@ export default function AvatarParticles({
     
     // Update uniforms
     uniforms.uTime.value = state.clock.getElapsedTime();
+
+    // The avatar is already at rest when the pointer is outside the canvas.
+    // Avoid walking every particle on every frame until interaction begins.
+    if (!hoverActive) return;
     
     // Update mouse 3D position
-    if (hoverActive) {
-      raycaster.setFromCamera(pointer, camera);
-      raycaster.ray.intersectPlane(interactionPlane.current, intersectionPoint.current);
-      mouse3D.current.lerp(intersectionPoint.current, 0.1);
-    }
+    raycaster.setFromCamera(pointer, camera);
+    raycaster.ray.intersectPlane(interactionPlane.current, intersectionPoint.current);
+    mouse3D.current.lerp(intersectionPoint.current, 0.1);
 
     // CPU Physics Update
     const positions = pointsRef.current.geometry.attributes.position.array as Float32Array;
@@ -159,12 +161,13 @@ export default function AvatarParticles({
       let fx = 0, fy = 0, fz = 0;
 
       // Repulsion (only if close)
-      if (hoverActive && distSq < repulsionRadius * repulsionRadius) {
+      if (distSq < repulsionRadius * repulsionRadius) {
         const dist = Math.sqrt(distSq);
         const force = (1.0 - dist / repulsionRadius) * repulsionStrength;
-        fx += (dx / dist + jitters[ix]) * force;
-        fy += (dy / dist + jitters[iy]) * force;
-        fz += (dz / dist + jitters[iz]) * force;
+        const inverseDist = dist > 0.0001 ? 1 / dist : 0;
+        fx += (dx * inverseDist + jitters[ix]) * force;
+        fy += (dy * inverseDist + jitters[iy]) * force;
+        fz += (dz * inverseDist + jitters[iz]) * force;
       }
 
       // Spring Return Force

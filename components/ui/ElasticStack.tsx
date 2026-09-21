@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type HTMLAttributes, type ReactNode } from 'react'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 interface ElasticStackItem {
@@ -62,7 +63,7 @@ export default function ElasticStack({
             {item.icon ? (
               item.icon
             ) : item.image ? (
-              <img src={item.image} alt={item.name || ''} className="h-full w-full object-cover" />
+              <Image src={item.image} alt={item.name || ''} width={itemSize} height={itemSize} unoptimized className="h-full w-full object-cover" />
             ) : (
               item.name?.charAt(0).toUpperCase() || index + 1
             )}

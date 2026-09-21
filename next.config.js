@@ -16,7 +16,7 @@ const nextConfig = {
   
   // Enable SWC minification (faster than Terser)
   swcMinify: true,
-  
+
   // Note: compiler.removeConsole is not supported by Turbopack yet
   // Remove console logs manually or use a babel plugin if needed
   
@@ -42,7 +42,6 @@ const nextConfig = {
     // Faster builds in development
     if (dev) {
       config.watchOptions = {
-        poll: 1000,
         aggregateTimeout: 300,
         ignored: [
           '**/node_modules',
@@ -55,6 +54,13 @@ const nextConfig = {
           '**/pagefile.sys',
           '**/swapfile.sys',
         ],
+      }
+
+      // Prefer the native watcher on local Linux/macOS development. Polling
+      // scans the tree continuously and can keep CPU high during recompiles;
+      // opt into it only for filesystems that do not emit native events.
+      if (process.env.NEXT_WATCH_POLL === '1') {
+        config.watchOptions.poll = 1000
       }
     }
     
@@ -108,6 +114,10 @@ const nextConfig = {
   
   // Experimental features for faster builds
   experimental: {
+    // Keep static generation bounded on memory-constrained development machines and CI runners.
+    cpus: 4,
+    workerThreads: true,
+
     // Do not bundle native libsql into Server Components
     serverComponentsExternalPackages: [
       '@libsql/client',

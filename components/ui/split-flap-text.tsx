@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { motion } from "framer-motion"
-import { useMemo, useState, useCallback, useEffect, useRef } from "react"
+import { useEffect, useMemo, useState, useRef } from "react"
 
 interface SplitFlapTextProps {
   text: string
@@ -15,29 +15,11 @@ const CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".split("")
 
 function SplitFlapTextInner({ text, className = "", speed = 50, skipEntrance = false }: SplitFlapTextProps) {
   const chars = useMemo(() => text.split(""), [text])
-  const [animationKey, setAnimationKey] = useState(0)
-  const [hasInitialized, setHasInitialized] = useState(skipEntrance)
-
-  const handleMouseEnter = useCallback(() => {
-    setAnimationKey((prev) => prev + 1)
-  }, [])
-
-  useEffect(() => {
-    if (skipEntrance) {
-      setHasInitialized(true)
-      return
-    }
-    const timer = setTimeout(() => {
-      setHasInitialized(true)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [skipEntrance])
 
   return (
     <div
       className={`inline-flex gap-[0.08em] items-center ${className}`}
       aria-label={text}
-      onMouseEnter={handleMouseEnter}
       style={{ perspective: "1000px", fontSize: "inherit" }}
     >
       {chars.map((char, index) => (
@@ -45,8 +27,7 @@ function SplitFlapTextInner({ text, className = "", speed = 50, skipEntrance = f
           key={index}
           char={char.toUpperCase()}
           index={index}
-          animationKey={animationKey}
-          skipEntrance={hasInitialized}
+          skipEntrance={skipEntrance}
           speed={speed}
         />
       ))}
@@ -61,12 +42,11 @@ export function SplitFlapText(props: SplitFlapTextProps) {
 interface SplitFlapCharProps {
   char: string
   index: number
-  animationKey: number
   skipEntrance: boolean
   speed: number
 }
 
-function SplitFlapChar({ char, index, animationKey, skipEntrance, speed }: SplitFlapCharProps) {
+function SplitFlapChar({ char, index, skipEntrance, speed }: SplitFlapCharProps) {
   const displayChar = CHARSET.includes(char) ? char : " "
   const isSpace = char === " "
   const [currentChar, setCurrentChar] = useState(skipEntrance ? displayChar : " ")
@@ -80,13 +60,25 @@ function SplitFlapChar({ char, index, animationKey, skipEntrance, speed }: Split
   const textColor = isSettled ? "#ffffff" : "#666666"
 
   useEffect(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    const cleanup = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      intervalRef.current = null
+      timeoutRef.current = null
+    }
+
+    cleanup()
 
     if (isSpace) {
       setCurrentChar(" ")
       setIsSettled(true)
-      return
+      return cleanup
+    }
+
+    if (skipEntrance) {
+      setCurrentChar(displayChar)
+      setIsSettled(true)
+      return cleanup
     }
 
     setIsSettled(false)
@@ -114,10 +106,9 @@ function SplitFlapChar({ char, index, animationKey, skipEntrance, speed }: Split
     }, startDelay)
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      cleanup()
     }
-  }, [displayChar, isSpace, tileDelay, animationKey, skipEntrance, index, speed])
+  }, [displayChar, isSpace, tileDelay, skipEntrance, index, speed])
 
   if (isSpace) {
     return (
@@ -165,7 +156,7 @@ function SplitFlapChar({ char, index, animationKey, skipEntrance, speed }: Split
       </div>
 
       <motion.div
-        key={`${animationKey}-${isSettled}`}
+        key={isSettled ? "settled" : "rolling"}
         initial={{ rotateX: -90 }}
         animate={{ rotateX: 0 }}
         transition={{

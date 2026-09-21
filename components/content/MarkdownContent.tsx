@@ -2,6 +2,7 @@
 
 import type { Components } from "react-markdown";
 import React from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkBreaks from "remark-breaks";
@@ -69,7 +70,8 @@ function headingId(children: React.ReactNode) {
     .trim()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
   return text || undefined;
 }
@@ -126,10 +128,12 @@ function getMarkdownComponents(
       if (!resolvedSrc) return null;
 
       return (
-        <img
+        <Image
           src={resolvedSrc}
           alt={alt || ""}
-          loading="lazy"
+          width={1200}
+          height={800}
+          unoptimized
           className={cn("mt-4 w-full border border-[#d5d5d5] bg-white object-cover first:mt-0", roundedClass)}
         />
       );

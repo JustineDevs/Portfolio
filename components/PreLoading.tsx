@@ -1,88 +1,148 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { SplitFlapText } from './ui/split-flap-text'
-import { AnimatedNoise } from './ui/animated-noise'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
 
-export default function PreLoading() {
-  const [loadingState, setLoadingState] = useState(0)
-  const [isVisible, setIsVisible] = useState(true)
+type LoaderPhase = 'loading' | 'curtain' | 'complete'
 
-  useEffect(() => {
-    // State 1: Dark background with "JUSTINE" (scramble)
-    setTimeout(() => {
-      setLoadingState(1)
-    }, 800)
+const TOTAL_PRELOADER_TIME = 5000
+const CURTAIN_DURATION = 1150
+const MINIMUM_LOADING_TIME = TOTAL_PRELOADER_TIME - CURTAIN_DURATION
+const ASSET_TIMEOUT = 1800
 
-    // State 2: Light background with "JSTN" (split-flap)
-    setTimeout(() => {
-      setLoadingState(2)
-    }, 2000)
+function waitForImage(image: HTMLImageElement) {
+  if (image.complete) return Promise.resolve()
 
-    // Hide after both states
-    setTimeout(() => {
-      setIsVisible(false)
-    }, 3500)
-  }, [])
-
-  // Prevent body scroll during loading
-  useEffect(() => {
-    if (isVisible) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
+  return new Promise<void>((resolve) => {
+    const finish = () => {
+      image.removeEventListener('load', finish)
+      image.removeEventListener('error', finish)
+      resolve()
     }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [isVisible])
 
-  if (!isVisible) return null
-
-  return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          className="fixed inset-0 z-[9999] flex items-center justify-center"
-          initial={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {loadingState === 0 && (
-            <motion.div
-              className="absolute inset-0 bg-[#424242] flex items-center justify-center"
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <AnimatedNoise opacity={0.03} />
-              <motion.h1
-                className="text-6xl md:text-8xl font-bold text-white"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5 }}
-              >
-                JUSTINE
-              </motion.h1>
-            </motion.div>
-          )}
-
-          {loadingState === 1 && (
-            <motion.div
-              className="absolute inset-0 bg-[#F8F8F8] flex items-center justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <AnimatedNoise opacity={0.02} />
-              <div className="flex items-center justify-center">
-                <SplitFlapText text="JSTN" speed={60} skipEntrance={false} />
-              </div>
-            </motion.div>
-          )}
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
+    image.addEventListener('load', finish, { once: true })
+    image.addEventListener('error', finish, { once: true })
+  })
 }
 
+export default function PreLoading({ onComplete, ready = true }: { onComplete?: () => void; ready?: boolean }) {
+  const [progress, setProgress] = useState(0)
+  const [phase, setPhase] = useState<LoaderPhase>('loading')
+  const [assetsReady, setAssetsReady] = useState(false)
+  const [reducedMotion, setReducedMotion] = useState(false)
+  const startedAt = useRef<number>(0)
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    startedAt.current = performance.now()
+    const images = Array.from(document.images).filter((image) => {
+      if (image.loading !== 'lazy') return true
+      return image.getBoundingClientRect().top < window.innerHeight * 1.5
+    })
+
+    document.documentElement.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+    setReducedMotion(prefersReducedMotion)
+
+    let cancelled = false
+    let currentProgress = 4
+
+    const updateProgress = (nextProgress: number) => {
+      if (cancelled) return
+      currentProgress = Math.max(currentProgress, Math.min(100, Math.round(nextProgress)))
+      setProgress(currentProgress)
+    }
+
+    const progressTicker = window.setInterval(() => {
+      if (currentProgress < 88) updateProgress(currentProgress + 3)
+    }, 90)
+
+    const waitForAssets = async () => {
+      await Promise.race([
+        Promise.all([
+          ...images.map(waitForImage),
+          document.fonts?.ready ?? Promise.resolve(),
+        ]),
+        new Promise<void>((resolve) => window.setTimeout(resolve, ASSET_TIMEOUT)),
+      ])
+
+      window.clearInterval(progressTicker)
+      if (!cancelled) setAssetsReady(true)
+    }
+
+    void waitForAssets()
+
+    return () => {
+      cancelled = true
+      window.clearInterval(progressTicker)
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !assetsReady || phase !== 'loading') return
+
+    if (reducedMotion) {
+      setProgress(100)
+      setPhase('complete')
+      return
+    }
+
+    const elapsed = performance.now() - startedAt.current
+    const delay = Math.max(0, MINIMUM_LOADING_TIME - elapsed)
+    const revealTimer = window.setTimeout(() => {
+      setProgress(100)
+      setPhase('curtain')
+      window.setTimeout(() => setPhase('complete'), CURTAIN_DURATION)
+    }, delay)
+
+    return () => window.clearTimeout(revealTimer)
+  }, [assetsReady, phase, ready, reducedMotion])
+
+  useEffect(() => {
+    if (phase !== 'complete') return
+
+    onComplete?.()
+
+    const timeout = window.setTimeout(() => {
+      document.documentElement.style.overflow = ''
+      document.body.style.overflow = ''
+    }, 950)
+
+    return () => window.clearTimeout(timeout)
+  }, [onComplete, phase])
+
+  if (phase === 'complete') return null
+
+  return (
+    <div
+      className={`jstn-preloader ${phase === 'curtain' ? 'jstn-preloader--curtain' : ''}`}
+      role="status"
+      aria-live="polite"
+      aria-label={`Loading ${progress}%`}
+    >
+      <div className="jstn-preloader__content">
+        <Image
+          src="/JSTN Logo/SVG/Logo Header - B.svg"
+          alt="JSTN"
+          width={280}
+          height={96}
+          priority
+          className="jstn-preloader__logo"
+        />
+        <div className="jstn-preloader__status">
+          <span>Loading...</span>
+          <span>{progress}%</span>
+        </div>
+      </div>
+
+      <div className="jstn-preloader__curtain" aria-hidden="true">
+        <div className="jstn-preloader__curtain-column jstn-preloader__curtain-column--1" />
+        <div className="jstn-preloader__curtain-column jstn-preloader__curtain-column--2" />
+        <div className="jstn-preloader__curtain-column jstn-preloader__curtain-column--3" />
+        <div className="jstn-preloader__curtain-column jstn-preloader__curtain-column--4" />
+      </div>
+    </div>
+  )
+}
