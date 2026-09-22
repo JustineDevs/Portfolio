@@ -32,7 +32,6 @@ export function CrowdCanvas({ src, rows = 15, cols = 7 }: CrowdCanvasProps) {
     if (!canvas || !context) return
 
     const image = new Image()
-    image.crossOrigin = 'anonymous'
 
     const stage = { width: 0, height: 0 }
     const allPeeps: Peep[] = []
