@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   index,
   integer,
+  real,
   sqliteTable,
   text,
   uniqueIndex,
@@ -18,6 +19,7 @@ export const highlightTypes = [
   "custom",
 ] as const;
 export const adminUserStatuses = ["active", "disabled"] as const;
+export const providerConnectionStatuses = ["pending", "connected", "paused", "error", "revoked"] as const;
 
 const timestamps = {
   createdAt: text("created_at")
@@ -227,6 +229,7 @@ export const testimonials = sqliteTable(
     company: text("company"),
     quote: text("quote").notNull(),
     avatarUrl: text("avatar_url"),
+    avatarAssetKey: text("avatar_asset_key"),
     status: text("status", { enum: contentStatuses }).notNull().default("draft"),
     featured: integer("featured", { mode: "boolean" }).notNull().default(false),
     sortOrder: integer("sort_order").notNull().default(0),
@@ -285,6 +288,62 @@ export const highlights = sqliteTable(
   })
 );
 
+export const assetKinds = [
+  "brand",
+  "icon",
+  "avatar",
+  "project",
+  "certificate",
+  "award",
+  "decorative",
+] as const;
+
+export const mediaAssets = sqliteTable(
+  "media_assets",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    slug: text("slug").notNull(),
+    name: text("name").notNull(),
+    kind: text("kind", { enum: assetKinds }).notNull().default("brand"),
+    fileName: text("file_name").notNull(),
+    mimeType: text("mime_type").notNull(),
+    sourceUrl: text("source_url"),
+    dataUrl: text("data_url"),
+    altText: text("alt_text").notNull().default(""),
+    width: integer("width"),
+    height: integer("height"),
+    checksum: text("checksum"),
+    status: text("status", { enum: contentStatuses }).notNull().default("draft"),
+    ...timestamps,
+  },
+  (table) => ({
+    slugUnique: uniqueIndex("media_assets_slug_unique").on(table.slug),
+    statusIdx: index("media_assets_status_idx").on(table.status),
+    kindIdx: index("media_assets_kind_idx").on(table.kind),
+  }),
+);
+
+export const assetRegistry = sqliteTable(
+  "asset_registry",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    semanticKey: text("semantic_key").notNull(),
+    label: text("label").notNull(),
+    category: text("category").notNull(),
+    assetId: integer("asset_id")
+      .notNull()
+      .references(() => mediaAssets.id, { onDelete: "restrict" }),
+    aliasesJson: text("aliases_json").notNull().default("[]"),
+    status: text("status", { enum: contentStatuses }).notNull().default("draft"),
+    ...timestamps,
+  },
+  (table) => ({
+    semanticKeyUnique: uniqueIndex("asset_registry_semantic_key_unique").on(table.semanticKey),
+    assetIdx: index("asset_registry_asset_idx").on(table.assetId),
+    statusIdx: index("asset_registry_status_idx").on(table.status),
+  }),
+);
+
 export const siteSettings = sqliteTable("site_settings", {
   key: text("key").primaryKey(),
   valueJson: text("value_json").notNull(),
@@ -307,6 +366,50 @@ export const githubActivitySnapshots = sqliteTable(
   (table) => ({
     yearIdx: index("github_activity_snapshots_year_idx").on(table.year),
   })
+);
+
+/** One row per external AI vendor account. Secrets remain in the connection provider. */
+export const providerConnections = sqliteTable(
+  "provider_connections",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    provider: text("provider").notNull(),
+    externalAccountId: text("external_account_id").notNull(),
+    accountLabel: text("account_label").notNull(),
+    accountEmail: text("account_email"),
+    connectionRef: text("connection_ref"),
+    scopesJson: text("scopes_json").notNull().default("[]"),
+    status: text("status", { enum: providerConnectionStatuses }).notNull().default("pending"),
+    includeInRollup: integer("include_in_rollup", { mode: "boolean" }).notNull().default(true),
+    lastSyncedAt: text("last_synced_at"),
+    lastError: text("last_error"),
+    ...timestamps,
+  },
+  (table) => ({
+    providerAccountUnique: uniqueIndex("provider_connections_account_unique").on(table.provider, table.externalAccountId),
+    providerIdx: index("provider_connections_provider_idx").on(table.provider),
+    statusIdx: index("provider_connections_status_idx").on(table.status),
+  }),
+);
+
+/** Normalized daily usage, keyed to an external account for idempotent aggregation. */
+export const providerUsageSnapshots = sqliteTable(
+  "provider_usage_snapshots",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    connectionId: integer("connection_id").notNull().references(() => providerConnections.id, { onDelete: "cascade" }),
+    periodDate: text("period_date").notNull(),
+    totalTokens: integer("total_tokens").notNull().default(0),
+    cachedTokens: integer("cached_tokens").notNull().default(0),
+    estimatedCost: real("estimated_cost").notNull().default(0),
+    sourceHash: text("source_hash"),
+    syncedAt: text("synced_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => ({
+    connectionDateUnique: uniqueIndex("provider_usage_snapshots_connection_date_unique").on(table.connectionId, table.periodDate),
+    connectionIdx: index("provider_usage_snapshots_connection_idx").on(table.connectionId),
+    dateIdx: index("provider_usage_snapshots_period_date_idx").on(table.periodDate),
+  }),
 );
 
 export const adminUsers = sqliteTable(

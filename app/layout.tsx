@@ -11,6 +11,7 @@ import SkipToContent from "@/components/ui/SkipToContent";
 import { Pointer } from "@/components/ui/pointer";
 import PublicSocialBar from "@/components/layouts/PublicSocialBar";
 import { Analytics } from "@vercel/analytics/next";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -35,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${isWorkSite ? "work-site-html" : ""}`}>
       <body className={`${isWorkSite ? "work-site-root" : "cursor-none"} font-sans antialiased`}>
+        <TooltipProvider>
         <ErrorBoundary>
           <ModeProvider>
             <ToastProvider>
@@ -52,6 +54,7 @@ export default function RootLayout({
             </ToastProvider>
           </ModeProvider>
         </ErrorBoundary>
+        </TooltipProvider>
       </body>
     </html>
   );

@@ -8,13 +8,14 @@ import { Menu, X } from 'lucide-react';
 import CornerDot from './ui/CornerDot';
 import { useMode } from '@/components/providers/ModeProvider';
 import { tokens } from '@/lib/design-tokens';
+import { ONBOARDING_COMPLETED_KEY } from '@/lib/onboarding';
 
 const PERSONAL_ONLY_PAGES = ['/about', '/projects', '/experience', '/blog'] as const
 const PROFESSIONAL_MODE_PAGE = '/'
 const isPersonalOnlyPage = (value: string) =>
   (PERSONAL_ONLY_PAGES as readonly string[]).includes(value)
 
-export default function Navbar() {
+export default function Navbar({ logoUrl }: { logoUrl?: string | null } = {}) {
   const pathname = usePathname();
   const router = useRouter();
   const { mode, setMode, saveCurrentPage } = useMode();
@@ -41,6 +42,17 @@ export default function Navbar() {
   useEffect(() => {
     setMobileMenuOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    const handleHardRefreshIntent = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'r') {
+        sessionStorage.removeItem(ONBOARDING_COMPLETED_KEY)
+      }
+    }
+
+    window.addEventListener('keydown', handleHardRefreshIntent)
+    return () => window.removeEventListener('keydown', handleHardRefreshIntent)
+  }, [])
 
   useEffect(() => {
     document.body.style.overflow = mobileMenuOpen ? 'hidden' : ''
@@ -95,14 +107,14 @@ export default function Navbar() {
                 }}
               >
                 <Image
-                  src="/JSTN Logo/SVG/Logo Header - B.svg"
+                  src={logoUrl || "/JSTN Logo/SVG/Logo Header - B.svg"}
                   alt="JSTN Logo"
+                  unoptimized
                   width={140}
                   height={48}
                   sizes="140px"
                   className="object-contain h-8 xs:h-10 sm:h-12 w-auto"
                   priority
-                  unoptimized
                 />
               </Link>
             </div>

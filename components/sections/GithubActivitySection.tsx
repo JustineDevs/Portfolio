@@ -6,6 +6,9 @@ import { createPortal } from "react-dom";
 
 import CornerDot from "@/components/ui/CornerDot";
 import type { GithubActivitySummary } from "@/lib/github/normalize-activity";
+import AgentUsagePanel from "@/components/sections/AgentUsagePanel";
+import ActivityProviderLogo from "@/components/ui/ActivityProviderLogo";
+import type { ActivityProviderId } from "@/lib/usage/providers";
 
 interface HoveredCell {
   date: string;
@@ -15,6 +18,10 @@ interface HoveredCell {
 }
 
 const fallbackYears = [2026, 2025, 2024, 2023];
+const activityFilters = [
+  { id: "github" as const, label: "GitHub" },
+  { id: "ai" as const, label: "AI Usage" },
+];
 
 function contributionColor(count: number) {
   if (count <= 0) return "#E1E3E6";
@@ -29,6 +36,7 @@ export default function GithubActivitySection() {
   const [hoveredCell, setHoveredCell] = useState<HoveredCell | null>(null);
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedProvider, setSelectedProvider] = useState<ActivityProviderId>("github");
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -170,17 +178,44 @@ export default function GithubActivitySection() {
         <CornerDot position="bl" className="hidden xs:block" />
         <CornerDot position="br" className="hidden xs:block" />
 
-        <div className="mb-3 xs:mb-4 sm:mb-5">
+        <div className="mb-4 xs:mb-5 sm:mb-6">
+          <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Activity provider filters">
+            {activityFilters.map((provider) => (
+              <button
+                key={provider.id}
+                type="button"
+                role="tab"
+                aria-selected={provider.id === "github" ? selectedProvider === "github" : selectedProvider !== "github"}
+                onClick={() => setSelectedProvider(provider.id === "github" ? "github" : "openai")}
+                aria-label={provider.label}
+                title={provider.label}
+                className={`inline-flex min-h-8 items-center gap-2 rounded-full px-3 py-1.5 text-[11px] font-medium transition-colors ${(provider.id === "github" ? selectedProvider === "github" : selectedProvider !== "github") ? "bg-[#424242] text-white" : "bg-white text-[#666666] hover:bg-[#f0f1f2] hover:text-[#424242]"}`}
+              >
+                {provider.id === "github" ? (
+                  <ActivityProviderLogo
+                    provider="github"
+                    selected={selectedProvider === "github"}
+                    className="size-3.5 shrink-0"
+                  />
+                ) : null}
+                <span>{provider.label}</span>
+              </button>
+            ))}
+          </div>
+          {selectedProvider !== "github" ? <AgentUsagePanel provider={selectedProvider} /> : null}
+          {selectedProvider === "github" ? <>
           <h3 className="text-[13px] xs:text-[14px] sm:text-[15px] font-semibold text-[#424242] mb-1 xs:mb-1.5">
-            Heatmap
+            GitHub activity
           </h3>
           <p className="text-[11px] xs:text-[12px] sm:text-[13px] leading-[1.6] text-[#666666] max-w-[480px]">
             {summary
               ? `${summary.username}'s contribution activity for ${selectedYear}. ${summary.totalContributions.toLocaleString()} contributions tracked.`
               : "GitHub activity is loading or unavailable. Last-known snapshots will appear here after the first refresh."}
           </p>
+          </> : null}
         </div>
 
+        {selectedProvider === "github" ? <>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px overflow-hidden border border-[#D5D5D5] rounded-none mb-4 xs:mb-5 sm:mb-6 bg-[#D5D5D5]">
           {[
             ["Total Contributions", stats.totalContributions.toLocaleString(), "#424242"],
@@ -307,6 +342,7 @@ export default function GithubActivitySection() {
             configuring `GH_TOKEN` and `GITHUB_USERNAME`.
           </p>
         ) : null}
+        </> : null}
       </div>
 
       {mounted &&

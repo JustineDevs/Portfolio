@@ -1,16 +1,19 @@
 import { refreshGithubActivityAction } from "@/app/admin/actions";
+import { requireAdminSession } from "@/lib/auth";
 import { AdminFormSubmitButton } from "@/components/admin/AdminFormSubmitButton";
 import { adminInputControlClass } from "@/components/admin/admin-styles";
 import { listGithubActivitySnapshotsForAdmin } from "@/lib/content/admin";
+import { AdminPageHeader, AdminTable, AdminTableHeader, AdminTableRow } from "@/components/admin/CmsSurface";
 
 export default async function AdminActivityPage() {
+  await requireAdminSession();
   const snapshots = await listGithubActivitySnapshotsForAdmin();
 
   return (
-    <main className="space-y-6">
-      <section className="rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight text-[#424242]">Activity</h1>
-        <p className="mt-2 text-sm text-[#666666]">
+    <main className="space-y-8">
+      <AdminPageHeader eyebrow="Operations / Activity" title="Activity" count={`${snapshots.length} snapshots`} description="Refresh GitHub contribution data and inspect the latest stored snapshots." />
+      <section className="rounded-xl border border-[#e4e4e7] bg-white p-5 shadow-[0_8px_30px_rgba(24,24,27,0.04)]">
+        <p className="text-sm leading-6 text-[#71717a]">
           Refresh GitHub contribution data and inspect the latest stored snapshots.
         </p>
         <form action={refreshGithubActivityAction} className="mt-5 flex flex-wrap items-end gap-3">
@@ -28,35 +31,7 @@ export default async function AdminActivityPage() {
         </form>
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <table className="w-full min-w-[32rem] border-collapse text-left text-sm">
-          <caption className="sr-only">Stored GitHub activity snapshots</caption>
-          <thead>
-            <tr className="border-b border-[#d5d5d5] bg-[#fafafa] text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
-              <th scope="col" className="px-6 py-4 font-semibold">
-                Year
-              </th>
-              <th scope="col" className="px-6 py-4 font-semibold">
-                Fetched At
-              </th>
-              <th scope="col" className="px-6 py-4 font-semibold">
-                Source Hash
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {snapshots.map((snapshot) => (
-              <tr key={snapshot.id} className="border-b border-[#efefef] last:border-b-0">
-                <td className="px-6 py-4 font-medium text-[#424242]">{snapshot.year}</td>
-                <td className="px-6 py-4 text-[#424242]">{snapshot.fetchedAt}</td>
-                <td className="max-w-[220px] truncate px-6 py-4 text-[#666666]" title={snapshot.sourceHash ?? undefined}>
-                  {snapshot.sourceHash}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+      <AdminTable label="Stored GitHub activity snapshots"><AdminTableHeader><div>Year</div><div>Fetched at</div><div>Source hash</div><div>Status</div></AdminTableHeader>{snapshots.map((snapshot) => <AdminTableRow key={snapshot.id}><div className="font-semibold text-[#18181b]">{snapshot.year}</div><div className="text-[#52525b]">{snapshot.fetchedAt}</div><div className="max-w-[220px] truncate font-mono text-xs text-[#71717a]" title={snapshot.sourceHash ?? undefined}>{snapshot.sourceHash}</div><div className="text-xs font-semibold text-emerald-700">Stored</div></AdminTableRow>)}</AdminTable>
     </main>
   );
 }

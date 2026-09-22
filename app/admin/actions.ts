@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 import { db } from "@/db/client";
 import { requireAdminSession, signOut } from "@/lib/auth";
@@ -620,6 +621,11 @@ export async function savePageSectionAction(formData: FormData) {
 
   if (payload.pageKey === "about") {
     revalidateAbout();
+  }
+  if (payload.pageKey === "legal") {
+    revalidatePath("/privacy");
+    revalidatePath("/terms");
+    revalidatePath("/license");
   }
   revalidateHome();
   redirect(returnTo);

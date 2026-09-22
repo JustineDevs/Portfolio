@@ -1,134 +1,48 @@
 import Link from "next/link";
-import { ArrowUpRight, FolderKanban, Settings2, Sparkles, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, BookOpen, FolderKanban, Settings2, ShieldCheck } from "lucide-react";
 
 import { requireAdminSession } from "@/lib/auth";
 import type { AdminDashboardCounts } from "@/lib/content/admin";
 import { getAdminDashboardCounts } from "@/lib/content/admin";
 
-type Section = {
-  href: string;
-  label: string;
-  description: string;
-  count: (c: AdminDashboardCounts) => number;
-  countLabel: (n: number) => string;
-};
+type DashboardCard = { label: string; value: number; detail: string; href: string; icon: typeof FolderKanban };
 
-const adminSections: Section[] = [
-  {
-    href: "/admin/projects",
-    label: "Projects",
-    description: "Case studies, featured work, and project metadata.",
-    count: (c) => c.projects,
-    countLabel: (n) => `${n} project${n === 1 ? "" : "s"}`,
-  },
-  {
-    href: "/admin/writing",
-    label: "Writing",
-    description: "Blog posts, native articles, and external summaries.",
-    count: (c) => c.posts,
-    countLabel: (n) => `${n} post${n === 1 ? "" : "s"}`,
-  },
-  {
-    href: "/admin/certificates",
-    label: "Certificates",
-    description: "Formal certificate records and proof links.",
-    count: (c) => c.certificates,
-    countLabel: (n) => `${n} certificate${n === 1 ? "" : "s"}`,
-  },
-  {
-    href: "/admin/highlights",
-    label: "Highlights",
-    description: "Pinned proof-of-work and card overrides.",
-    count: (c) => c.highlights,
-    countLabel: (n) => `${n} highlight${n === 1 ? "" : "s"}`,
-  },
-  {
-    href: "/admin/about",
-    label: "About",
-    description: "Grouped About page sections and copy.",
-    count: (c) => c.aboutSections,
-    countLabel: (n) => `${n} section${n === 1 ? "" : "s"}`,
-  },
-  {
-    href: "/admin/activity",
-    label: "Activity",
-    description: "GitHub contribution cache and refresh.",
-    count: (c) => c.activitySnapshots,
-    countLabel: (n) => `${n} snapshot${n === 1 ? "" : "s"} stored`,
-  },
-  {
-    href: "/admin/settings",
-    label: "Settings",
-    description: "Site-level JSON values (username, availability, focus).",
-    count: (c) => c.siteSettings,
-    countLabel: (n) => `${n} setting key${n === 1 ? "" : "s"}`,
-  },
+const contentLinks = [
+  { href: "/admin/projects", label: "Projects", description: "Case studies and featured work." },
+  { href: "/admin/writing", label: "Writing", description: "Posts, articles, and external summaries." },
+  { href: "/admin/experience", label: "Experience", description: "Timeline, roles, proof, and testimonials." },
+  { href: "/admin/library", label: "Asset library", description: "Reusable logos, icons, and media." },
 ];
 
-const summaryCards: [string, number, LucideIcon][] = [
-  ["Projects", 0, FolderKanban],
-  ["Writing", 0, Sparkles],
-  ["Proof", 0, ArrowUpRight],
-  ["Settings", 0, Settings2],
-];
+function getCards(counts: AdminDashboardCounts): DashboardCard[] {
+  return [
+    { label: "Projects", value: counts.projects, detail: "Published and draft records", href: "/admin/projects", icon: FolderKanban },
+    { label: "Writing", value: counts.posts, detail: "Posts and article records", href: "/admin/writing", icon: BookOpen },
+    { label: "Proof", value: counts.certificates + counts.highlights, detail: "Certificates and highlights", href: "/admin/certificates", icon: ShieldCheck },
+    { label: "Settings", value: counts.siteSettings, detail: "Configured site values", href: "/admin/settings", icon: Settings2 },
+  ];
+}
 
 export default async function AdminDashboardPage() {
   const session = await requireAdminSession();
-  const email = session?.user?.email ?? "authorized admin";
   const counts = await getAdminDashboardCounts();
+  const email = session?.user?.email ?? "authorized admin";
+  const cards = getCards(counts);
 
   return (
-    <main className="space-y-8">
-      <section className="rounded-lg border border-[#e4e4e7] bg-white p-6 shadow-sm sm:p-8">
-        <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#71717a]">Portfolio CMS</p>
-            <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#18181b]">Good to see you.</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-[#52525b]">
-          Signed in as {email}. This is the private CMS console for the current portfolio data model, writing flow,
-          highlights, and activity refresh controls.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 rounded-md border border-[#e4e4e7] bg-[#fafafa] px-3 py-2 text-xs text-[#71717a]">
-            <span className="h-2 w-2 rounded-full bg-emerald-500" />
-            Workspace ready
-          </div>
-        </div>
+    <main className="space-y-6">
+      <header className="flex flex-col gap-4 border-b border-[#e4e4e7] pb-6 lg:flex-row lg:items-end lg:justify-between">
+        <div><p className="text-sm text-[#71717a]">Workspace / Overview</p><h1 className="mt-1 text-2xl font-semibold tracking-tight text-[#18181b]">Portfolio overview</h1><p className="mt-2 text-sm text-[#71717a]">Manage the published portfolio data and reusable content library.</p></div>
+        <div className="flex items-center gap-2 text-xs text-[#71717a]"><span className="inline-flex items-center gap-2 rounded-md border border-[#e4e4e7] bg-white px-3 py-2"><span className="size-2 rounded-full bg-emerald-500" aria-hidden="true" />{email}</span><Link href="/admin/settings" className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md bg-[#18181b] px-3 text-xs font-medium text-white transition-[background-color,transform] duration-150 hover:bg-[#27272a] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#18181b]/25 focus-visible:ring-offset-2">Settings <ArrowUpRight className="size-3.5" aria-hidden="true" /></Link></div>
+      </header>
+
+      <section aria-label="Content metrics" className="grid gap-px overflow-hidden rounded-lg border border-[#e4e4e7] bg-[#e4e4e7] sm:grid-cols-2 xl:grid-cols-4">
+        {cards.map((card) => { const Icon = card.icon; return <Link key={card.href} href={card.href} className="group bg-white p-5 hover:bg-[#fafafa]"><div className="flex items-center justify-between gap-3"><span className="text-sm font-medium text-[#71717a]">{card.label}</span><Icon className="size-4 text-[#a1a1aa]" aria-hidden="true" /></div><p className="mt-3 text-2xl font-semibold tracking-tight text-[#18181b]">{card.value}</p><p className="mt-1 text-xs text-[#a1a1aa]">{card.detail}</p></Link>; })}
       </section>
 
-      <section aria-label="Content summary" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {summaryCards.map(([label, , Icon], index) => {
-          const values = [counts.projects, counts.posts, counts.certificates + counts.highlights, counts.siteSettings];
-          return (
-          <div key={label as string} className="rounded-lg border border-[#e4e4e7] bg-white px-4 py-5 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#71717a]">{label as string}</p>
-              <Icon className="h-4 w-4 text-[#a1a1aa]" aria-hidden="true" />
-            </div>
-            <p className="mt-2 text-2xl font-bold tracking-tight text-[#18181b]">{values[index]}</p>
-          </div>
-          );
-        })}
-      </section>
-
-      <section aria-label="CMS sections" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {adminSections.map((item) => {
-          const n = item.count(counts);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="group rounded-lg border border-[#e4e4e7] bg-white p-5 transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-[#a1a1aa] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#18181b]/25 focus-visible:ring-offset-2"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <h2 className="text-lg font-semibold">{item.label}</h2>
-                <ArrowUpRight aria-hidden className="h-4 w-4 text-[#a1a1aa] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-              </div>
-              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-[#888888]">{item.countLabel(n)}</p>
-              <p className="mt-2 text-sm text-[#666666]">{item.description}</p>
-            </Link>
-          );
-        })}
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.8fr)]">
+        <div className="rounded-lg border border-[#e4e4e7] bg-white"><div className="flex items-center justify-between border-b border-[#e4e4e7] px-5 py-4"><div><h2 className="font-semibold text-[#18181b]">Content areas</h2><p className="mt-1 text-sm text-[#71717a]">Jump directly into the records that power the site.</p></div><Link href="/admin/content" className="text-xs font-medium text-[#18181b] hover:underline">View all</Link></div><div className="divide-y divide-[#f1f1f2]">{contentLinks.map((item) => <Link key={item.href} href={item.href} className="flex items-center justify-between gap-4 px-5 py-4 hover:bg-[#fafafa]"><div><p className="text-sm font-medium text-[#18181b]">{item.label}</p><p className="mt-1 text-sm text-[#71717a]">{item.description}</p></div><ArrowUpRight className="size-4 shrink-0 text-[#a1a1aa]" aria-hidden="true" /></Link>)}</div></div>
+        <div className="rounded-lg border border-[#e4e4e7] bg-white"><div className="border-b border-[#e4e4e7] px-5 py-4"><h2 className="font-semibold text-[#18181b]">System status</h2><p className="mt-1 text-sm text-[#71717a]">Current CMS configuration.</p></div><dl className="divide-y divide-[#f1f1f2] px-5"><div className="flex items-center justify-between gap-4 py-4 text-sm"><dt className="text-[#71717a]">Activity snapshots</dt><dd className="font-medium text-[#18181b]">{counts.activitySnapshots}</dd></div><div className="flex items-center justify-between gap-4 py-4 text-sm"><dt className="text-[#71717a]">About sections</dt><dd className="font-medium text-[#18181b]">{counts.aboutSections}</dd></div><div className="flex items-center justify-between gap-4 py-4 text-sm"><dt className="text-[#71717a]">Site settings</dt><dd className="font-medium text-[#18181b]">{counts.siteSettings}</dd></div></dl></div>
       </section>
     </main>
   );

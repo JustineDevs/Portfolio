@@ -250,7 +250,7 @@ export default function SocialLinksBar({
             aria-label="Open JustineDevs on Product Hunt"
             title="Product Hunt submissions"
           >
-            <BrandIcon src="https://ph-static.imgix.net/ph-logo-1.png?auto=format" alt="Product Hunt logo" width={66} height={40} className="h-10 w-auto max-w-none object-contain" />
+            <BrandIcon src="https://ph-static.imgix.net/ph-logo-1.png?auto=format" alt="Product Hunt logo" width={66} height={40} priority className="h-10 w-[66px] max-w-none object-contain" />
           </a>
           <div className="social-links-bar__publications flex shrink-0 items-center gap-2.5 border-l border-[#e5e5e5] pl-3" aria-label="Writing profiles">
             {publicationLinks.map(({ brand, label, href, src }) => (
@@ -272,7 +272,7 @@ export default function SocialLinksBar({
                     <path d="M14.5 3.5H1.5A1 1 0 0 0 .5 4.5v7a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V4.5a1 1 0 0 0-1-1Zm0 8H1.5V4.5h13v7Zm-6.5-5v1h.5a.5.5 0 0 1 0 1H8v1h1a.5.5 0 0 1 0 1H7.5a.5.5 0 0 1-.5-.5V6a.5.5 0 0 1 .5-.5H9a.5.5 0 0 1 0 1H8Zm5.48125-.364375-1.125 4a.5.5 0 0 1-.9625 0l-1.125-4a.5.5 0 0 1 .9625-.27125l.64375 2.28875.64375-2.28875a.5.5 0 1 1 .9625.27125ZM4 5.5h-.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5H4a2 2 0 0 0 2-2v-1a2 2 0 0 0-2-2Zm1 3a1 1 0 0 1-1 1v-3a1 1 0 0 1 1 1v1Z" />
                   </svg>
                 ) : (
-                  <BrandIcon src={src} alt={`${label} logo`} width={56} height={32} className="max-h-8 max-w-14 object-contain" />
+                  <BrandIcon src={src} alt={`${label} logo`} width={56} height={32} className="h-8 w-14 object-contain" />
                 )}
               </a>
             ))}

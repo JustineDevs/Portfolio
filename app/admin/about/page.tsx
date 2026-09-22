@@ -1,75 +1,62 @@
 import Link from "next/link";
+import { requireAdminSession } from "@/lib/auth";
 
 import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminErrorBanner } from "@/components/admin/FormPrimitives";
 import { getAboutSectionConfig } from "@/lib/about-section-config";
 import { listAvailableAboutSectionKeysForAdmin, listPageSectionsForAdmin } from "@/lib/content/admin";
+import { AdminPageHeader, AdminPrimaryAction, AdminStatusBadge, AdminTable, AdminTableHeader, AdminTableRow, AdminTableToolbar } from "@/components/admin/CmsSurface";
 
 export default async function AdminAboutPage({
   searchParams,
 }: {
-  searchParams?: { error?: string };
+  searchParams?: { error?: string; q?: string; status?: string };
 }) {
+  await requireAdminSession();
   const [sections, availableSectionKeys] = await Promise.all([
     listPageSectionsForAdmin("about"),
     listAvailableAboutSectionKeysForAdmin(),
   ]);
   const errorMessage = searchParams?.error;
+  const search = searchParams?.q?.trim().toLowerCase() ?? "";
+  const status = searchParams?.status ?? "";
+  const visibleSections = sections.filter((section) => { const config = getAboutSectionConfig(section.sectionKey); return (!search || `${config.label} ${config.description} ${section.sectionKey}`.toLowerCase().includes(search)) && (!status || section.status === status); });
 
   return (
-    <main className="space-y-6">
-      <section className="flex items-center justify-between rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#424242]">About / Personal Page</h1>
-          <p className="mt-2 text-sm text-[#666666]">
-            Manage editorial About page slots for story, learning, philosophy, methodology, and under-the-hood thinking.
-          </p>
-          <p className="mt-2 text-sm text-[#666666]">
-            These are structured layout slots, but editing now follows the same list/new/edit flow as the other CMS areas.
-          </p>
-        </div>
-        {availableSectionKeys.length > 0 ? (
-          <Link href="/admin/about/new" className="rounded-lg bg-[#424242] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#333333]">
-            New section
-          </Link>
-        ) : (
-          <span className="rounded-lg border border-[#d5d5d5] px-4 py-2 text-sm text-[#666666]">
-            All slots created
-          </span>
-        )}
-      </section>
+    <main className="space-y-8">
+      <AdminPageHeader title="About / Personal Page" count={`${sections.length} sections`} description="Manage editorial page slots for story, learning, philosophy, methodology, and under-the-hood thinking." actions={availableSectionKeys.length > 0 ? <AdminPrimaryAction href="/admin/about/new">New section</AdminPrimaryAction> : <span className="inline-flex min-h-10 items-center rounded-md border border-[#e4e4e7] px-3 text-xs font-semibold text-[#71717a]">All slots created</span>} />
 
       <section className="rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
         <AdminErrorBanner message={errorMessage} />
       </section>
 
-      <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <div className="grid grid-cols-[1.4fr_1fr_140px_170px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
+      <AdminTable label="About sections"><AdminTableToolbar search={searchParams?.q} placeholder="Search about sections..." filter={status} filterOptions={[{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }]} />
+        <AdminTableHeader>
           <div>Section</div>
           <div>Key</div>
           <div>Status</div>
           <div>Actions</div>
-        </div>
-        {sections.map((section) => {
+        </AdminTableHeader>
+        {visibleSections.map((section) => {
           const config = getAboutSectionConfig(section.sectionKey);
           return (
-            <div key={section.id} className="grid grid-cols-[1.4fr_1fr_140px_170px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
+            <AdminTableRow key={section.id}>
               <div>
-                <div className="font-semibold text-[#424242]">{config.label}</div>
-                <div className="text-[#666666]">{config.description}</div>
+                <div className="font-semibold text-[#18181b]">{config.label}</div>
+                <div className="text-xs text-[#71717a]">{config.description}</div>
               </div>
-              <div className="text-[#555555]">{section.sectionKey}</div>
-              <div className="capitalize text-[#555555]">{section.status}</div>
+              <div className="font-mono text-xs text-[#52525b]">{section.sectionKey}</div>
+              <AdminStatusBadge value={section.status} />
               <div className="flex flex-wrap items-center gap-3">
-                <Link href={`/admin/about/${section.id}`} className="text-[#1342FF] hover:underline">
+                <Link href={`/admin/about/${section.id}`} className="font-semibold text-[#1342FF] hover:underline">
                   Edit
                 </Link>
                 <AdminDeleteButton type="about" id={section.id} />
               </div>
-            </div>
+            </AdminTableRow>
           );
-        })}
-      </section>
+        })}{!visibleSections.length ? <div className="px-5 py-14 text-center text-sm text-[#71717a]">No sections match the current filters.</div> : null}
+      </AdminTable>
     </main>
   );
 }

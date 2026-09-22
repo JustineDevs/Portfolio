@@ -1,5 +1,7 @@
 import { HighlightForm } from "@/components/admin/HighlightForm";
+import { requireAdminSession } from "@/lib/auth";
 import { AdminErrorBanner } from "@/components/admin/FormPrimitives";
+import { AdminPageHeader } from "@/components/admin/CmsSurface";
 import { listHighlightTargetOptionsForAdmin, listHighlightsForAdmin } from "@/lib/content/admin";
 
 export default async function AdminHighlightsPage({
@@ -7,6 +9,7 @@ export default async function AdminHighlightsPage({
 }: {
   searchParams?: { error?: string; form?: string; saved?: string };
 }) {
+  await requireAdminSession();
   const [highlights, targetOptions] = await Promise.all([
     listHighlightsForAdmin(),
     listHighlightTargetOptionsForAdmin(),
@@ -16,10 +19,10 @@ export default async function AdminHighlightsPage({
   const savedState = searchParams?.saved;
 
   return (
-    <main className="space-y-6">
-      <section className="rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold tracking-tight text-[#424242]">Highlights</h1>
-        <p className="mt-2 text-sm text-[#666666]">
+    <main className="space-y-8">
+      <AdminPageHeader eyebrow="Publish / Content" title="Highlights" count={`${highlights.length} records`} description="Highlights feed the Experience testimonials and awards lanes. Use testimonial, award, or manual card; certificates are managed separately." />
+      <section className="rounded-xl border border-[#e4e4e7] bg-white p-5 shadow-[0_8px_30px_rgba(24,24,27,0.04)]">
+        <p className="text-sm leading-6 text-[#71717a]">
           Highlights only feed the Experience testimonials and awards lanes. Use `testimonial`, `award`, or `manual card`. Certificates are managed separately in the Certificates CMS.
         </p>
         <AdminErrorBanner message={errorMessage} />

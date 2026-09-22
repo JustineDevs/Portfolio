@@ -18,7 +18,7 @@ const AvatarParticlesCanvas = dynamic(() => import('./three/AvatarParticlesCanva
   ),
 });
 
-const Hero = () => {
+const Hero = ({ projectOnePercentLogoUrl }: { projectOnePercentLogoUrl?: string | null }) => {
   return (
     <section className={`relative border-l border-r border-b border-t border-[#d5d5d5] bg-white rounded-t-lg ${GeistSans.className}`}>
       <CornerDot position="tl" className="hidden xs:block" />
@@ -90,11 +90,12 @@ const Hero = () => {
                 className="relative block h-5 w-[clamp(72px,55%,140px)] shrink-0 rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#424242] xs:h-6"
               >
                 <Image
-                  src="/Logo/one percent/one percent.jpg"
+                  src={projectOnePercentLogoUrl || "/Logo/one percent/one percent.jpg"}
                   alt="Project One Percent"
                   fill
                   sizes="(max-width: 640px) 28vw, 140px"
                   loading="lazy"
+                  unoptimized
                   className="object-contain grayscale hover:grayscale-0 hover:opacity-100 transition-all"
                 />
               </a>

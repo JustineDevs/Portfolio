@@ -50,23 +50,6 @@ const groups: { title: string; items: { name: string; summary: string; icon: Ico
   ] },
 ]
 
-const platformLogoGroups = [
-  [
-    <Image key="platform-1" src="https://cdn.brandfetch.io/idsSceG8fK/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-    <Image key="platform-2" src="https://cdn.brandfetch.io/idJ3Cg8ymG/theme/dark/idRpwHe9Zf.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-    <Image key="platform-3" src="https://cdn.brandfetch.io/idFEnp00Rl/theme/dark/idXGMr_wi3.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-  ],
-  [
-    <Image key="platform-4" src="https://cdn.brandfetch.io/idTVdakwPY/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-    <Image key="platform-5" src="https://cdn.brandfetch.io/idDpCfN4VD/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-    <Image key="platform-6" src="https://cdn.brandfetch.io/id0BqaqET6/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-  ],
-  [
-    <Image key="platform-7" src="https://cdn.brandfetch.io/id6O2oGzv-/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Google Cloud" width={120} height={32} unoptimized />,
-    <Image key="platform-8" src="https://cdn.brandfetch.io/id8LeMTX5r/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Platform development logo" width={120} height={32} unoptimized />,
-  ],
-]
-
 function TechItem({ name, summary, icon: Icon, index }: { name: string; summary: string; icon: IconComponent; index: number }) {
   const mobileStart = index % 3 === 0
   const mobileEnd = index % 3 === 2
@@ -84,7 +67,11 @@ function TechItem({ name, summary, icon: Icon, index }: { name: string; summary:
   </div>
 }
 
-export default function TechAndDescriptionSection() {
+export default function TechAndDescriptionSection({ content, platformAssets = [] }: { content?: { title: string; paragraphs: string[]; linkLabel: string; link: string }; platformAssets?: Array<{ url: string; altText: string } | null> }) {
+  const copy = content?.paragraphs?.length ? content.paragraphs : [
+    'I build practical systems at the intersection of product design, AI, blockchain, and the web. The through-line is simple: make complex technology useful, legible, and ready to ship.',
+    'As co-founder of HyperKit Labs, I work on developer infrastructure and AI-native tooling for multi-chain workflows, while continuing to build focused tools and interfaces for real people.',
+  ]
   return <section className="w-full">
     <div className="relative flex flex-col border-l border-r border-b border-[#d5d5d5] lg:flex-row">
       <div className="h-[56px] shrink-0 border-b border-[#d5d5d5] px-4 flex items-center lg:w-1/2 lg:border-b-0 lg:border-r"><h2 className="text-[18px] font-bold text-[#424242]"><ScrambleTextOnHover text="Language & Frameworks" as="span" /></h2></div>
@@ -96,9 +83,9 @@ export default function TechAndDescriptionSection() {
         {groups.map((group) => <div key={group.title}><h3 className="mb-3 text-[11px] font-bold uppercase tracking-[0.14em] text-[#666]">{group.title}</h3><div className="grid grid-cols-3 gap-2 sm:grid-cols-4">{group.items.map((item, index) => <TechItem key={item.name} {...item} index={index} />)}</div></div>)}
       </div>
       <div className="w-full self-start p-4 sm:p-5 lg:w-1/2 lg:p-6">
-        <p className="max-w-2xl text-[14px] leading-[1.8] text-[#555]">I build practical systems at the intersection of product design, AI, blockchain, and the web. The through-line is simple: make complex technology useful, legible, and ready to ship.</p>
-        <p className="mt-4 max-w-2xl text-[14px] leading-[1.8] text-[#555]">As co-founder of HyperKit Labs, I work on developer infrastructure and AI-native tooling for multi-chain workflows, while continuing to build focused tools and interfaces for real people.</p>
-        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e5e5e5] pt-4"><span className="text-xs text-[#666666]">Want the longer version?</span><Link href="/about" className="rounded-lg bg-[#424242] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#222]">Read the story</Link></div>
+        <p className="max-w-2xl text-[14px] leading-[1.8] text-[#555]">{copy[0]}</p>
+        {copy[1] ? <p className="mt-4 max-w-2xl text-[14px] leading-[1.8] text-[#555]">{copy[1]}</p> : null}
+        <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#e5e5e5] pt-4"><span className="text-xs text-[#666666]">{content?.title || 'Want the longer version?'}</span><Link href={content?.link || "/about"} className="rounded-lg bg-[#424242] px-4 py-2.5 text-xs font-medium text-white transition hover:bg-[#222]">{content?.linkLabel || "Read the story"}</Link></div>
         <div className="mt-8 border-t border-[#d5d5d5] pt-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -107,7 +94,7 @@ export default function TechAndDescriptionSection() {
             </div>
           </div>
           <div className="mt-4 overflow-x-auto">
-            <StackedLogos logoGroups={platformLogoGroups} duration={8} className="mx-auto max-w-full" logoWidth="min(26vw, 150px)" />
+            <StackedLogos logoGroups={[[0, 1, 2], [3, 4, 5], [6, 7]].map((group) => group.map((index) => { const asset = platformAssets[index]; return <Image key={asset?.url || index} src={asset?.url || `/api/assets/brand.platform-${index + 1}`} alt={asset?.altText || "Platform development logo"} width={120} height={32} unoptimized /> }))} duration={8} className="mx-auto max-w-full" logoWidth="min(26vw, 150px)" />
           </div>
         </div>
       </div>

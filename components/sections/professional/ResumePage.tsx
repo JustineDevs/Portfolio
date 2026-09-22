@@ -1,37 +1,31 @@
 "use client"
 
-import React, { useMemo, useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
-import { createPortal } from 'react-dom'
 import CornerDot from '@/components/ui/CornerDot'
 import NeumorphicSocialButton from '@/components/ui/NeumorphicSocialButton'
 import { useToast } from '@/components/providers/ToastProvider'
 import type { PublicAwardCard, PublicCertificateCard, PublicProject } from '@/lib/content/types'
+import type { ProfessionalContent } from '@/lib/content/home-page-data'
 import TechStackResume from '@/components/sections/professional/TechStackResume'
 import { ProjectCard } from '@/components/sections/projects/ProjectsGrid'
 import { AwardsList, CertificatesTable } from '@/components/sections/experience/ExperienceProofCards'
-
-interface CellData {
-  level: number
-  contributions: number
-  date: Date
-}
 
 export default function ResumePage({
   featuredProjects = [],
   featuredAwards = [],
   featuredCertificates = [],
+  content,
 }: {
   featuredProjects?: PublicProject[]
   featuredAwards?: PublicAwardCard[]
   featuredCertificates?: PublicCertificateCard[]
+  content?: ProfessionalContent
 }) {
   const { info } = useToast()
   const awardsData = featuredAwards
   const certificatesData = featuredCertificates
 
-  const education = [
+  const fallbackEducation = [
     {
       institution: 'National University Dasmariñas',
       degree: 'Bachelor of Science in Information Technology',
@@ -51,7 +45,7 @@ export default function ResumePage({
     },
   ]
 
-  const experiences = [
+  const fallbackExperiences = [
     {
       company: 'Project One Percent',
       role: 'Web3 Community Moderator',
@@ -60,137 +54,8 @@ export default function ResumePage({
       website: 'https://projectonepercent.io/',
     },
   ]
-
-  // Activity Heatmap State
-  const [selectedYear, setSelectedYear] = useState(2026)
-  const [hoveredCell, setHoveredCell] = useState<{ date: Date; contributions: number; x: number; y: number } | null>(null)
-  const [mounted, setMounted] = useState(false)
-  const tooltipRef = useRef<HTMLDivElement>(null)
-
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan']
-  const days = ['', 'Mon', '', 'Wed', '', 'Fri', '']
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Generate grid data with dates and contribution counts
-  const gridData = useMemo(() => {
-    const grid: CellData[][] = []
-    const startDate = new Date(selectedYear, 0, 1)
-    const endDate = new Date(selectedYear, 11, 31)
-    const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24))
-    const weeks = Math.ceil(daysDiff / 7)
-
-    for (let col = 0; col < weeks; col++) {
-      const column: CellData[] = []
-      for (let row = 0; row < 7; row++) {
-        const dayOffset = col * 7 + row
-        const cellDate = new Date(startDate)
-        cellDate.setDate(startDate.getDate() + dayOffset)
-
-        if (cellDate > endDate) {
-          column.push({ level: 0, contributions: 0, date: cellDate })
-          continue
-        }
-
-        const seed = (col * 7 + row) * 9301 + 49297 + selectedYear
-        const val = (seed % 233280) / 233280
-        let level = 0
-        let contributions = 0
-
-        if (val > 0.85) {
-          level = 3
-          contributions = Math.floor(Math.random() * 20) + 15
-        } else if (val > 0.65) {
-          level = 2
-          contributions = Math.floor(Math.random() * 10) + 5
-        } else if (val > 0.4) {
-          level = 1
-          contributions = Math.floor(Math.random() * 4) + 1
-        }
-
-        column.push({ level, contributions, date: cellDate })
-      }
-      grid.push(column)
-    }
-    return grid
-  }, [selectedYear])
-
-  // Calculate statistics
-  const stats = useMemo(() => {
-    let totalContributions = 0
-    let activeDays = 0
-    let currentStreak = 0
-    let longestStreak = 0
-    let tempStreak = 0
-
-    gridData.forEach(column => {
-      column.forEach(cell => {
-        if (cell.contributions > 0) {
-          totalContributions += cell.contributions
-          activeDays++
-          tempStreak++
-          longestStreak = Math.max(longestStreak, tempStreak)
-        } else {
-          tempStreak = 0
-        }
-      })
-    })
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    for (let i = gridData.length - 1; i >= 0; i--) {
-      for (let j = gridData[i].length - 1; j >= 0; j--) {
-        const cell = gridData[i][j]
-        if (cell.date <= today && cell.contributions > 0) {
-          currentStreak++
-        } else if (cell.date <= today) {
-          break
-        }
-      }
-    }
-
-    return {
-      totalContributions,
-      activeDays,
-      currentStreak,
-      longestStreak,
-    }
-  }, [gridData])
-
-  const getCellColor = (level: number) => {
-    switch (level) {
-      case 3: return 'bg-[#216E39]'
-      case 2: return 'bg-[#30A14E]'
-      case 1: return 'bg-[#9BE9A8]'
-      default: return 'bg-[#EBEDF0]'
-    }
-  }
-
-  const handleCellHover = (cell: CellData, event: React.MouseEvent<HTMLDivElement>) => {
-    if (cell.contributions === 0) return
-
-    const rect = event.currentTarget.getBoundingClientRect()
-    setHoveredCell({
-      date: cell.date,
-      contributions: cell.contributions,
-      x: rect.left + rect.width / 2,
-      y: rect.top - 8,
-    })
-  }
-
-  const handleCellLeave = () => {
-    setHoveredCell(null)
-  }
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    })
-  }
+  const education = content?.education?.length ? content.education : fallbackEducation
+  const experiences = content?.experiences?.length ? content.experiences : fallbackExperiences
 
   return (
     <>
@@ -205,7 +70,7 @@ export default function ResumePage({
               <div className="min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <h1 className="text-[clamp(24px,3vw,32px)] font-bold text-[#424242] tracking-tight">
-                    Justine Lupasi
+                    {content?.name || 'Justine Lupasi'}
                   </h1>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-[#1342FF] flex-shrink-0">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"/>
@@ -216,10 +81,10 @@ export default function ResumePage({
                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                     <circle cx="12" cy="10" r="3"/>
                   </svg>
-                  <span>Metro Manila, Philippines</span>
+                  <span>{content?.location || 'Metro Manila, Philippines'}</span>
                 </div>
                 <p className="text-[14px] font-semibold text-[#424242] mb-4">
-                  2yrs | Software Developer | Website Developer | Entry-Mid Level | Backend / Frontend | AI-native agents | blockchain infra, and developer experience.
+                  {content?.headline || '2yrs | Software Developer | Website Developer | Entry-Mid Level | Backend / Frontend | AI-native agents | blockchain infra, and developer experience.'}
                 </p>
                 <div className="mb-4">
                   <NeumorphicSocialButton />
@@ -255,23 +120,7 @@ export default function ResumePage({
                     About
                   </h2>
                 <div className="grid gap-x-8 gap-y-4 text-[14px] leading-[1.8] text-[#555555] md:grid-cols-2">
-                  <p>
-                      I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end
-                      development, responsive web apps, authentication systems, developer tooling, crypto automation, and
-                      decentralized systems.
-                  </p>
-                  <p>
-                      As <span className="font-semibold text-[#1342FF]">Co-Founder of HyperKit Labs</span>, I work on developer
-                      infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart
-                      contract workflows and product experimentation.
-                  </p>
-                  <p className="md:col-span-2">
-                      I also bring community experience from{' '}
-                      <span className="font-semibold text-[#1342FF]">Web3 moderation</span>, where I&apos;ve supported onboarding,
-                      discussions, and technical guidance across Discord communities since 2023. I&apos;m especially interested in{' '}
-                      <span className="font-semibold text-[#1342FF]">product architecture, systems thinking</span>, and building tools
-                      that are practical, usable, and technically grounded.
-                  </p>
+                  {(content?.about?.length ? content.about : ['I build AI-augmented products, blockchain tools, and modern web applications. My work spans front-end development, responsive web apps, authentication systems, developer tooling, crypto automation, and decentralized systems.', 'As Co-Founder of HyperKit Labs, I work on developer infrastructure and AI-native tooling for the Web3 ecosystem, including projects connected to multi-chain smart contract workflows and product experimentation.', 'I also bring community experience from Web3 moderation, where I have supported onboarding, discussions, and technical guidance across Discord communities since 2023.']).map((paragraph, index) => <p key={index} className={index === 2 ? 'md:col-span-2' : undefined}>{paragraph}</p>)}
                 </div>
               </div>
             </div>
@@ -387,7 +236,7 @@ export default function ResumePage({
                 <p className="text-[clamp(11px,1.2vw,12px)] text-[#666666]">Badges earned from hackathon wins</p>
               </div>
               <div>
-                <AwardsList awards={awardsData} />
+                <AwardsList awards={awardsData} compact />
                 {certificatesData.length > 0 ? <CertificatesTable certificates={certificatesData} compact /> : null}
               </div>
             </div>

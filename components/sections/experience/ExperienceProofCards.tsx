@@ -30,7 +30,7 @@ function DiscordLogo() {
 
 function ProofOfWork({ payload }: { payload: ProofData }) {
   const item = payload.items[0];
-  if (!item) return null;
+  if (!item) return <EmptyProofState label="No published proof of work yet." />;
 
   return (
     <div aria-label="Proof of work" className="py-3">
@@ -45,7 +45,7 @@ function ProofOfWork({ payload }: { payload: ProofData }) {
 
         <div className="relative min-w-0 pr-10">
           <h2 className="text-2xl font-semibold tracking-[-0.035em] text-[#383838] sm:text-3xl">{item.title}</h2>
-          <div className="mt-3 flex items-center gap-2 text-sm text-[#666666]">
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-[#666666]">
             {item.brandLogoUrl ? <Image src={item.brandLogoUrl} alt={item.brandName} width={120} height={24} className="h-5 w-auto object-contain" /> : null}
             <span aria-hidden="true">·</span>
             <span>{item.startedAt || "Ongoing"}{item.endedAt ? ` — ${item.endedAt}` : " — Present"}</span>
@@ -61,12 +61,16 @@ function ProofOfWork({ payload }: { payload: ProofData }) {
   );
 }
 
+function EmptyProofState({ label }: { label: string }) {
+  return <p className="py-8 text-sm text-[#858585]">{label}</p>;
+}
+
 function AwardMark({ award }: { award: PublicAwardCard }) {
   return <RatingBadge title={award.eventName || "Award"} subtitle={award.year || "Award"} rating={5} aria-label={`${award.eventName || "Award"} ${award.year}`} className="origin-top-left scale-[0.55]" />;
 }
 
 export function AwardsList({ awards, compact = false }: { awards: PublicAwardCard[]; compact?: boolean }) {
-  if (awards.length === 0) return null;
+  if (awards.length === 0) return <EmptyProofState label="No published awards yet." />;
 
   return (
     <div aria-label="Competition awards" className={`grid gap-6 py-2 ${compact ? "grid-cols-1" : "md:grid-cols-2"}`}>
@@ -85,6 +89,8 @@ export function AwardsList({ awards, compact = false }: { awards: PublicAwardCar
 }
 
 function Testimonials({ payload }: { payload: ProofData }) {
+  if (payload.testimonials.length === 0) return <EmptyProofState label="No published testimonials yet." />;
+
   return (
     <div className="relative mx-auto max-w-7xl">
           <Carousel opts={{ align: "start" }} className="w-full">
@@ -93,12 +99,12 @@ function Testimonials({ payload }: { payload: ProofData }) {
                 <CarouselItem key={testimonial.key} className="basis-full md:basis-1/2 lg:basis-1/3">
                   <Card className="bg-muted/50 flex h-full min-h-[320px] flex-col justify-between rounded-4xl p-6 ring-0 select-none">
                     <div>
-                      <div className="mb-4 flex h-9 items-center"><Image src="/Logo/one percent/one percent.jpg" alt="Project One Percent" width={160} height={32} className="h-7 w-auto object-contain" /></div>
+                      {testimonial.brandLogoUrl ? <div className="mb-4 flex h-9 items-center"><Image src={testimonial.brandLogoUrl} alt="Project One Percent" width={160} height={32} unoptimized className="h-7 w-auto object-contain" /></div> : null}
                       <p className="text-muted-foreground mb-8 text-[15px] leading-relaxed md:text-base">{testimonial.quote}</p>
                     </div>
                     <div className="flex items-center gap-4">
-                      <Avatar className="border-border h-12 w-12 border"><AvatarImage src="/Avatar-shun.jpg" alt={testimonial.title || "Collaborator"} /><AvatarFallback className="bg-muted text-muted-foreground">{(testimonial.title || "C").charAt(0)}</AvatarFallback></Avatar>
-                  <div><p className="text-foreground font-medium">{testimonial.title || `Collaborator ${index + 1}`}</p>{testimonial.label.toLowerCase() !== "manual card" ? <p className="text-muted-foreground mt-0.5 text-sm">{testimonial.label}</p> : null}</div>
+                      <Avatar className="border-border h-12 w-12 border"><AvatarImage src={testimonial.avatarUrl || "/Avatar-shun.jpg"} alt={testimonial.title || "Collaborator"} /><AvatarFallback className="bg-muted text-muted-foreground">{(testimonial.title || "C").charAt(0)}</AvatarFallback></Avatar>
+                  <div><p className="text-foreground font-medium">{testimonial.title || `Collaborator ${index + 1}`}</p><p className="text-muted-foreground mt-0.5 text-sm">{testimonial.label}</p></div>
                     </div>
                   </Card>
                 </CarouselItem>
@@ -111,7 +117,7 @@ function Testimonials({ payload }: { payload: ProofData }) {
 }
 
 export function CertificatesTable({ certificates, compact = false }: { certificates: PublicCertificateCard[]; compact?: boolean }) {
-  if (certificates.length === 0) return null;
+  if (certificates.length === 0) return <EmptyProofState label="No published certificates yet." />;
 
   if (compact) {
     return (
@@ -133,9 +139,9 @@ export function CertificatesTable({ certificates, compact = false }: { certifica
   }
 
   return (
-    <section className="w-full bg-[#f8fafc] py-12 sm:py-16">
+    <section className="w-full bg-[#f8f8f8] py-12 text-[#424242] sm:py-16">
       <div className="space-y-10">
-        <div className="grid grid-cols-[minmax(4rem,0.65fr)_minmax(12rem,1.2fr)_minmax(16rem,2fr)_minmax(3rem,0.35fr)] items-center border-b border-[#d9dde3] pb-3 text-sm text-[#9aa2ad] sm:text-base">
+        <div className="grid grid-cols-[minmax(4rem,0.65fr)_minmax(12rem,1.2fr)_minmax(16rem,2fr)_minmax(3rem,0.35fr)] items-center border-b border-[#d5d5d5] pb-3 text-sm text-[#858585] sm:text-base">
           <span aria-hidden="true" />
           <span>Name</span>
           <span>Issuer</span>
@@ -144,16 +150,16 @@ export function CertificatesTable({ certificates, compact = false }: { certifica
 
         <div>
           {certificates.map((certificate, index) => (
-            <a key={certificate.slug} href={certificate.proofUrl || undefined} className="grid grid-cols-[minmax(4rem,0.65fr)_minmax(12rem,1.2fr)_minmax(16rem,2fr)_minmax(3rem,0.35fr)] items-center border-b border-[#d9dde3] py-5 transition-opacity hover:opacity-70">
-              <span className="text-sm text-[#657080]">({String(index + 1).padStart(3, "0")})</span>
-              <span className="flex min-w-0 items-center gap-3 text-base font-medium text-[#111318] sm:text-lg">
-                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#111318] text-white">
+            <a key={certificate.slug} href={certificate.proofUrl || undefined} className="grid grid-cols-[minmax(4rem,0.65fr)_minmax(12rem,1.2fr)_minmax(16rem,2fr)_minmax(3rem,0.35fr)] items-center border-b border-[#d5d5d5] py-5 transition-opacity hover:opacity-70">
+              <span className="text-sm text-[#666666]">({String(index + 1).padStart(3, "0")})</span>
+              <span className="flex min-w-0 items-center gap-3 text-base font-medium text-[#424242] sm:text-lg">
+                <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#424242] text-white">
                   {certificate.logoUrl ? <Image src={certificate.logoUrl} alt="" width={16} height={16} className="size-4 object-contain" /> : <BadgeCheck aria-hidden="true" className="size-4" />}
                 </span>
                 <span className="truncate">{certificate.title}</span>
               </span>
-              <span className="pr-4 text-sm leading-6 text-[#9aa2ad] sm:text-base">{certificate.issuer || certificate.description}</span>
-              <span className="text-right text-sm text-[#111318] sm:text-base">—</span>
+              <span className="pr-4 text-sm leading-6 text-[#666666] sm:text-base">{certificate.issuer || certificate.description}</span>
+              <span className="text-right text-sm text-[#424242] sm:text-base">—</span>
             </a>
           ))}
         </div>

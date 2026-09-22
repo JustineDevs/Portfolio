@@ -50,6 +50,90 @@
       "when": 1778736000000,
       "tag": "0006_certificates",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778739600000,
+      "tag": "0007_experience_progress",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1778743200000,
+      "tag": "0008_media_asset_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1778746800000,
+      "tag": "0009_seed_asset_registry",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1778750400000,
+      "tag": "0010_link_experience_assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1778754000000,
+      "tag": "0011_registry_ui_assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1778757600000,
+      "tag": "0012_seed_experience_profile",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1778761200000,
+      "tag": "0013_seed_home_copy",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1778764800000,
+      "tag": "0014_seed_experience_proof",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1778768400000,
+      "tag": "0015_seed_professional_content",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1778772000000,
+      "tag": "0016_seed_legal_content",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1778775600000,
+      "tag": "0017_seed_platform_assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1778779200000,
+      "tag": "0018_provider_usage_connections",
+      "breakpoints": true
     }
   ]
 }

@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { saveHighlightAction } from "@/app/admin/actions";
 import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { AdminFormSubmitButton } from "@/components/admin/AdminFormSubmitButton";
+import { adminInputControlClass } from "@/components/admin/admin-styles";
 import {
   AdminErrorBanner,
   CheckboxField,
@@ -128,7 +129,7 @@ export function HighlightForm({
             name="highlightType"
             value={highlightType}
             onChange={(event) => setHighlightType(event.target.value as HighlightType)}
-            className="w-full rounded-lg border border-[#d5d5d5] bg-white px-3 py-2 text-sm text-[#424242]"
+            className={"cursor-pointer " + adminInputControlClass}
           >
             {HIGHLIGHT_TYPE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -145,7 +146,7 @@ export function HighlightForm({
             name="placementKey"
             value={placementKey}
             onChange={(event) => setPlacementKey(event.target.value as HighlightPlacementKey)}
-            className="w-full rounded-lg border border-[#d5d5d5] bg-white px-3 py-2 text-sm text-[#424242]"
+            className={"cursor-pointer " + adminInputControlClass}
           >
             {currentPlacementOptions.map((option) => (
               <option key={option.value} value={option.value}>
@@ -161,7 +162,7 @@ export function HighlightForm({
             name="targetId"
             value={targetId}
             onChange={(event) => setTargetId(event.target.value)}
-            className="w-full rounded-lg border border-[#d5d5d5] bg-white px-3 py-2 text-sm text-[#424242]"
+            className={"cursor-pointer " + adminInputControlClass}
           >
             <option value="0">{highlightType === "custom" ? "None" : `Select ${highlightType}`}</option>
             {currentTargetOptions.map((option) => (
@@ -197,7 +198,7 @@ export function HighlightForm({
       <CheckboxField label="Pinned" name="pinned" defaultChecked={value?.pinned} />
       <div className="flex flex-wrap items-center gap-3">
         <AdminFormSubmitButton>{value ? "Save highlight" : "Create highlight"}</AdminFormSubmitButton>
-        {value?.id ? <AdminDeleteButton type="highlight" id={value.id} /> : null}
+        {value?.id ? <AdminDeleteButton type="highlight" id={value.id} inline /> : null}
       </div>
     </form>
   );

@@ -70,6 +70,7 @@ export default function SiteOnboarding({
         <button
           type="button"
           className="site-onboarding__panel site-onboarding__panel--portfolio"
+          onPointerDown={() => chooseSite('portfolio')}
           onClick={() => chooseSite('portfolio')}
           onMouseEnter={() => setHoveredSite('portfolio')}
           onMouseLeave={() => setHoveredSite(null)}
@@ -87,6 +88,7 @@ export default function SiteOnboarding({
         <button
           type="button"
           className="site-onboarding__panel site-onboarding__panel--work"
+          onPointerDown={() => chooseSite('work')}
           onClick={() => chooseSite('work')}
           onMouseEnter={() => setHoveredSite('work')}
           onMouseLeave={() => setHoveredSite(null)}

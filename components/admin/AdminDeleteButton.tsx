@@ -1,5 +1,7 @@
 "use client";
 
+import type { MouseEvent } from "react";
+
 import {
   deleteCertificateAction,
   deleteHighlightAction,
@@ -12,9 +14,10 @@ type Props = {
   type: "project" | "post" | "certificate" | "highlight" | "about";
   id: number;
   label?: string;
+  inline?: boolean;
 };
 
-export function AdminDeleteButton({ type, id, label = "Delete" }: Props) {
+export function AdminDeleteButton({ type, id, label = "Delete", inline = false }: Props) {
   const action = {
     project: deleteProjectAction,
     post: deletePostAction,
@@ -30,22 +33,36 @@ export function AdminDeleteButton({ type, id, label = "Delete" }: Props) {
     about: "About section",
   }[type];
 
+  const confirmDelete = (event: MouseEvent<HTMLButtonElement>) => {
+    if (!window.confirm(`Delete this ${itemLabel}? This cannot be undone.`)) {
+      event.preventDefault();
+    }
+  };
+
+  const button = (
+    <button
+      type="submit"
+      {...(inline ? { formAction: action } : {})}
+      onClick={inline ? confirmDelete : undefined}
+      className="min-h-11 cursor-pointer rounded-md px-3 py-2 text-sm font-medium text-[#b42318] transition-[background-color,transform] duration-150 hover:bg-[#fff1f0] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42318]/30 focus-visible:ring-offset-2"
+    >
+      {label}
+    </button>
+  );
+
+  if (inline) {
+    return <><input type="hidden" name="id" value={id} />{button}</>;
+  }
+
   return (
     <form
       action={action}
       onSubmit={(event) => {
-        if (!window.confirm(`Delete this ${itemLabel}? This cannot be undone.`)) {
-          event.preventDefault();
-        }
+        if (!window.confirm(`Delete this ${itemLabel}? This cannot be undone.`)) event.preventDefault();
       }}
     >
       <input type="hidden" name="id" value={id} />
-      <button
-        type="submit"
-        className="rounded-md px-2 py-1.5 text-sm font-medium text-[#b42318] transition-colors hover:bg-[#fff1f0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b42318]/30 focus-visible:ring-offset-2"
-      >
-        {label}
-      </button>
+      {button}
     </form>
   );
 }

@@ -1,47 +1,45 @@
 import Link from "next/link";
+import { requireAdminSession } from "@/lib/auth";
 
 import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
 import { listCertificatesForAdmin } from "@/lib/content/admin";
+import { AdminPageHeader, AdminPrimaryAction, AdminStatusBadge, AdminTable, AdminTableHeader, AdminTableRow, AdminTableToolbar } from "@/components/admin/CmsSurface";
 
-export default async function AdminCertificatesPage() {
+export default async function AdminCertificatesPage({ searchParams }: { searchParams?: { q?: string; status?: string } }) {
+  await requireAdminSession();
   const certificates = await listCertificatesForAdmin();
+  const search = searchParams?.q?.trim().toLowerCase() ?? "";
+  const status = searchParams?.status ?? "";
+  const visibleCertificates = certificates.filter((certificate) => (!search || `${certificate.title} ${certificate.slug} ${certificate.issuer ?? ""}`.toLowerCase().includes(search)) && (!status || certificate.status === status));
 
   return (
-    <main className="space-y-6">
-      <section className="flex items-center justify-between rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#424242]">Certificates</h1>
-          <p className="mt-2 text-sm text-[#666666]">Manage certificate records separately from manual highlights.</p>
-        </div>
-        <Link href="/admin/certificates/new" className="rounded-lg bg-[#424242] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#333333]">
-          New certificate
-        </Link>
-      </section>
+    <main className="space-y-8">
+      <AdminPageHeader title="Certificates" count={`${certificates.length} records`} description="Manage certificate records separately from manual highlights." actions={<AdminPrimaryAction href="/admin/certificates/new">New certificate</AdminPrimaryAction>} />
 
-      <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <div className="grid grid-cols-[1.5fr_1fr_140px_170px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
+      <AdminTable label="Certificates"><AdminTableToolbar search={searchParams?.q} placeholder="Search certificates..." filter={status} filterOptions={[{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }]} />
+        <AdminTableHeader>
           <div>Certificate</div>
           <div>Issuer</div>
           <div>Status</div>
           <div>Actions</div>
-        </div>
-        {certificates.map((certificate) => (
-          <div key={certificate.id} className="grid grid-cols-[1.5fr_1fr_140px_170px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
+        </AdminTableHeader>
+        {visibleCertificates.map((certificate) => (
+          <AdminTableRow key={certificate.id}>
             <div>
-              <div className="font-semibold text-[#424242]">{certificate.title}</div>
-              <div className="text-[#666666]">{certificate.slug}</div>
+              <div className="font-semibold text-[#18181b]">{certificate.title}</div>
+              <div className="text-xs text-[#71717a]">{certificate.slug}</div>
             </div>
-            <div className="text-[#555555]">{certificate.issuer || "—"}</div>
-            <div className="capitalize text-[#555555]">{certificate.status}</div>
+            <div className="text-[#52525b]">{certificate.issuer || "—"}</div>
+            <AdminStatusBadge value={certificate.status} />
             <div className="flex flex-wrap items-center gap-3">
-              <Link href={`/admin/certificates/${certificate.id}`} className="text-[#1342FF] hover:underline">
+              <Link href={`/admin/certificates/${certificate.id}`} className="font-semibold text-[#1342FF] hover:underline">
                 Edit
               </Link>
               <AdminDeleteButton type="certificate" id={certificate.id} />
             </div>
-          </div>
-        ))}
-      </section>
+          </AdminTableRow>
+        ))}{!visibleCertificates.length ? <div className="px-5 py-14 text-center text-sm text-[#71717a]">No certificates match the current filters.</div> : null}
+      </AdminTable>
     </main>
   );
 }

@@ -1,47 +1,45 @@
 import Link from "next/link";
+import { requireAdminSession } from "@/lib/auth";
 
 import { listPostsForAdmin } from "@/lib/content/admin";
 import { AdminDeleteButton } from "@/components/admin/AdminDeleteButton";
+import { AdminPageHeader, AdminPrimaryAction, AdminStatusBadge, AdminTable, AdminTableHeader, AdminTableRow, AdminTableToolbar } from "@/components/admin/CmsSurface";
 
-export default async function AdminWritingPage() {
+export default async function AdminWritingPage({ searchParams }: { searchParams?: { q?: string; status?: string } }) {
+  await requireAdminSession();
   const posts = await listPostsForAdmin();
+  const search = searchParams?.q?.trim().toLowerCase() ?? "";
+  const status = searchParams?.status ?? "";
+  const visiblePosts = posts.filter((post) => (!search || `${post.title} ${post.slug} ${post.postType}`.toLowerCase().includes(search)) && (!status || post.status === status));
 
   return (
-    <main className="space-y-6">
-      <section className="flex items-center justify-between rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-[#424242]">Writing</h1>
-          <p className="mt-2 text-sm text-[#666666]">Manage native articles and external/social posts.</p>
-        </div>
-        <Link href="/admin/writing/new" className="rounded-lg bg-[#424242] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#333333]">
-          New post
-        </Link>
-      </section>
+    <main className="space-y-8">
+      <AdminPageHeader title="Writing" count={`${posts.length} records`} description="Manage native articles and external/social posts." actions={<AdminPrimaryAction href="/admin/writing/new">New post</AdminPrimaryAction>} />
 
-      <section className="overflow-hidden rounded-2xl border border-[#d5d5d5] bg-white shadow-sm">
-        <div className="grid grid-cols-[1.5fr_140px_140px_160px] gap-4 border-b border-[#d5d5d5] px-6 py-4 text-xs font-semibold uppercase tracking-[0.2em] text-[#666666]">
+      <AdminTable label="Writing"><AdminTableToolbar search={searchParams?.q} placeholder="Search writing..." filter={status} filterOptions={[{ value: "published", label: "Published" }, { value: "draft", label: "Draft" }]} />
+        <AdminTableHeader>
           <div>Post</div>
           <div>Type</div>
           <div>Status</div>
           <div>Actions</div>
-        </div>
-        {posts.map((post) => (
-          <div key={post.id} className="grid grid-cols-[1.5fr_140px_140px_160px] gap-4 border-b border-[#efefef] px-6 py-4 text-sm last:border-b-0">
+        </AdminTableHeader>
+        {visiblePosts.map((post) => (
+          <AdminTableRow key={post.id}>
             <div>
-              <div className="font-semibold text-[#424242]">{post.title}</div>
-              <div className="text-[#666666]">{post.slug}</div>
+              <div className="font-semibold text-[#18181b]">{post.title}</div>
+              <div className="text-xs text-[#71717a]">{post.slug}</div>
             </div>
-            <div className="capitalize text-[#555555]">{post.postType}</div>
-            <div className="capitalize text-[#555555]">{post.status}</div>
+            <div className="capitalize text-[#52525b]">{post.postType}</div>
+            <AdminStatusBadge value={post.status} />
             <div className="flex items-center gap-3">
-              <Link href={`/admin/writing/${post.id}`} className="text-[#1342FF] hover:underline">
+              <Link href={`/admin/writing/${post.id}`} className="font-semibold text-[#1342FF] hover:underline">
                 Edit
               </Link>
               <AdminDeleteButton type="post" id={post.id} />
             </div>
-          </div>
-        ))}
-      </section>
+          </AdminTableRow>
+        ))}{!visiblePosts.length ? <div className="px-5 py-14 text-center text-sm text-[#71717a]">No posts match the current filters.</div> : null}
+      </AdminTable>
     </main>
   );
 }

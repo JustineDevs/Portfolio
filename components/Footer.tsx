@@ -41,7 +41,7 @@ function FooterLegalAnchor({ href, children }: { href: string; children: React.R
   )
 }
 
-export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }) {
+export default function Footer({ legalLinks, logoUrl }: { legalLinks?: PublicLegalLinks; logoUrl?: string | null }) {
   const { info } = useToast()
   const privacyUrl = pickVisibleUrl(legalLinks?.privacyPolicyUrl, process.env.NEXT_PUBLIC_PRIVACY_POLICY_URL)
   const termsUrl = pickVisibleUrl(legalLinks?.termsUrl, process.env.NEXT_PUBLIC_TERMS_URL)
@@ -55,13 +55,13 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
           <div className="lg:w-[48%] shrink-0 min-w-0 border-b lg:border-b-0 border-[#d5d5d5] p-3 xs:p-4 sm:p-5 md:p-6 lg:p-8 flex items-center overflow-x-hidden">
             <div className="relative w-full max-w-[240px] xs:max-w-[300px] sm:max-w-[380px] md:max-w-[460px] lg:max-w-[520px] xl:max-w-[580px] h-[92px] xs:h-[110px] sm:h-[130px] md:h-[150px] lg:h-[165px] xl:h-[180px] overflow-hidden">
               <Image 
-                src="/JSTN Logo/SVG/Logo Header - B.svg" 
+                src={logoUrl || "/JSTN Logo/SVG/Logo Header - B.svg"}
                 alt="JSTN Logo" 
+                unoptimized
                 fill 
                 sizes="(max-width: 1024px) 90vw, 750px"
                 loading="lazy"
                 className="object-contain object-left" 
-                unoptimized
               />
             </div>
           </div>
@@ -98,6 +98,9 @@ export default function Footer({ legalLinks }: { legalLinks?: PublicLegalLinks }
                   >
                     Tags
                   </button>
+                  <Link href="/changelog" className={resourceLinkClass}>
+                    Changelog
+                  </Link>
                   {privacyUrl ? (
                     <FooterLegalAnchor href={privacyUrl}>Privacy Policy</FooterLegalAnchor>
                   ) : null}
