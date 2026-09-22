@@ -3,7 +3,7 @@
 import CornerDot from '@/components/ui/CornerDot'
 import {
   TypeScriptIcon, JavaScriptIcon, ReactIcon, NextJsIcon, NodeIcon, PythonBrandIcon, SolidityIcon, RustIcon,
-  TailwindIcon, DockerIcon, GitIcon, CloudflareIcon, OpenAIIcon, ClaudeIcon, GitHubIcon, GoIcon, BashIcon,
+  TailwindIcon, DockerIcon, GitIcon, OpenAIIcon, ClaudeIcon, GitHubIcon, GoIcon, BashIcon,
   SqlIcon, NpmIcon, PnpmIcon, BunIcon, NamecheapIcon,
 } from '@/components/ui/TechIcons'
 
@@ -14,7 +14,7 @@ const items = [
   ['Tailwind', 'UI systems', TailwindIcon], ['Docker', 'Delivery', DockerIcon], ['Git', 'Collaboration', GitIcon],
   ['GitHub', 'Code hosting', GitHubIcon], ['Go', 'Backend services', GoIcon], ['Bash', 'Shell scripting', BashIcon],
   ['SQL', 'Data querying', SqlIcon], ['npm', 'Package manager', NpmIcon], ['pnpm', 'Package manager', PnpmIcon],
-  ['Bun', 'JavaScript runtime', BunIcon], ['Cloudflare', 'Edge runtime', CloudflareIcon],
+  ['Bun', 'JavaScript runtime', BunIcon],
   ['Namecheap', 'Domain services', NamecheapIcon], ['OpenAI', 'AI products', OpenAIIcon], ['Claude', 'Agent workflows', ClaudeIcon],
 ] as const
 

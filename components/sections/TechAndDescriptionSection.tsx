@@ -10,7 +10,7 @@ import { CursorIcon } from '@/components/ui/TechIcons'
 import {
   TypeScriptIcon, JavaScriptIcon, NextJsIcon, ReactIcon, SolidityIcon, RustIcon, PythonBrandIcon, HTML5Icon,
   TailwindIcon, GrokIcon, ClaudeIcon, OpenAIIcon, PerplexityIcon, VercelIcon, DockerIcon, GitIcon,
-  FirebaseIcon, CloudflareIcon, MoveIcon, LuaIcon, RobloxIcon, VpsIcon, EcsIcon,
+  FirebaseIcon, MoveIcon, LuaIcon, RobloxIcon, VpsIcon, EcsIcon,
 } from '@/components/ui/TechIcons'
 
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>
@@ -40,7 +40,6 @@ const groups: { title: string; items: { name: string; summary: string; icon: Ico
     { name: 'Docker', summary: 'Reproducible development and deployment environments.', icon: DockerIcon },
     { name: 'Git', summary: 'Version control and collaborative delivery.', icon: GitIcon },
     { name: 'Firebase', summary: 'Managed services for rapid product prototypes.', icon: FirebaseIcon },
-    { name: 'Cloudflare', summary: 'Workers, edge infrastructure, and production delivery.', icon: CloudflareIcon },
     { name: 'VPS', summary: 'Flexible virtual servers for self-managed deployments.', icon: VpsIcon },
     { name: 'ECS', summary: 'Container orchestration for scalable cloud services.', icon: EcsIcon },
   ] },

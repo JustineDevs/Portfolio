@@ -21,12 +21,10 @@ serviceAccount*.json
 
 # --- Next.js & build output ---
 /.next/
-.open-next/
 /out/
 /build
 dist/
 .vercel
-.wrangler/
 *.tsbuildinfo
 
 # --- Caches & tooling ---

@@ -31,14 +31,14 @@ export const changelogEntries: ChangelogEntry[] = [
     version: 'v0.1.3',
     date: 'June 9, 2026',
     title: 'A safer deployment lane',
-    description: 'The deployment path was tightened for Cloudflare while keeping the portfolio resilient when remote content or heavier visual layers fail.',
+    description: 'The deployment path was tightened while keeping the portfolio resilient when remote content or heavier visual layers fail.',
     highlights: [
-      'Hardened the Cloudflare migration path with Wrangler and OpenNext guidance.',
+      'Hardened the deployment path with clearer runtime guidance and safer local preview behavior.',
       'Removed Vercel-specific deployment assumptions from the application.',
       'Improved WebGL avatar visibility, framing, and hover performance.',
     ],
     changed: [
-      'Added Cloudflare deployment files and local preview documentation.',
+      'Added deployment guidance and local preview documentation.',
       'Added softer fallbacks for remote images and public content.',
       'Added regression coverage for database configuration and public-content fallback behavior.',
     ],

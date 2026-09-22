@@ -31,7 +31,7 @@ All tiers include: design + build + deploy + basic documentation + 2 weeks of po
 - Basic auth (email/password or simple OAuth)
 - Simple database schema
 - Basic UI (no heavy custom design)
-- Deploy to a single environment (e.g., Vercel, Cloudflare, Render)
+- Deploy to a single hosting environment
 
 **Price range:** **$1,500–$4,000 USD**  
 **Timeline:** ~1–3 weeks  
