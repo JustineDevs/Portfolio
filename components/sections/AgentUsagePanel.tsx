@@ -40,7 +40,7 @@ export default function AgentUsagePanel() {
   useEffect(() => {
     let cancelled = false;
     Promise.all(sourceProviders.map(async (provider) => {
-      const response = await fetch(`/api/usage?provider=${provider}&year=${selectedYear}`);
+      const response = await fetch(`/api/usage?provider=${provider}&year=${selectedYear}`, { cache: "no-store" });
       return [provider, await response.json()] as const;
     })).then((entries) => { if (!cancelled) setUsage(Object.fromEntries(entries) as Record<AgentProviderId, ProviderUsage>); }).catch(() => { if (!cancelled) setUsage(null); });
     return () => { cancelled = true; };
