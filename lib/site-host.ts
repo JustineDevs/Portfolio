@@ -10,9 +10,13 @@ export function getRequestHost(requestHeaders: Headers) {
 
 export function isWorkSiteHost(host: string) {
   const hostname = hostnameFromHostHeader(host)
-  return PRODUCTION_WORK_HOSTS.has(hostname) || hostname === 'localhost' && host.endsWith(':3001')
+  return PRODUCTION_WORK_HOSTS.has(hostname) || isLocalWorkSiteHost(host)
+}
+
+function isLocalWorkSiteHost(host: string) {
+  return hostnameFromHostHeader(host) === 'localhost' && host.trim().endsWith(':3001')
 }
 
 export function isProductionWorkSiteHost(host: string) {
-  return PRODUCTION_WORK_HOSTS.has(hostnameFromHostHeader(host))
+  return isWorkSiteHost(host) && !isLocalWorkSiteHost(host)
 }
