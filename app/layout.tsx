@@ -13,7 +13,7 @@ import PublicSocialBar from "@/components/layouts/PublicSocialBar";
 import { Analytics } from "@vercel/analytics/next";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import UnderConstructionPage from "@/components/UnderConstructionPage";
-import { isProductionWorkSiteHost, isWorkSiteHost } from "@/lib/site-host";
+import { getRequestHost, isProductionWorkSiteHost, isWorkSiteHost } from "@/lib/site-host";
 import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, SITE_NAME, SITE_URL, SOCIAL_IMAGE } from "@/lib/seo";
 import "./globals.css";
 
@@ -68,7 +68,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const host = headers().get("host") || "";
+  const host = getRequestHost(headers());
   const isWorkSite = isWorkSiteHost(host);
   const isWorkSiteUnderConstruction = isProductionWorkSiteHost(host);
 

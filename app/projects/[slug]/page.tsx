@@ -7,7 +7,7 @@ import { getProjectDetailPageData } from '@/lib/content/page-data'
 import { notFound } from 'next/navigation'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { isProductionWorkSiteHost, isWorkSiteHost } from '@/lib/site-host'
+import { getRequestHost, isProductionWorkSiteHost, isWorkSiteHost } from '@/lib/site-host'
 import JsonLd from '@/components/seo/JsonLd'
 import { absoluteUrl, pageMetadata } from '@/lib/seo'
 
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 }
 
 export default async function ProjectShowcasePage({ params }: { params: { slug: string } }) {
-  const host = headers().get('host') || ''
+  const host = getRequestHost(headers())
   const isWorkSite = isWorkSiteHost(host)
 
   if (isWorkSite && !isProductionWorkSiteHost(host)) {
