@@ -16,8 +16,28 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Classify changed surfaces
+    runs-on: ubuntu-latest
+    outputs:
+      personal: ${{ steps.surfaces.outputs.personal }}
+      work: ${{ steps.surfaces.outputs.work }}
+      shared: ${{ steps.surfaces.outputs.shared }}
+      run_quality: ${{ steps.surfaces.outputs.run_quality }}
+      scope: ${{ steps.surfaces.outputs.scope }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Classify changed files
+        id: surfaces
+        run: node scripts/changed-surfaces.mjs
+
   quality:
-    name: Lint, test, and build
+    name: Lint, test, and build (${{ needs.changes.outputs.scope }})
+    needs: changes
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
@@ -30,28 +50,39 @@ jobs:
       # Production build sets NODE_ENV only for that step (see below).
 
     steps:
+      - name: Skip runtime checks for documentation-only changes
+        if: needs.changes.outputs.run_quality != 'true'
+        run: echo "No runtime files changed; lint, tests, and build are not required."
+
       - name: Checkout
+        if: needs.changes.outputs.run_quality == 'true'
         uses: actions/checkout@v4
 
       - name: Setup pnpm
+        if: needs.changes.outputs.run_quality == 'true'
         uses: pnpm/action-setup@v4
 
       - name: Setup Node
+        if: needs.changes.outputs.run_quality == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           cache: "pnpm"
 
       - name: Install dependencies
+        if: needs.changes.outputs.run_quality == 'true'
         run: pnpm install --frozen-lockfile
 
       - name: ESLint
+        if: needs.changes.outputs.run_quality == 'true'
         run: pnpm run lint
 
       - name: Unit tests
+        if: needs.changes.outputs.run_quality == 'true'
         run: pnpm run test
 
       - name: Production build
+        if: needs.changes.outputs.run_quality == 'true'
         env:
           NODE_ENV: production
         run: pnpm run build
