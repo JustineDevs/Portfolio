@@ -28,6 +28,11 @@ function parseLine(line) {
 const lines = csv.replace(/^\uFEFF/, "").split(/\r?\n/).filter(Boolean);
 const headers = parseLine(lines.shift()).map((header) => header.trim());
 const providerMap = { Codex: "openai", Cursor: "cursor", Orca: "orca" };
+const standardApiPricing = {
+  "gpt-5.6-luna": { input: 0.2, cachedInput: 0.02, output: 1.2 },
+  "gpt-5.4-mini": { input: 0.75, cachedInput: 0.075, output: 4.5 },
+  "gpt-5.5": { input: 5, cachedInput: 0.5, output: 30 },
+};
 const grouped = new Map();
 for (const line of lines) {
   const values = parseLine(line);
@@ -35,10 +40,15 @@ for (const line of lines) {
   const provider = providerMap[row.platform]; const date = row.date_time?.slice(0, 10);
   if (!provider || !/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
   const key = `${provider}:${date}`;
-  const current = grouped.get(key) || { provider, date, tokens: 0, cached: 0, events: 0 };
+  const current = grouped.get(key) || { provider, date, tokens: 0, cached: 0, events: 0, estimatedCost: 0 };
   current.tokens += Math.max(0, Number(row.token_usage) || 0);
   current.cached += Math.max(0, Number(row.cached_input_tokens) || 0);
   current.events += Math.max(0, Number(row.tool_event_count) || 0);
+  const pricing = standardApiPricing[row.model_provider];
+  const input = Math.max(0, Number(row.input_tokens) || 0);
+  const cached = Math.min(input, Math.max(0, Number(row.cached_input_tokens) || 0));
+  const output = Math.max(0, Number(row.output_tokens) || 0);
+  if (pricing && (input > 0 || output > 0)) current.estimatedCost += ((input - cached) * pricing.input + cached * pricing.cachedInput + output * pricing.output) / 1_000_000;
   grouped.set(key, current);
 }
 
@@ -49,8 +59,8 @@ async function importProvider(provider, rows) {
   const source = await database.execute({ sql: "SELECT id FROM provider_usage_sources WHERE source_key = ?", args: [sourceKey] });
   await database.execute({ sql: `INSERT INTO provider_connections (provider, external_account_id, account_label, status, include_in_rollup, last_synced_at, last_error, created_at, updated_at) VALUES (?, ?, ?, 'connected', 1, ?, NULL, ?, ?) ON CONFLICT(provider, external_account_id) DO UPDATE SET account_label=excluded.account_label, status='connected', include_in_rollup=1, last_synced_at=excluded.last_synced_at, last_error=NULL, updated_at=excluded.updated_at`, args: [provider, accountId, `Public anonymized ${provider} export`, now, now, now] });
   const connection = await database.execute({ sql: "SELECT id FROM provider_connections WHERE provider = ? AND external_account_id = ?", args: [provider, accountId] });
-  for (const row of rows) await database.execute({ sql: `INSERT INTO provider_usage_snapshots (connection_id, source_id, period_date, total_tokens, cached_tokens, activity_count, estimated_cost, source_hash, synced_at) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?) ON CONFLICT(connection_id, period_date) DO UPDATE SET source_id=excluded.source_id, total_tokens=excluded.total_tokens, cached_tokens=excluded.cached_tokens, activity_count=excluded.activity_count, estimated_cost=0, source_hash=excluded.source_hash, synced_at=excluded.synced_at`, args: [connection.rows[0].id, source.rows[0].id, row.date, row.tokens, Math.min(row.cached, row.tokens), row.events, sourceHash, now] });
-  return { provider, days: rows.length, tokens: rows.reduce((sum, row) => sum + row.tokens, 0), events: rows.reduce((sum, row) => sum + row.events, 0), coverage: `${dates[0]}..${dates.at(-1)}` };
+  for (const row of rows) await database.execute({ sql: `INSERT INTO provider_usage_snapshots (connection_id, source_id, period_date, total_tokens, cached_tokens, activity_count, estimated_cost, source_hash, synced_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(connection_id, period_date) DO UPDATE SET source_id=excluded.source_id, total_tokens=excluded.total_tokens, cached_tokens=excluded.cached_tokens, activity_count=excluded.activity_count, estimated_cost=excluded.estimated_cost, source_hash=excluded.source_hash, synced_at=excluded.synced_at`, args: [connection.rows[0].id, source.rows[0].id, row.date, row.tokens, Math.min(row.cached, row.tokens), row.events, row.estimatedCost, sourceHash, now] });
+  return { provider, days: rows.length, tokens: rows.reduce((sum, row) => sum + row.tokens, 0), events: rows.reduce((sum, row) => sum + row.events, 0), estimatedCost: rows.reduce((sum, row) => sum + row.estimatedCost, 0), coverage: `${dates[0]}..${dates.at(-1)}` };
 }
 
 if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) throw new Error("Turso credentials are required.");
