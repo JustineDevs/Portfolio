@@ -62,9 +62,9 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null } = {}) {
   }, [mobileMenuOpen])
 
   const navLinks = [
-    { name: 'About', href: '/about' },
-    { name: 'Projects', href: '/projects' },
     { name: 'Experience', href: '/experience' },
+    { name: 'Projects', href: '/projects' },
+    { name: 'About', href: '/about' },
     { name: 'Blog', href: '/blog' },
   ];
 
