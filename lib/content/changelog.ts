@@ -39,6 +39,18 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
   {
+    version: 'v0.1.5',
+    date: 'September 23, 2026',
+    title: 'A clearer public and work-site boundary',
+    description: 'This release prepared the portfolio for a safer public launch by clarifying the personal surface, preserving the work-site route for development, and tightening the release baseline.',
+    highlights: [
+      'Marked the work site and onboarding experience as under construction in production without removing their development paths.',
+      'Restored the personal landing experience and its crowd rendering while keeping the navigation treatment intact.',
+      'Prepared the application for the v0.1.5 release with the current public content foundation.',
+    ],
+    verification: ['pnpm lint', 'pnpm test', 'pnpm build'],
+  },
+  {
     version: 'v0.1.4',
     date: 'September 9, 2026',
     title: 'The V2 portfolio becomes the source of truth',
