@@ -24,6 +24,26 @@ const docsOnlyFiles = new Set([
   "README.md",
 ]);
 
+const nonDeployPrefixes = [
+  ".github/",
+  ".devcontainer/",
+  ".cursor/",
+  ".internal/",
+  ".omx/",
+  "docs/",
+  "planning/",
+  "scripts/",
+  "test/",
+  "version/",
+];
+
+const nonDeployFiles = new Set([
+  ".dev.vars.example",
+  ".env.example",
+  "AGENTS.md",
+  "OPTIMIZATION_GUIDE.md",
+]);
+
 const personalPrefixes = [
   "app/about/",
   "app/blog/",
@@ -52,9 +72,14 @@ function isPersonalOnly(path) {
   return personalFiles.has(path) || personalPrefixes.some((prefix) => path.startsWith(prefix));
 }
 
+function isNonDeploy(path) {
+  return nonDeployFiles.has(path) || nonDeployPrefixes.some((prefix) => path.startsWith(prefix));
+}
+
 export function classifyPaths(paths) {
   const changed = paths.map((path) => path.trim()).filter(Boolean);
-  const runtimePaths = changed.filter((path) => !isDocsOnly(path));
+  const ciPaths = changed.filter((path) => !isDocsOnly(path));
+  const runtimePaths = ciPaths.filter((path) => !isNonDeploy(path));
   let personal = false;
   let work = false;
   let shared = false;
@@ -79,8 +104,8 @@ export function classifyPaths(paths) {
     personal,
     work,
     shared,
-    runQuality: runtimePaths.length > 0,
-    scope: runtimePaths.length === 0 ? "documentation-only" : shared ? "shared" : personal && work ? "personal-and-work" : personal ? "personal" : "work",
+    runQuality: ciPaths.length > 0,
+    scope: runtimePaths.length === 0 ? (ciPaths.length === 0 ? "documentation-only" : "ci-only") : shared ? "shared" : personal && work ? "personal-and-work" : personal ? "personal" : "work",
   };
 }
 

@@ -7,15 +7,16 @@ This repository contains the personal portfolio and the work-site experience in 
 - **Personal-only:** personal pages, portfolio sections, navigation, footer, and onboarding.
 - **Work-only:** `components/HorizontalScrollPage.tsx` and `components/UnderConstructionPage.tsx`.
 - **Shared:** everything else that can affect the runtime, including `app/layout.tsx`, `app/page.tsx`, `app/globals.css`, `lib/`, `db/`, `public/`, package files, and unknown source files.
-- **Documentation-only:** documentation, release notes, `.internal/`, and local orchestration files. These keep the CI check green but skip installation, tests, and the production build.
+- **CI-only:** tests, GitHub workflow files, scripts, versioning helpers, and local tooling. These can validate CI but never request a host deployment.
+- **Documentation-only:** documentation, release notes, `.internal/`, and repository metadata. These skip installation, tests, the production build, and deployment.
 
 ## CI behavior
 
-`.github/workflows/ci.yml` always creates a successful change-classification check. The quality job then runs once for any runtime change and is skipped safely for documentation-only changes. This avoids duplicate personal/work builds while ensuring shared changes are never missed.
+`.github/workflows/ci.yml` always creates a successful change-classification check. The quality job runs for runtime and CI-only changes, but is skipped safely for documentation-only changes. This avoids duplicate personal/work builds while ensuring shared changes are never missed.
 
 ## Hosting-provider behavior
 
-The hosting projects must use the same classifier in their provider-level ignored-build setting:
+The hosting projects must use the same classifier in their provider-level ignored-build setting. Non-app changes—including `.md`, tests, workflow files, scripts, and local tooling—return exit `0` and therefore skip deployment:
 
 ```text
 Personal Vercel project: node scripts/ignore-deploy.mjs personal

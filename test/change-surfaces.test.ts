@@ -15,5 +15,7 @@ assert.equal(classifyPaths(["components/HorizontalScrollPage.tsx"]).scope, "work
 assert.equal(classifyPaths(["components/UnderConstructionPage.tsx"]).scope, "work");
 assert.equal(classifyPaths(["app/globals.css"]).scope, "shared");
 assert.equal(classifyPaths(["docs/deployment-path-strategy.md"]).scope, "documentation-only");
+assert.equal(classifyPaths(["test/change-surfaces.test.ts"]).scope, "ci-only");
+assert.equal(classifyPaths([".github/workflows/ci.yml"]).scope, "ci-only");
 
 console.log("change-surfaces.test: ok");
