@@ -8,6 +8,10 @@ export type ChangelogEntry = {
   verification?: string[]
 }
 
+export function changelogEntryId(version: string) {
+  return version.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+}
+
 export const changelogEntries: ChangelogEntry[] = [
   {
     version: 'v0.1.6',
@@ -115,3 +119,6 @@ export const changelogEntries: ChangelogEntry[] = [
     ],
   },
 ]
+
+export const latestChangelogEntry = changelogEntries[0]
+export const latestChangelogDate = new Date(latestChangelogEntry.date)

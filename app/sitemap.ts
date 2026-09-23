@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
+import { latestChangelogDate } from "@/lib/content/changelog";
 import { getPublishedPosts, getPublishedProjects } from "@/lib/content/public";
 import { absoluteUrl } from "@/lib/seo";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [projects, posts] = await Promise.all([getPublishedProjects(), getPublishedPosts()]);
-  const staticPages = ["/", "/about", "/projects", "/experience", "/blog"].map((path) => ({
+  const staticPages = ["/", "/about", "/projects", "/experience", "/blog", "/changelog"].map((path) => ({
     url: absoluteUrl(path),
+    lastModified: path === "/changelog" ? latestChangelogDate : undefined,
     changeFrequency: "monthly" as const,
     priority: path === "/" ? 1 : 0.7,
   }));

@@ -1,6 +1,6 @@
 import { ArrowUpRight, Check, GitCommitHorizontal } from 'lucide-react'
 
-import { changelogEntries } from '@/lib/content/changelog'
+import { changelogEntries, changelogEntryId } from '@/lib/content/changelog'
 
 export default function ChangelogPageContent() {
   return (
@@ -26,7 +26,7 @@ export default function ChangelogPageContent() {
       <section className="mx-auto max-w-5xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12 lg:py-28" aria-label="Release notes">
         <div className="space-y-20 sm:space-y-28">
           {changelogEntries.map((entry, index) => (
-            <article key={entry.version} className="relative grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
+            <article id={changelogEntryId(entry.version)} key={entry.version} className="relative scroll-mt-24 grid gap-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-16">
               <aside className="lg:sticky lg:top-24 lg:self-start">
                 <div className="flex items-center gap-3">
                   <span className={`inline-flex items-center gap-2 border px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] ${index === 0 ? 'border-[#1342FF] bg-[#1342FF] text-white' : 'border-[#d5d5d5] bg-white text-[#424242]'}`}>
