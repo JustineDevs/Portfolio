@@ -94,6 +94,7 @@ export function parseProviderUsageCsv(csv: string): ProviderUsageCsvRow[] {
     const periodDate = requiredField(record, "period_date", "date", "perioddate");
     const totalTokens = numberField(record, "total_tokens", "tokens", "totaltokens");
     const cachedTokens = numberField(record, "cached_tokens", "cache_tokens", "cachedtokens") ?? 0;
+    const activityCount = numberField(record, "activity_count", "events", "activitycount") ?? 0;
     const estimatedCost = numberField(record, "estimated_cost", "cost", "estimatedcost");
 
     if (!providerIds.has(provider) || !externalAccountId || !/^\d{4}-\d{2}-\d{2}$/.test(periodDate) || !isValidIsoDate(periodDate) || totalTokens === null || estimatedCost === null) {
@@ -109,6 +110,7 @@ export function parseProviderUsageCsv(csv: string): ProviderUsageCsvRow[] {
       periodDate,
       totalTokens,
       cachedTokens,
+      activityCount,
       estimatedCost,
     });
   }

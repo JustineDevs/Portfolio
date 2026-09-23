@@ -372,6 +372,13 @@
       "when": 1790164200000,
       "tag": "0053_remove_legacy_hyperagent_thumbnail",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1790164800000,
+      "tag": "0054_add_provider_activity_count",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@ export type ProviderUsageCsvRow = {
   periodDate: string;
   totalTokens: number;
   cachedTokens: number;
+  activityCount?: number;
   estimatedCost: number;
   sourceHash?: string | null;
 };
@@ -106,16 +107,18 @@ export async function getProviderUsageSummary(provider: AgentProviderId, year: n
   const daily: Record<string, number> = {};
   let totalTokens = 0;
   let cachedTokens = 0;
+  let activityCount = 0;
   let estimatedCost = 0;
   for (const row of rows) {
     if (!row.periodDate.startsWith(`${year}-`)) continue;
-    daily[row.periodDate] = (daily[row.periodDate] ?? 0) + row.totalTokens;
+    daily[row.periodDate] = (daily[row.periodDate] ?? 0) + (row.totalTokens > 0 ? row.totalTokens : row.activityCount);
     totalTokens += row.totalTokens;
     cachedTokens += row.cachedTokens;
+    activityCount += row.activityCount;
     estimatedCost += row.estimatedCost;
   }
   const activeDays = Object.keys(daily).filter((date) => daily[date] > 0).length;
-  return { provider, year, totalTokens, estimatedCost, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily };
+  return { provider, year, totalTokens, estimatedCost: estimatedCost > 0 ? estimatedCost : null, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, totalEvents: activityCount || null };
 }
 
 export async function createProviderConnection(input: {
@@ -169,12 +172,13 @@ export async function writeProviderUsageSnapshot(input: {
   periodDate: string;
   totalTokens: number;
   cachedTokens: number;
+  activityCount?: number;
   estimatedCost: number;
   sourceHash?: string | null;
 }) {
   const existing = await db.select({ id: providerUsageSnapshots.id }).from(providerUsageSnapshots).where(and(eq(providerUsageSnapshots.connectionId, input.connectionId), eq(providerUsageSnapshots.periodDate, input.periodDate))).limit(1);
   if (existing[0]) {
-    return db.update(providerUsageSnapshots).set({ ...input, syncedAt: new Date().toISOString() }).where(eq(providerUsageSnapshots.id, existing[0].id));
+    return db.update(providerUsageSnapshots).set({ ...input, activityCount: input.activityCount ?? 0, syncedAt: new Date().toISOString() }).where(eq(providerUsageSnapshots.id, existing[0].id));
   }
   return db.insert(providerUsageSnapshots).values(input);
 }
@@ -223,6 +227,7 @@ export async function importProviderUsageCsvFromSource(rows: ProviderUsageCsvRow
       periodDate: row.periodDate,
       totalTokens: row.totalTokens,
       cachedTokens: row.cachedTokens,
+      activityCount: row.activityCount ?? 0,
       estimatedCost: row.estimatedCost,
       sourceHash: row.sourceHash ?? source?.sourceHash,
     });

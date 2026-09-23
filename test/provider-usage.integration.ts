@@ -54,6 +54,7 @@ async function main() {
         period_date text NOT NULL,
         total_tokens integer DEFAULT 0 NOT NULL,
         cached_tokens integer DEFAULT 0 NOT NULL,
+        activity_count integer DEFAULT 0 NOT NULL,
         estimated_cost real DEFAULT 0 NOT NULL,
         source_hash text,
         synced_at text DEFAULT CURRENT_TIMESTAMP NOT NULL,

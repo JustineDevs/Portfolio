@@ -15,18 +15,22 @@ export async function GET(request: Request) {
   if (!provider || !providerIds.includes(provider as (typeof providerIds)[number]) || !Number.isInteger(year)) {
     return NextResponse.json({ error: "Invalid provider or year." }, { status: 400 });
   }
+  const summary = await getProviderUsageSummary(provider as "openai" | "claude" | "cursor" | "orca", year);
+  if (summary.activeDays !== null && summary.activeDays > 0) {
+    return NextResponse.json(summary, { headers: { "Cache-Control": "no-store" } });
+  }
   if (provider === "openai") {
     const codex = getPublicUsageSummary(year, "Codex");
     if (codex.activeDays !== null) return NextResponse.json({ provider, year, ...codex }, { headers: { "Cache-Control": "no-store" } });
   }
   if (provider === "orca") {
-    return NextResponse.json({ provider, year, ...getPublicUsageSummary(year, "Orca") }, { headers: { "Cache-Control": "no-store" } });
+    const orca = getPublicUsageSummary(year, "Orca");
+    if (orca.activeDays !== null) return NextResponse.json({ provider, year, ...orca }, { headers: { "Cache-Control": "no-store" } });
   }
   if (provider === "cursor") {
     const cursor = getPublicUsageSummary(year, "Cursor");
     if (cursor.activeDays !== null) return NextResponse.json({ provider, year, ...cursor }, { headers: { "Cache-Control": "no-store" } });
   }
-  const summary = await getProviderUsageSummary(provider as "openai" | "claude" | "cursor", year);
   if (provider === "claude" && summary.totalTokens === null) {
     const archive = getArchiveActivitySummary(year);
     if (archive) {
