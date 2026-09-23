@@ -109,7 +109,9 @@ type PublicationBrand = 'coderlegion' | 'peerlist' | 'devto' | 'medium'
 
 const publicationLinks: { brand: PublicationBrand; label: string; href: string; src?: string }[] = [
   { brand: 'coderlegion', label: 'CoderLegion', href: 'https://coderlegion.com/user/JustineDevs' },
-  { brand: 'peerlist', label: 'Peerlist', href: 'https://peerlist.io/jstndevs', src: 'https://cdn.brandfetch.io/idNU2eDEh8/theme/dark/logo.svg?c=1bxid64Mup7aczewSAYMX&t=1781763714360' },
+  // Use Simple Icons instead of Brandfetch: the Brandfetch asset intermittently
+  // returns an error in production and leaves a broken image in the social bar.
+  { brand: 'peerlist', label: 'Peerlist', href: 'https://peerlist.io/jstndevs', src: 'https://cdn.simpleicons.org/peerlist/666666' },
   { brand: 'devto', label: 'DEV.to', href: 'https://dev.to/justinedevs', src: 'https://media2.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fthepracticaldev.s3.amazonaws.com%2Fi%2F78hs31fax49uwy6kbxyw.png' },
   { brand: 'medium', label: 'Medium', href: 'https://medium.com/@justinedevs', src: 'https://logos-world.net/wp-content/uploads/2023/07/Medium-Logo.png' },
 ]

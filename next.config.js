@@ -9,6 +9,14 @@ const appVersionTag = `v${appVersion}`
 const nextConfig = {
   reactStrictMode: true,
 
+  // Keep original source maps available in development, but never publish
+  // them with the production browser bundle. This prevents DevTools from
+  // reconstructing the authored module tree from public .map files.
+  productionBrowserSourceMaps: false,
+
+  // Do not advertise the framework and version in the response headers.
+  poweredByHeader: false,
+
   async headers() {
     return [
       {
