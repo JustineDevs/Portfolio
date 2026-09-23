@@ -10,6 +10,31 @@ export type ChangelogEntry = {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    version: 'v0.1.6',
+    date: 'September 23, 2026',
+    title: 'A more discoverable, trustworthy portfolio',
+    description: 'This release brings the portfolio, CMS, project archive, and AI-usage presentation into a cleaner public release with stronger provenance, safer boundaries, and better search visibility.',
+    highlights: [
+      'Added canonical SEO metadata, Open Graph and Twitter cards, structured data, sitemap, robots rules, and an answer-engine index.',
+      'Expanded project dossiers with corrected banners, awards, certificates, author links, technology details, and archived-record cleanup.',
+      'Added a combined, anonymized AI-usage view with provider-aware activity, secure source registries, CSV validation, and public-export documentation.',
+      'Disabled unfinished onboarding and work-site surfaces in production while preserving their original navigation treatment and clear construction state.',
+    ],
+    changed: [
+      'Added the HyperKit README banner as the single published HyperAgent thumbnail and removed the legacy asset path.',
+      'Improved CMS connection handling, experience progress editing, provider logos, homepage technology coverage, and remote asset fallbacks.',
+      'Documented the SEO keyword strategy, public AI-usage export contract, and provider-usage security model.',
+    ],
+    verification: [
+      'pnpm exec tsc --noEmit',
+      'pnpm lint',
+      'pnpm test',
+      'pnpm build',
+      'pnpm db:migrate',
+      'git diff --check',
+    ],
+  },
+  {
     version: 'v0.1.4',
     date: 'September 9, 2026',
     title: 'The V2 portfolio becomes the source of truth',

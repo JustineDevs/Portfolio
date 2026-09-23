@@ -46,14 +46,14 @@ export default function HeroProjectHeader({ project }: HeroProjectHeaderProps) {
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
             {project.websiteUrl && <a href={project.websiteUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#383838] underline decoration-[#1342FF] decoration-2 underline-offset-4 transition hover:text-[#1342FF]">Visit website <ExternalLink size={15} aria-hidden="true" /></a>}
             <button type="button" onClick={handleShare} className="inline-flex items-center gap-2 text-sm font-semibold text-[#666666] transition hover:text-[#383838]">Share project <Share2 size={15} aria-hidden="true" /></button>
-            <a href="https://work.jstn.site" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm font-semibold text-[#666666] transition hover:text-[#383838]">Work with me <Calendar size={15} aria-hidden="true" /></a>
+            <span aria-disabled="true" title="Work site under construction" className="inline-flex cursor-not-allowed items-center gap-2 text-sm font-semibold text-[#999999]">Work site under construction <Calendar size={15} aria-hidden="true" /></span>
           </div>
           <div className="mt-8 border-t border-[#d5d5d5] pt-5"><span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#777777]">Tech stack</span><div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm text-[#555555]">{project.technologies.map((technology) => <span key={technology}>{technology}</span>)}</div></div>
         </div>
 
         <aside className="space-y-10 border-t border-[#d5d5d5] pt-6 text-sm text-[#555555] lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0">
           <div><span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#777777]">Role</span><ul className="space-y-1.5">{(project.responsibilities.length > 0 ? project.responsibilities : [project.category]).map((item) => <li key={item}>{item}</li>)}</ul></div>
-          <div><span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#777777]">Author</span><span>{project.authorName}</span></div>
+          <div><span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#777777]">Authors</span><div className="space-y-1.5">{(project.authors.length > 0 ? project.authors : [{ name: project.authorName, url: project.authorUrl }]).map((author) => author.url ? <a key={`${author.name}-${author.url}`} href={author.url} target="_blank" rel="noopener noreferrer" className="block transition hover:text-[#1342FF] hover:underline hover:underline-offset-2">{author.name}</a> : <span key={author.name} className="block">{author.name}</span>)}</div></div>
           <div><span className="mb-3 block text-[10px] font-semibold uppercase tracking-[0.22em] text-[#777777]">Tags</span><div className="flex flex-wrap gap-x-3 gap-y-1">{project.tags.map((tag) => <span key={tag}>#{tag}</span>)}</div></div>
         </aside>
       </div>

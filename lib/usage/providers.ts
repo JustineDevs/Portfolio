@@ -3,6 +3,7 @@ export const activityProviders = [
   { id: "openai", label: "OpenAI (Codex)", kind: "usage" },
   { id: "claude", label: "Claude Code", kind: "usage" },
   { id: "cursor", label: "Cursor", kind: "usage" },
+  { id: "orca", label: "Orca", kind: "usage" },
 ] as const;
 
 export type ActivityProviderId = (typeof activityProviders)[number]["id"];

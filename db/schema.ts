@@ -20,6 +20,7 @@ export const highlightTypes = [
 ] as const;
 export const adminUserStatuses = ["active", "disabled"] as const;
 export const providerConnectionStatuses = ["pending", "connected", "paused", "error", "revoked"] as const;
+export const providerUsageSourceStatuses = ["verified", "partial", "stale", "rejected"] as const;
 
 const timestamps = {
   createdAt: text("created_at")
@@ -368,7 +369,7 @@ export const githubActivitySnapshots = sqliteTable(
   })
 );
 
-/** One row per external AI vendor account. Secrets remain in the connection provider. */
+/** One row per AI vendor account represented in an imported CSV. */
 export const providerConnections = sqliteTable(
   "provider_connections",
   {
@@ -377,8 +378,6 @@ export const providerConnections = sqliteTable(
     externalAccountId: text("external_account_id").notNull(),
     accountLabel: text("account_label").notNull(),
     accountEmail: text("account_email"),
-    connectionRef: text("connection_ref"),
-    scopesJson: text("scopes_json").notNull().default("[]"),
     status: text("status", { enum: providerConnectionStatuses }).notNull().default("pending"),
     includeInRollup: integer("include_in_rollup", { mode: "boolean" }).notNull().default(true),
     lastSyncedAt: text("last_synced_at"),
@@ -392,12 +391,38 @@ export const providerConnections = sqliteTable(
   }),
 );
 
-/** Normalized daily usage, keyed to an external account for idempotent aggregation. */
+/** Registry of the authoritative source and validation state for imported usage. */
+export const providerUsageSources = sqliteTable(
+  "provider_usage_sources",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    sourceKey: text("source_key").notNull(),
+    provider: text("provider").notNull(),
+    surface: text("surface").notNull(),
+    authority: text("authority").notNull(),
+    schemaVersion: integer("schema_version").notNull().default(1),
+    timezone: text("timezone").notNull().default("UTC"),
+    coverageStart: text("coverage_start"),
+    coverageEnd: text("coverage_end"),
+    lastSourceHash: text("last_source_hash"),
+    status: text("status", { enum: providerUsageSourceStatuses }).notNull().default("partial"),
+    lastValidatedAt: text("last_validated_at"),
+    ...timestamps,
+  },
+  (table) => ({
+    sourceKeyUnique: uniqueIndex("provider_usage_sources_source_key_unique").on(table.sourceKey),
+    providerIdx: index("provider_usage_sources_provider_idx").on(table.provider),
+    statusIdx: index("provider_usage_sources_status_idx").on(table.status),
+  }),
+);
+
+/** Normalized daily usage imported from a provider CSV, keyed to an account. */
 export const providerUsageSnapshots = sqliteTable(
   "provider_usage_snapshots",
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     connectionId: integer("connection_id").notNull().references(() => providerConnections.id, { onDelete: "cascade" }),
+    sourceId: integer("source_id").references(() => providerUsageSources.id, { onDelete: "set null" }),
     periodDate: text("period_date").notNull(),
     totalTokens: integer("total_tokens").notNull().default(0),
     cachedTokens: integer("cached_tokens").notNull().default(0),
@@ -408,6 +433,7 @@ export const providerUsageSnapshots = sqliteTable(
   (table) => ({
     connectionDateUnique: uniqueIndex("provider_usage_snapshots_connection_date_unique").on(table.connectionId, table.periodDate),
     connectionIdx: index("provider_usage_snapshots_connection_idx").on(table.connectionId),
+    sourceIdx: index("provider_usage_snapshots_source_idx").on(table.sourceId),
     dateIdx: index("provider_usage_snapshots_period_date_idx").on(table.periodDate),
   }),
 );

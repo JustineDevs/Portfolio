@@ -131,7 +131,7 @@ async function getExperienceProgress(sections: Awaited<ReturnType<typeof getPubl
     const resolved = await Promise.all(entries.map(async (entry) => {
       if (!entry.logoKey) return entry;
       const asset = await getPublishedAssetBySemanticKey(entry.logoKey);
-      return { ...entry, logoUrl: asset?.url || entry.logoUrl || null };
+      return { ...entry, logoUrl: asset?.url || null };
     }));
     return resolved.length > 0 ? resolved : fallbackExperienceProgress;
   } catch {
@@ -359,7 +359,7 @@ export async function getExperiencePageData(): Promise<ExperiencePageData> {
     getPublishedProjects(),
     getLatestPosts(3),
     getPublishedTestimonials(),
-    getFeaturedAwardCards(3, "experience.awards"),
+    getFeaturedAwardCards(5, "experience.awards"),
     getFeaturedCertificateCards(3, "experience.certificates"),
     getPublishedHighlights(),
     getPublishedPageSections("experience"),

@@ -11,6 +11,8 @@ interface HeartButtonProps {
   reminderPlacement?: 'above' | 'below'
 }
 
+const pendingHeartCounts = new Map<string, Promise<{ likes?: number; hasLiked?: boolean }>>()
+
 export default function HeartButton({ className = '', showReminderPopup = true, reminderPlacement = 'above' }: HeartButtonProps) {
   const [isLiked, setIsLiked] = useState(false)
   const [heartCount, setHeartCount] = useState(0)
@@ -43,9 +45,22 @@ export default function HeartButton({ className = '', showReminderPopup = true, 
   }, [heartCount, isLoading])
 
   const fetchHeartCount = useCallback(async (vid: string) => {
+    const pending = pendingHeartCounts.get(vid)
+    if (pending) {
+      const data = await pending
+      setHeartCount(data.likes || 0)
+      setIsLiked(data.hasLiked || false)
+      setIsLoading(false)
+      return
+    }
+
+    const request = fetch(`/api/hearts?visitorId=${encodeURIComponent(vid)}`)
+      .then((response) => response.json() as Promise<{ likes?: number; hasLiked?: boolean }>)
+      .finally(() => pendingHeartCounts.delete(vid))
+    pendingHeartCounts.set(vid, request)
+
     try {
-      const response = await fetch(`/api/hearts?visitorId=${encodeURIComponent(vid)}`)
-      const data = await response.json()
+      const data = await request
       setHeartCount(data.likes || 0)
       setIsLiked(data.hasLiked || false)
     } catch (error) {

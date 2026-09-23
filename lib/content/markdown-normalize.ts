@@ -15,7 +15,9 @@ function normalizeBareDimensionAttributes(input: string) {
 export function normalizeCmsMarkdown(markdown: string) {
   if (!markdown) return markdown;
 
-  let normalized = markdown.replace(/\r\n/g, "\n");
+  // Some legacy SQLite migrations stored escaped line breaks literally. Turn
+  // them back into real Markdown line breaks before parsing or indexing.
+  let normalized = markdown.replace(/\\n/g, "\n").replace(/\r\n/g, "\n");
   normalized = normalizeDimensionAttributes(normalized);
   normalized = normalizeBareDimensionAttributes(normalized);
   return normalized;

@@ -87,19 +87,21 @@ export default function SiteOnboarding({
 
         <button
           type="button"
-          className="site-onboarding__panel site-onboarding__panel--work"
-          onPointerDown={() => chooseSite('work')}
-          onClick={() => chooseSite('work')}
-          onMouseEnter={() => setHoveredSite('work')}
-          onMouseLeave={() => setHoveredSite(null)}
-          onFocus={() => setHoveredSite('work')}
-          onBlur={() => setHoveredSite(null)}
-          aria-label="Open JustineDevs work site"
+          className="site-onboarding__panel site-onboarding__panel--work site-onboarding__panel--disabled"
+          disabled
+          aria-disabled="true"
+          aria-label="JustineDevs work site is under construction"
         >
+          <span className="site-onboarding__panel-mark site-onboarding__panel-mark--lock" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="presentation">
+              <rect x="11" y="21" width="26" height="20" rx="3" />
+              <path d="M16 21v-6a8 8 0 0 1 16 0v6M24 29v5" />
+            </svg>
+          </span>
           <span className="site-onboarding__panel-copy">
             <span className="site-onboarding__eyebrow">02 / PROFESSIONAL</span>
             <span className="site-onboarding__title">Work Site</span>
-            <span className="site-onboarding__hint">Systems, services, and collaboration</span>
+            <span className="site-onboarding__hint">Under construction — unavailable for now</span>
           </span>
         </button>
 

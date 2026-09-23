@@ -1,0 +1,24 @@
+# JSTN — Justine Lupasi
+
+JSTN is the portfolio of Justine Lupasi, a software developer based in Metro Manila, Philippines.
+
+## Focus
+
+- AI-native software development and agent workflows
+- Blockchain infrastructure and smart-contract tooling
+- Practical web products, developer experience, and auditable systems
+
+## Canonical pages
+
+- [Home](https://jstn.site/)
+- [About](https://jstn.site/about)
+- [Projects](https://jstn.site/projects)
+- [Experience](https://jstn.site/experience)
+- [Writing](https://jstn.site/blog)
+
+## Featured project pages
+
+Project details, technologies, responsibilities, and links are maintained in the portfolio CMS:
+
+- [HyperKit Labs — HyperAgent](https://jstn.site/projects/hyperkit)
+- [Mandate402](https://jstn.site/projects/mandate402)

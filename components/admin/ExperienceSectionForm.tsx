@@ -2,6 +2,7 @@ import { savePageSectionAction } from "@/app/admin/actions";
 import { AdminFormSubmitButton } from "@/components/admin/AdminFormSubmitButton";
 import { AdminErrorBanner, Field, FormSection, SelectField, TextareaField, type SelectOption } from "@/components/admin/FormPrimitives";
 import { MarkdownBodyField } from "@/components/admin/MarkdownBodyField";
+import { ExperienceProgressForm } from "@/components/admin/ExperienceProgressForm";
 
 const statuses: SelectOption[] = [
   { value: "draft", label: "Draft" },
@@ -9,7 +10,10 @@ const statuses: SelectOption[] = [
   { value: "archived", label: "Archived" },
 ];
 
-export function ExperienceSectionForm({ value, errorMessage }: { value: { id?: number; sectionKey?: string; title?: string | null; subtitle?: string | null; bodyMd?: string | null; metaJson?: string | null; status?: string; sortOrder?: number } | null; errorMessage?: string }) {
+export function ExperienceSectionForm({ value, projectOptions = [], errorMessage }: { value: { id?: number; sectionKey?: string; title?: string | null; subtitle?: string | null; bodyMd?: string | null; metaJson?: string | null; status?: string; sortOrder?: number } | null; projectOptions?: { value: string; label: string; description: string }[]; errorMessage?: string }) {
+  if (value?.sectionKey === "progress") {
+    return <ExperienceProgressForm value={value} projectOptions={projectOptions} errorMessage={errorMessage} />;
+  }
   return (
     <form action={savePageSectionAction} className="space-y-6 rounded-2xl border border-[#d5d5d5] bg-white p-6 shadow-sm">
       <FormSection title={`Experience / ${value?.sectionKey || "section"}`} description="Edit the structured content behind the Experience page without changing its presentation template." />

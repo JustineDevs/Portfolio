@@ -35,7 +35,7 @@ export default function ExperienceOverviewSection({ payload, assets, profile }: 
           </div>
           <div className="flex flex-col justify-start pt-2 text-center lg:pt-8 lg:text-left">
             <p className="font-mono text-[9px] font-bold uppercase tracking-[0.22em] text-[#1342FF]">Experience / profile</p>
-            <h1 className="mt-5 whitespace-nowrap text-[clamp(30px,4vw,54px)] font-medium leading-[0.98] tracking-[-0.065em] text-[#424242]">{profile.title}</h1>
+            <h1 className="mt-5 max-w-full break-words text-[clamp(30px,4vw,54px)] font-medium leading-[0.98] tracking-[-0.065em] text-[#424242]">{profile.title}</h1>
             <p className="mt-6 max-w-xl text-[15px] leading-[1.75] text-[#858585] sm:text-[17px]">{profile.description}</p>
             <div className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2 font-mono text-[10px] uppercase tracking-[0.14em] text-[#6a7280] lg:justify-start">
               <span>{profile.location}</span>

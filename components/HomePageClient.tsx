@@ -106,6 +106,7 @@ export default function HomePageClient({
 }) {
   const [pageData, setPageData] = useState<HomePageData>(initialData ?? emptyHomePageData)
   const [contentDataReady, setContentDataReady] = useState(Boolean(initialData))
+  const [avatarReady, setAvatarReady] = useState(false)
   const [contentReady, setContentReady] = useState(false)
   /** Desktop-only intro overlay; mobile always sees content (Speed Insights / LCP). */
   const [deskSplash, setDeskSplash] = useState(false)
@@ -134,31 +135,8 @@ export default function HomePageClient({
   }, [initialData])
 
   useEffect(() => {
-    if (!contentDataReady) return
-
-    let cancelled = false
-    const deadline = performance.now() + 8000
-
-    const waitForDynamicSections = () => {
-      const pendingSections = document.querySelectorAll('#main-content [aria-busy="true"]').length
-
-      if (pendingSections === 0 || performance.now() >= deadline) {
-        if (!cancelled) setContentReady(true)
-        return
-      }
-
-      window.requestAnimationFrame(waitForDynamicSections)
-    }
-
-    const frame = window.requestAnimationFrame(() => {
-      window.requestAnimationFrame(waitForDynamicSections)
-    })
-
-    return () => {
-      cancelled = true
-      window.cancelAnimationFrame(frame)
-    }
-  }, [contentDataReady, mode])
+    setContentReady(contentDataReady && (mode !== 'personal' || avatarReady))
+  }, [avatarReady, contentDataReady, mode])
 
   const { featuredProjects, featuredAwards, featuredPosts, featuredCertificates, legalLinks } = pageData
 
@@ -192,7 +170,10 @@ export default function HomePageClient({
         <AnimatePresence mode="wait">
           {mode === 'personal' ? (
             <motion.div key="personal" {...animations.modeSwitch} initial={false}>
-              <Hero projectOnePercentLogoUrl={pageData.assets.projectOnePercent?.url} />
+              <Hero
+                projectOnePercentLogoUrl={pageData.assets.projectOnePercent?.url}
+                onAvatarReady={() => setAvatarReady(true)}
+              />
               <TechAndDescriptionSection content={pageData.howIWork} platformAssets={pageData.assets.platforms} />
               <BrandBadgeProjectsSection featuredProjects={featuredProjects} featuredAwards={featuredAwards} featuredPosts={featuredPosts} />
               <GithubActivitySection />

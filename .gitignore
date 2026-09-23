@@ -79,4 +79,14 @@ swapfile.sys
 /db/local.db-*
 *.sqlite
 *.sqlite3
+
+# --- Local AI-usage sources and generated exports (never commit) ---
+/.codex/
+/.config/orca/
+/.omx/
+/public/usage/
+**/ai-usage*.csv
+**/usage-export*.csv
+**/private-usage*/
 .vercel
+.internal

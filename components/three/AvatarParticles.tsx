@@ -10,17 +10,20 @@ type AvatarParticlesProps = {
   particleSize?: number;
   hoverIntensity?: number;
   hoverActive?: boolean;
+  onReady?: () => void;
 };
 
 export default function AvatarParticles({
+  // Keep the original particle density while sampling every model surface.
   density = 4,
   particleSize = 0.82,
   hoverIntensity = 0.028,
   hoverActive = false,
+  onReady,
 }: AvatarParticlesProps) {
   const { scene } = useGLTF("/assets/avatar.glb");
   const pointsRef = useRef<THREE.Points>(null);
-  const { camera, raycaster, pointer } = useThree();
+  const { camera, raycaster, pointer, gl, scene: renderScene } = useThree();
   
   // Mouse position in 3D space
   const mouse3D = useRef(new THREE.Vector3(0, 0, 0));
@@ -62,8 +65,8 @@ export default function AvatarParticles({
     const center = bounds.getCenter(new THREE.Vector3());
     const size = bounds.getSize(new THREE.Vector3());
     const lift = size.y * 0.12;
-    const count = posAttr.count;
     const step = density;
+    const count = posAttr.count;
     const particleCount = Math.floor(count / step);
     
     const positions = new Float32Array(particleCount * 3);
@@ -78,15 +81,15 @@ export default function AvatarParticles({
       const x = posAttr.getX(i) - center.x;
       const y = sourceY - center.y + lift;
       const z = posAttr.getZ(i) - center.z;
-      
+
       positions[j * 3 + 0] = x;
       positions[j * 3 + 1] = y;
       positions[j * 3 + 2] = z;
-      
+
       origins[j * 3 + 0] = x;
       origins[j * 3 + 1] = y;
       origins[j * 3 + 2] = z;
-      
+
       phases[j] = Math.random() * Math.PI * 2;
       jitters[j * 3 + 0] = (Math.random() - 0.5) * 0.5;
       jitters[j * 3 + 1] = (Math.random() - 0.5) * 0.5;
@@ -109,6 +112,31 @@ export default function AvatarParticles({
   useEffect(() => {
     velocitiesRef.current = new Float32Array(origins.length);
   }, [origins]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    // Compile materials and upload the first buffers while the intro curtain
+    // is still covering the page, then wait for two frames before revealing it.
+    const renderer = gl as THREE.WebGLRenderer & {
+      compileAsync?: (scene: THREE.Scene, camera: THREE.Camera) => Promise<void>;
+    };
+    const compile = renderer.compileAsync
+      ? renderer.compileAsync(renderScene, camera)
+      : Promise.resolve(renderer.compile(renderScene, camera));
+
+    compile.catch(() => undefined).finally(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (!cancelled) onReady?.();
+        });
+      });
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [camera, gl, onReady, renderScene]);
 
   useFrame((state) => {
     if (!pointsRef.current) return;
@@ -247,6 +275,3 @@ export default function AvatarParticles({
     </points>
   );
 }
-
-// Preload the GLB
-useGLTF.preload("/assets/avatar.glb");

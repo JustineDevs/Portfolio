@@ -9,6 +9,20 @@ const appVersionTag = `v${appVersion}`
 const nextConfig = {
   reactStrictMode: true,
 
+  async headers() {
+    return [
+      {
+        source: '/assets/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ]
+  },
+
   env: {
     NEXT_PUBLIC_APP_VERSION: appVersion,
     NEXT_PUBLIC_APP_VERSION_TAG: appVersionTag,

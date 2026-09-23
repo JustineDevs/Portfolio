@@ -66,7 +66,7 @@ function HighlightGrid({ rows = [], preview, children, className, ...props }: Hi
 
       {isExpanded && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 z-[200] overflow-y-auto bg-white/95 backdrop-blur-sm"
+          className="highlight-grid-expanded fixed inset-0 z-[200] overflow-y-auto bg-white/95 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-label="Expanded section"

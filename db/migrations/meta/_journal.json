@@ -134,6 +134,244 @@
       "when": 1778779200000,
       "tag": "0018_provider_usage_connections",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1790144335997,
+      "tag": "0020_correct_go_mirofish_progress",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1790145000000,
+      "tag": "0021_add_legacy_learning_path",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1790145600000,
+      "tag": "0022_group_hyperagent_under_hyperkit",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1790146200000,
+      "tag": "0023_import_audited_projects",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1790146800000,
+      "tag": "0024_link_project_timeline_marks",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790147400000,
+      "tag": "0025_link_go_mirofish_mark",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790148000000,
+      "tag": "0026_group_hyperagent_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1790148600000,
+      "tag": "0027_add_audited_projects_to_timeline",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1790149200000,
+      "tag": "0028_add_story_milestones_to_timeline",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1790149800000,
+      "tag": "0029_enrich_project_dossiers",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1790150400000,
+      "tag": "0030_add_founders_school_brand_asset",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1790151000000,
+      "tag": "0031_correct_builder_pivot_technology",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1790151600000,
+      "tag": "0032_use_discord_logo_for_community_milestone",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1790152200000,
+      "tag": "0033_correct_foundation_timeline_year",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1790152800000,
+      "tag": "0034_correct_learning_path_year",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790153400000,
+      "tag": "0035_correct_fullstack_pivot_year",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1790154000000,
+      "tag": "0036_correct_hyperkit_technology_stack",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790154600000,
+      "tag": "0037_remove_founder_school_technology_row",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790155200000,
+      "tag": "0038_archive_hyperagent_project_listing",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1790155800000,
+      "tag": "0039_name_timeline_milestones",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1790156400000,
+      "tag": "0040_archive_meta_architect_project_listing",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1790157000000,
+      "tag": "0041_archive_codex_meta_architect_listing",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1790157600000,
+      "tag": "0042_archive_go_mirofish_project_listing",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1790158200000,
+      "tag": "0043_archive_mirofish_project_listing",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1790158800000,
+      "tag": "0044_correct_project_banners_and_dossiers",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790159400000,
+      "tag": "0045_add_mandate402_project",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1790160000000,
+      "tag": "0046_polish_project_dossier_rendering",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1790160600000,
+      "tag": "0047_correct_project_banners_and_add_awards",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1790161200000,
+      "tag": "0048_finalize_project_content_and_assets",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1790161800000,
+      "tag": "0049_move_founder_school_to_certificate",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1790162400000,
+      "tag": "0050_secure_provider_usage_sources",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1790163000000,
+      "tag": "0051_add_project_authors",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1790163600000,
+      "tag": "0052_correct_project_author_targets",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1790164200000,
+      "tag": "0053_remove_legacy_hyperagent_thumbnail",
+      "breakpoints": true
     }
   ]
 }

@@ -5,10 +5,9 @@ import { useEffect, useRef, useState } from 'react'
 
 type LoaderPhase = 'loading' | 'curtain' | 'complete'
 
-const TOTAL_PRELOADER_TIME = 5000
-const CURTAIN_DURATION = 1150
-const MINIMUM_LOADING_TIME = TOTAL_PRELOADER_TIME - CURTAIN_DURATION
-const ASSET_TIMEOUT = 1800
+const CURTAIN_DURATION = 650
+const MINIMUM_LOADING_TIME = 350
+const ASSET_TIMEOUT = 1200
 
 function waitForImage(image: HTMLImageElement) {
   if (image.complete) return Promise.resolve()

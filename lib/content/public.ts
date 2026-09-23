@@ -12,6 +12,7 @@ import {
   normalizeOptionalImageAssetUrl,
 } from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
+import { getPublishedAssetBySemanticKey } from "@/lib/content/assets";
 import {
   placementMatches,
   type HighlightPlacementKey,
@@ -490,7 +491,14 @@ async function hydrateProjects(
     ]);
 
   const projects = await Promise.all(
-    projectRows.map(async (project) => ({
+    projectRows.map(async (project) => {
+      // Keep the published HyperKit card tied to the supplied README artwork.
+      // The version query also clears stale incorrect thumbnails from browser caches.
+      const hyperkitBanner = project.slug === "hyperkit"
+        ? "/assets/projects/curated/hyperkit-banner-readme.png?v=20260923"
+        : null;
+
+      return ({
       id: project.id,
       slug: project.slug,
       title: project.title,
@@ -499,10 +507,14 @@ async function hydrateProjects(
       category: project.category,
       publishedAt: project.publishedAt,
       featured: project.featured,
-      coverImageUrl: await normalizeOptionalImageAssetUrl(project.coverImageUrl),
-      bannerImageUrl: await normalizeOptionalImageAssetUrl(project.bannerImageUrl),
+      logoUrl: (await getPublishedAssetBySemanticKey(`project.${project.slug}`))?.url || null,
+      coverImageUrl: hyperkitBanner || await normalizeOptionalImageAssetUrl(project.coverImageUrl),
+      bannerImageUrl: hyperkitBanner || await normalizeOptionalImageAssetUrl(project.bannerImageUrl),
       authorName: project.authorName,
       authorUrl: project.authorUrl,
+      authors: linkRows
+        .filter((row) => row.projectId === project.id && row.type === "author")
+        .map((row) => ({ name: row.label?.trim() || row.url, url: row.url })),
       websiteUrl: project.websiteUrl,
       sortOrder: project.sortOrder,
       tags: tagRows.filter((row) => row.projectId === project.id).map((row) => row.tag),
@@ -516,7 +528,8 @@ async function hydrateProjects(
       links: linkRows
         .filter((row) => row.projectId === project.id)
         .map((row) => ({ type: row.type, label: row.label, url: row.url })),
-    })),
+      });
+    }),
   );
 
   return projects satisfies PublicProject[];

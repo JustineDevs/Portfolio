@@ -1,21 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { getProviderUsageSummary, ingestProviderUsageSnapshots, type ProviderUsageSyncInput } from "@/lib/integrations/provider-usage";
+import { getProviderUsageSummary, importProviderUsageCsvFromSource } from "@/lib/integrations/provider-usage";
+import { MAX_PROVIDER_USAGE_CSV_BYTES, MAX_PROVIDER_USAGE_CSV_ROWS, parseProviderUsageCsv } from "@/lib/integrations/provider-usage-csv";
+import { getArchiveActivitySummary } from "@/lib/usage/archive-activity";
+import { getPublicUsageSummary } from "@/lib/usage/public-ai-usage";
+import { sha256Hex, verifyUsageSignature } from "@/lib/integrations/provider-usage-security";
 
-const providerIds = ["openai", "claude", "cursor"] as const;
-
-function hasSyncSecret(request: Request) {
-  const configured = process.env.PROVIDER_USAGE_SYNC_SECRET?.trim();
-  const authorization = request.headers.get("authorization") ?? "";
-  return Boolean(configured && authorization === `Bearer ${configured}`);
-}
-
-function isValidSnapshot(value: unknown): value is ProviderUsageSyncInput["snapshots"][number] {
-  if (!value || typeof value !== "object") return false;
-  const snapshot = value as Record<string, unknown>;
-  return typeof snapshot.periodDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(snapshot.periodDate)
-    && ["totalTokens", "cachedTokens", "estimatedCost"].every((key) => typeof snapshot[key] === "number" && Number.isFinite(snapshot[key]) && Number(snapshot[key]) >= 0);
-}
+const providerIds = ["openai", "claude", "cursor", "orca"] as const;
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -24,30 +15,60 @@ export async function GET(request: Request) {
   if (!provider || !providerIds.includes(provider as (typeof providerIds)[number]) || !Number.isInteger(year)) {
     return NextResponse.json({ error: "Invalid provider or year." }, { status: 400 });
   }
-  return NextResponse.json(await getProviderUsageSummary(provider as "openai" | "claude" | "cursor", year), { headers: { "Cache-Control": "no-store" } });
+  if (provider === "openai") {
+    const codex = getPublicUsageSummary(year, "Codex");
+    if (codex.activeDays !== null) return NextResponse.json({ provider, year, ...codex }, { headers: { "Cache-Control": "no-store" } });
+  }
+  if (provider === "orca") {
+    return NextResponse.json({ provider, year, ...getPublicUsageSummary(year, "Orca") }, { headers: { "Cache-Control": "no-store" } });
+  }
+  if (provider === "cursor") {
+    const cursor = getPublicUsageSummary(year, "Cursor");
+    if (cursor.activeDays !== null) return NextResponse.json({ provider, year, ...cursor }, { headers: { "Cache-Control": "no-store" } });
+  }
+  const summary = await getProviderUsageSummary(provider as "openai" | "claude" | "cursor", year);
+  if (provider === "claude" && summary.totalTokens === null) {
+    const archive = getArchiveActivitySummary(year);
+    if (archive) {
+      return NextResponse.json({
+        ...summary,
+        activeDays: archive.activeDays,
+        daily: archive.daily,
+        activityType: "messages",
+        totalMessages: archive.totalMessages,
+        totalConversations: archive.totalConversations,
+      }, { headers: { "Cache-Control": "no-store" } });
+    }
+  }
+  return NextResponse.json(summary, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
-  if (!hasSyncSecret(request)) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-  let payload: unknown;
+  const body = await request.text();
+  if (Buffer.byteLength(body, "utf8") > MAX_PROVIDER_USAGE_CSV_BYTES) return NextResponse.json({ error: "Usage import is limited to 5 MB." }, { status: 413 });
+  const signature = verifyUsageSignature(request, body);
+  if (!signature.ok) return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   try {
-    payload = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Request body must be valid JSON." }, { status: 400 });
-  }
-  if (!payload || typeof payload !== "object") return NextResponse.json({ error: "Invalid sync payload." }, { status: 400 });
-  const body = payload as Record<string, unknown>;
-  const provider = body.provider;
-  const externalAccountId = typeof body.externalAccountId === "string" ? body.externalAccountId.trim() : "";
-  const snapshots = Array.isArray(body.snapshots) ? body.snapshots : [];
-  if (!providerIds.includes(provider as (typeof providerIds)[number]) || !externalAccountId || !snapshots.length || snapshots.length > 1000 || !snapshots.every(isValidSnapshot)) {
-    return NextResponse.json({ error: "Provider, external account ID, and 1–1000 valid snapshots are required." }, { status: 400 });
-  }
-  try {
-    const result = await ingestProviderUsageSnapshots({ provider: provider as ProviderUsageSyncInput["provider"], externalAccountId, snapshots });
+    const rows = parseProviderUsageCsv(body);
+    if (rows.length > MAX_PROVIDER_USAGE_CSV_ROWS) return NextResponse.json({ error: `CSV cannot contain more than ${MAX_PROVIDER_USAGE_CSV_ROWS.toLocaleString()} usage rows.` }, { status: 400 });
+    const providers = new Set(rows.map((row) => row.provider));
+    if (providers.size !== 1) return NextResponse.json({ error: "Each ingestion request must contain one provider." }, { status: 400 });
+    const sourceKey = request.headers.get("x-usage-source-key")?.trim() ?? "";
+    const surface = request.headers.get("x-usage-surface")?.trim() ?? "";
+    const authority = request.headers.get("x-usage-authority")?.trim() ?? "";
+    if (!/^[a-z0-9][a-z0-9._:-]{2,127}$/.test(sourceKey) || !surface || !authority) {
+      return NextResponse.json({ error: "Source key, surface, and authority headers are required." }, { status: 400 });
+    }
+    const result = await importProviderUsageCsvFromSource(rows, {
+      sourceKey,
+      provider: rows[0].provider,
+      surface,
+      authority,
+      sourceHash: sha256Hex(body),
+    });
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unable to sync provider usage.";
-    return NextResponse.json({ error: message }, { status: message === "Provider account is not registered." ? 404 : 500 });
+    const message = error instanceof Error ? error.message : "Unable to import provider usage CSV.";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

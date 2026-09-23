@@ -210,6 +210,32 @@
 }
 .site-onboarding__panel--portfolio { align-items: center; background: transparent; }
 .site-onboarding__panel--work { align-items: center; background: transparent; color: #f8f8f8; }
+.site-onboarding__panel-mark {
+  position: absolute;
+  top: clamp(5.5rem, 13vh, 9rem);
+  left: clamp(1.25rem, 7vw, 7rem);
+  z-index: 5;
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  opacity: .72;
+}
+.site-onboarding__panel-mark svg { width: 1.65rem; height: 1.65rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; }
+.site-onboarding__panel-mark--lock {
+  top: 50%;
+  left: 50%;
+  width: clamp(5rem, 9vw, 8rem);
+  height: clamp(5rem, 9vw, 8rem);
+  transform: translate(-50%, -50%);
+  border-width: 2px;
+  opacity: .3;
+  mix-blend-mode: screen;
+  filter: blur(.15px);
+}
+.site-onboarding__panel-mark--lock svg { width: 52%; height: 52%; stroke-width: 1.5; }
 .site-onboarding__crowd-overlay {
   position: absolute;
   inset: 0;
@@ -253,6 +279,10 @@
   mask-image: radial-gradient(ellipse 62% 78% at 75% 76%, #000 0%, rgba(0, 0, 0, .92) 42%, transparent 100%);
 }
 .site-onboarding__panel:focus-visible { outline: 2px solid #1342ff; outline-offset: -8px; }
+.site-onboarding__panel--disabled,
+.site-onboarding__panel--disabled * { cursor: not-allowed !important; }
+.site-onboarding__panel--disabled { opacity: .62; }
+.site-onboarding__panel--disabled .site-onboarding__hint { opacity: 1; color: currentColor; }
 .site-onboarding--selected .site-onboarding__panels { pointer-events: none; }
 .site-onboarding--selected .site-onboarding__header { opacity: 0; transition: opacity .18s ease; }
 .site-onboarding--selected .site-onboarding__panel-copy { opacity: 0; transition: opacity .25s ease; }
@@ -284,6 +314,8 @@
   .site-onboarding__title { font-size: clamp(2.25rem, 13vw, 4.5rem); }
   .site-onboarding__action { bottom: 1.25rem; }
   .site-onboarding__crowd-canvas { width: 100vw; height: 62vh; }
+  .site-onboarding__panel-mark { top: 2rem; left: 1.25rem; }
+  .site-onboarding__panel-mark--lock { top: 50%; left: 50%; }
 }
 
 @media (max-width: 767px) {
@@ -334,6 +366,8 @@ html, body {
   width: 100%;
   min-width: 0;
   font-size: var(--text-base-fluid);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
   /* Ensure background is always visible during transitions */
   background-color: #F8F8F8 !important;
 }
@@ -341,6 +375,28 @@ html, body {
 /* Hide cursor on all elements */
 *, *::before, *::after {
   cursor: none !important;
+}
+
+/* Touch devices do not have a pointer to replace. Keep native controls and
+   scrolling behavior available on phones and tablets. */
+@media (hover: none), (pointer: coarse) {
+  html,
+  body,
+  *,
+  *::before,
+  *::after {
+    cursor: auto !important;
+  }
+}
+
+/* Expanded content uses the native cursor so the close control and text
+   selection remain discoverable even while the desktop Magic UI pointer is
+   active over the page underneath. */
+.highlight-grid-expanded,
+.highlight-grid-expanded *,
+[role="dialog"],
+[role="dialog"] * {
+  cursor: auto !important;
 }
 
 /* Minimalistic + Clean + ASCII style */

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { GeistSans } from 'geist/font/sans';
@@ -12,13 +12,60 @@ const AvatarParticlesCanvas = dynamic(() => import('./three/AvatarParticlesCanva
   ssr: false,
   loading: () => (
     <div
-      className="relative z-20 w-full h-full min-h-[250px] xs:min-h-[300px] sm:min-h-[350px] md:min-h-0 bg-[#424242]"
-      aria-hidden
+      className="relative z-20 h-full min-h-[250px] w-full overflow-hidden bg-transparent xs:min-h-[300px] sm:min-h-[350px] md:min-h-0"
+      role="img"
+      aria-label="Interactive particle avatar loading"
     />
   ),
 });
 
-const Hero = ({ projectOnePercentLogoUrl }: { projectOnePercentLogoUrl?: string | null }) => {
+function AvatarParticlesSlot({ onReady }: { onReady?: () => void }) {
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isSmallScreen = window.matchMedia('(max-width: 767px)').matches;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true;
+
+    if (prefersReducedMotion || isSmallScreen || saveData) {
+      onReady?.();
+      return;
+    }
+
+    let cancelled = false;
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    const load = () => {
+      if (!cancelled) setShouldLoad(true);
+    };
+
+    if (idleWindow.requestIdleCallback) {
+      idleId = idleWindow.requestIdleCallback(load, { timeout: 1400 });
+    } else {
+      timeoutId = window.setTimeout(load, 900);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined) idleWindow.cancelIdleCallback?.(idleId);
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, [onReady]);
+
+  if (!shouldLoad) {
+    return (
+      <div className="relative z-20 h-full min-h-[250px] w-full overflow-hidden bg-transparent xs:min-h-[300px] sm:min-h-[350px] md:min-h-0" role="img" aria-label="Interactive particle avatar loading" />
+    );
+  }
+
+  return <AvatarParticlesCanvas onReady={onReady} />;
+}
+
+const Hero = ({ projectOnePercentLogoUrl, onAvatarReady }: { projectOnePercentLogoUrl?: string | null; onAvatarReady?: () => void }) => {
   return (
     <section className={`relative border-l border-r border-b border-t border-[#d5d5d5] bg-white rounded-t-lg ${GeistSans.className}`}>
       <CornerDot position="tl" className="hidden xs:block" />
@@ -49,7 +96,7 @@ const Hero = ({ projectOnePercentLogoUrl }: { projectOnePercentLogoUrl?: string 
           <div className="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_0%,#2B3138_120%)]" />
           
           <div className="relative z-20 w-full h-full">
-            <AvatarParticlesCanvas />
+            <AvatarParticlesSlot onReady={onAvatarReady} />
           </div>
         </div>
 

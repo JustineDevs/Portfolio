@@ -1,9 +1,18 @@
+import type { Metadata } from 'next'
 import PageLayout from '@/components/layouts/PageLayout'
 import Sidebar from '@/components/sections/about/Sidebar'
 import HeroBanner from '@/components/sections/about/HeroBanner'
 import StoryResponsibilities from '@/components/sections/about/StoryResponsibilities'
 import StrengthsHowVision from '@/components/sections/about/StrengthsHowVision'
 import { getAboutPageData } from '@/lib/content/page-data'
+import { pageMetadata } from '@/lib/seo'
+
+export const metadata: Metadata = pageMetadata({
+  title: 'About Justine Lupasi — Software Developer',
+  description: 'Learn how Justine Lupasi builds useful software at the intersection of AI, blockchain, web products, and developer experience.',
+  path: '/about',
+  keywords: ['Justine Lupasi', 'JustineDevs', 'software developer Philippines', 'AI developer Philippines'],
+})
 
 export default async function AboutPage() {
   const { byKey, heroMeta, sidebarMeta, recentPosts, legalLinks } = await getAboutPageData()

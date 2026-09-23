@@ -1,7 +1,15 @@
 ---
 name: JSTN Portfolio / work.jstn.site
-version: 1.0.0
+version: 2.0.0
 description: A restrained editorial portfolio system for technical product work, influenced by Otter's product-led hierarchy and progressive storytelling.
+source:
+  repository: /home/justine/Downloads/MyWebsite/Portfolio V2
+  evidence:
+    - app/globals.css
+    - tailwind.config.js
+    - lib/design-tokens.ts
+    - app/layout.tsx
+    - components/
 colors:
   background: "#F8F8F8"
   surface: "#FFFFFF"
@@ -14,6 +22,9 @@ colors:
   accent: "#1342FF"
   action: "#424242"
   control: "#A8CEFF"
+  workCanvas: "#F4F1EB"
+  workInk: "#1E211F"
+  workAccent: "#D45335"
 typography:
   family: "Geist Sans"
   mono: "Geist Mono"
@@ -30,7 +41,18 @@ spacing:
   pageGutter: "16px–64px"
   sectionGap: "32px–64px"
   contentMax: "1280px"
+breakpoints:
+  xs: "375px"
+  sm: "480px"
+  md: "768px"
+  lg: "1024px"
+  xl: "1280px"
+  2xl: "1920px"
 components:
+  border: "1px solid #D5D5D5"
+  focus: "2px solid #424242 with 2px offset"
+  accentFocus: "2px solid #1342FF"
+  buttonHeight: "44px minimum"
   motion:
     pageTransition: "Framer Motion opacity and vertical settle"
     smoothScroll: "Lenis-style eased scroll"
@@ -137,3 +159,84 @@ Motion should make the page feel responsive and continuous while preserving edit
 - Repeat utility bars or global UI on route transitions.
 - Hide important content behind hover-only behavior.
 - Introduce a custom component when an existing shared primitive already expresses the behavior.
+
+## 9. Component and state contract
+
+Document important behavior as:
+
+`token → component state → affordance → user intent → feedback/recovery`
+
+### Navigation and wordmark
+
+Use the JSTN wordmark and abstract symbol assets from `public/JSTN Logo/` with clear space. The primary navigation is white, rule-separated, and calm. Active navigation uses electric blue or a clear underline/indicator. Mobile navigation preserves the desktop action order and remains keyboard reachable.
+
+### Buttons and links
+
+Buttons are at least `44px` high. Primary actions use graphite with white text; secondary actions use white with a gray rule; text links use electric blue. Hover may change color, border, opacity, or translate by no more than roughly `2px`. Focus remains visible even when the custom pointer is active.
+
+Every icon-only action needs an accessible name. External links visibly communicate that they leave the site. Destructive actions require confirmation and are visually secondary to save actions.
+
+### Cards and project proof
+
+Project cards use a predictable order: category/number, title, role or summary, banner, tags, and one clear action. Media has a stable aspect ratio, `object-fit: cover`, and meaningful alt text. Descriptions must explain what was built, the technical decisions, and what was learned.
+
+### Editorial sections
+
+Use a compact uppercase section label, strong heading, short rationale, and proof/action region. Separate content with `border-bottom` or `border-left` rules instead of decorative containers. Case-study content uses readable headings and real HTML tables; escaped raw Markdown must never appear in the UI.
+
+### Forms and admin surfaces
+
+Inputs are white or muted-white with a thin gray rule, visible label, and blue or graphite focus ring. Validation is adjacent to its field and written plainly. Loading, empty, success, error, and cancellation states are explicit. Never expose secrets, raw provider exports, or private source metadata on public pages.
+
+### Onboarding and unavailable destinations
+
+Onboarding is a choice surface, not a marketing paragraph. Use recognizable visual marks, short labels, and direct affordances. The available portfolio option is a real button. An unavailable destination is a disabled control with reduced emphasis, a lock/status cue, `aria-disabled="true"`, and a short construction message. It must not navigate on click, keyboard activation, or direct production host access.
+
+## 10. Interaction, accessibility, and content guardrails
+
+| State | Visual treatment | Required behavior |
+| --- | --- | --- |
+| Default | Neutral surface, graphite text, quiet rule | Explain the action through label and context. |
+| Hover | Small color, opacity, border, or `≤2px` movement change | Never be the only way to discover meaning. |
+| Focus | `2px` visible outline with offset | Keyboard focus remains visible and ordered. |
+| Active/selected | Electric blue indicator or stronger rule | Preserve selection after navigation or mode changes. |
+| Pressed/loading | Stable layout with reduced opacity or progress cue | Prevent duplicate submissions and preserve recovery. |
+| Disabled/unavailable | Reduced contrast, lock/status cue, no pointer action | Explain why unavailable without pretending it is a link. |
+| Empty | Calm container with next useful action | State what is missing and how to recover. |
+| Error | Local message with clear contrast | Keep input and provide retry or correction. |
+| Success | Brief confirmation near changed content | Keep the user in context and allow review. |
+| Reduced motion | No nonessential transforms or loops | Respect `prefers-reduced-motion`. |
+
+- Use semantic landmarks, ordered headings, real buttons/links, and meaningful `alt` text.
+- Maintain a minimum `44px` interactive target where practical.
+- Never rely on color, hover, animation, or an icon alone for important meaning.
+- Keep text selection and native scrolling available; custom pointer effects must not block keyboard or touch.
+- Announce asynchronous status changes with live regions when the user needs to know an action completed or failed.
+- Keep project claims specific, current, and evidence-based. Do not present incomplete integrations as active production functionality.
+
+## 11. WebMCP and design-file contract
+
+If a WebMCP design tool is added, keep it narrow and origin-bound. The expected pipeline is:
+
+`source page or DESIGN.md → lexer → parser/AST → semantic model → validator → renderer/preview`
+
+The semantic model preserves unknown Markdown sections and human rationale. References such as `{colors.accent}` resolve to front-matter values. Validation reports missing references, section-order problems, contrast risks, orphaned tokens, and missing component states with source spans where possible.
+
+Generation and preview are separate from persistence. Never silently overwrite this file. A preview reports visible state, accessibility state, and interaction results after mutation. Any write, theme publication, or external sync requires explicit approval and a recoverable diff.
+
+## 12. Do and do not
+
+### Do
+
+- Reuse front-matter tokens and existing component primitives.
+- Let hierarchy, borders, and whitespace carry the brand.
+- Provide a clear next action after proof sections.
+- Test desktop, tablet, mobile, keyboard focus, disabled, loading, empty, error, and reduced-motion states.
+
+### Do not
+
+- Add another accent color, decorative gradient, glow, or generic dashboard treatment without a documented reason.
+- Replace JSTN logos with text or incorrect brand assets.
+- Mix unrelated border weights, corner radii, or shadow languages in one surface.
+- Hide meaningful content behind hover-only behavior.
+- Present the unavailable Work Site or incomplete integration as active production functionality.

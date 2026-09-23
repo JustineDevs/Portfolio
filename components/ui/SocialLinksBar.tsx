@@ -37,6 +37,29 @@ interface SocialLinksBarProps {
   blurIntensity?: number
 }
 
+let engagementRequest: Promise<{ views?: number; stars?: number }> | null = null
+
+function fetchEngagement(visitorId: string) {
+  if (engagementRequest) return engagementRequest
+
+  const controller = new AbortController()
+  const timeout = window.setTimeout(() => controller.abort(), 5000)
+  engagementRequest = fetch(
+    `/api/engagement?visitorId=${encodeURIComponent(visitorId)}`,
+    { cache: 'no-store', signal: controller.signal },
+  )
+    .then((response) => {
+      if (!response.ok) throw new Error(`Engagement request failed: ${response.status}`)
+      return response.json() as Promise<{ views?: number; stars?: number }>
+    })
+    .finally(() => {
+      window.clearTimeout(timeout)
+      engagementRequest = null
+    })
+
+  return engagementRequest
+}
+
 // Smart URL Logic: Converts handles to full URLs
 const buildSocialUrl = (platform: string, username: string): string => {
   const cleanUsername = username.replace(/^@/, '') // Remove @ if present
@@ -170,19 +193,7 @@ export default function SocialLinksBar({
           }
         }
         const vid = typeof window !== 'undefined' ? getVisitorId() : ''
-        const controller = new AbortController()
-        const timeout = window.setTimeout(() => controller.abort(), 5000)
-        let res: Response
-        try {
-          res = await fetch(
-            `/api/engagement?visitorId=${encodeURIComponent(vid)}`,
-            { cache: 'no-store', signal: controller.signal }
-          )
-        } finally {
-          window.clearTimeout(timeout)
-        }
-        if (!res.ok) throw new Error(`Engagement request failed: ${res.status}`)
-        const data = await res.json()
+        const data = await fetchEngagement(vid)
         if (cancelled) return
         setSiteViews(typeof data.views === 'number' ? data.views : 0)
         setRepoStars(typeof data.stars === 'number' ? data.stars : 0)

@@ -32,6 +32,7 @@ import { fetchGithubActivityForYear, saveGithubActivitySnapshot } from "@/lib/gi
 import { normalizeAssetFieldsInObjectAsync, normalizeOptionalImageAssetUrl } from "@/lib/asset-urls";
 import { canonicalizeAboutSectionKey, getAboutSectionSortOrder } from "@/lib/about-section-keys";
 import { normalizeCmsMarkdown } from "@/lib/content/markdown-normalize";
+import { EXPERIENCE_TECH_OPTIONS } from "@/lib/content/experience-progress";
 import {
   getDefaultPlacementKeyForType,
   isPlacementCompatibleWithType,
@@ -628,6 +629,82 @@ export async function savePageSectionAction(formData: FormData) {
     revalidatePath("/license");
   }
   revalidateHome();
+  redirect(returnTo);
+}
+
+export async function saveExperienceProgressAction(formData: FormData) {
+  await requireAdminSession();
+  const id = Number.parseInt(stringValue(formData, "id"), 10);
+  const returnTo = normalizeReturnTo(stringValue(formData, "returnTo") || `/admin/experience/${id}`, "/admin/experience");
+  const rawEntries = stringValue(formData, "entriesJson");
+
+  let parsedEntries: unknown;
+  try {
+    parsedEntries = JSON.parse(rawEntries);
+  } catch {
+    redirectWithError(returnTo, "Progress entries must be valid structured data.");
+  }
+
+  if (!Array.isArray(parsedEntries) || parsedEntries.length === 0) {
+    redirectWithError(returnTo, "Add at least one progress entry.");
+  }
+
+  const allowedTech = new Map<string, string>(EXPERIENCE_TECH_OPTIONS.map((option) => [option.key, option.name]));
+  const entries = (parsedEntries as Record<string, unknown>[]).map((entry, index) => {
+    const year = typeof entry.year === "string" ? entry.year.trim() : "";
+    const company = typeof entry.company === "string" ? entry.company.trim() : "";
+    const status = typeof entry.status === "string" ? entry.status.trim() : "";
+    const role = typeof entry.role === "string" ? entry.role.trim() : "";
+    const description = typeof entry.description === "string" ? entry.description.trim() : "";
+    const project = typeof entry.project === "string" ? entry.project.trim() : "";
+    const projectDescription = typeof entry.projectDescription === "string" ? entry.projectDescription.trim() : "";
+
+    if (!year || !company || !status || !role || !description || !project) {
+      redirectWithError(returnTo, `Complete every required field for progress entry ${index + 1}.`);
+    }
+
+    const icons = Array.isArray(entry.icons)
+      ? entry.icons
+        .filter((icon): icon is { key?: unknown } => Boolean(icon && typeof icon === "object"))
+        .map((icon) => typeof icon.key === "string" ? icon.key : "")
+        .filter((key): key is string => allowedTech.has(key))
+        .map((key) => ({ key, name: allowedTech.get(key) || key }))
+      : [];
+
+    return {
+      id: typeof entry.id === "string" && entry.id.trim() ? entry.id.trim() : `entry-${index + 1}`,
+      parentId: typeof entry.parentId === "string" && entry.parentId.trim() ? entry.parentId.trim() : null,
+      year,
+      company,
+      status,
+      role,
+      description,
+      logoKey: typeof entry.logoKey === "string" && entry.logoKey.trim() ? entry.logoKey.trim() : null,
+      logoUrl: null,
+      project,
+      projectDescription,
+      icons,
+    };
+  });
+
+  const payload = {
+    pageKey: "experience",
+    sectionKey: "progress",
+    title: "Progress",
+    subtitle: "Career and product timeline",
+    bodyMd: null,
+    metaJson: JSON.stringify({ entries }),
+    status: parseStatus(stringValue(formData, "status") || "draft", returnTo),
+    sortOrder: Number.parseInt(stringValue(formData, "sortOrder") || "0", 10) || 0,
+    updatedAt: new Date().toISOString(),
+  };
+
+  if (!id) {
+    redirectWithError(returnTo, "The Progress section could not be found.");
+  }
+
+  await db.update(pageSections).set(payload).where(and(eq(pageSections.id, id), eq(pageSections.pageKey, "experience"), eq(pageSections.sectionKey, "progress")));
+  revalidateExperience();
   redirect(returnTo);
 }
 

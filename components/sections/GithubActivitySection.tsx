@@ -202,7 +202,9 @@ export default function GithubActivitySection() {
               </button>
             ))}
           </div>
-          {selectedProvider !== "github" ? <AgentUsagePanel provider={selectedProvider} /> : null}
+          {selectedProvider !== "github" ? <>
+            <AgentUsagePanel />
+          </> : null}
           {selectedProvider === "github" ? <>
           <h3 className="text-[13px] xs:text-[14px] sm:text-[15px] font-semibold text-[#424242] mb-1 xs:mb-1.5">
             GitHub activity

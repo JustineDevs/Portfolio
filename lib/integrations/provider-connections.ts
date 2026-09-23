@@ -7,45 +7,39 @@ export interface ProviderConnectionDefinition {
   label: string;
   description: string;
   logoSlug: string;
-  status: ProviderConnectionStatus;
-  access: "read-only";
-  protocol: "OAuth 2.0 + PKCE" | "MCP 2.1 + OAuth 2.0 + PKCE";
-  scopes: string[];
+  ingestion: "normalized CSV";
 }
 
 /**
- * The CMS owns the connection contract, not provider credentials. Actual
- * tokens must be held by the WorkOS connection layer once configured.
+ * The CMS owns the catalog contract; usage data arrives through normalized CSV imports.
  */
 export const providerConnections: ProviderConnectionDefinition[] = [
   {
     id: "openai",
     label: "OpenAI (Codex)",
-    description: "Token and cache analytics from Codex usage.",
+    description: "Normalized token and cache analytics imported from Codex exports.",
     logoSlug: "openai",
-    status: "not_connected",
-    access: "read-only",
-    protocol: "MCP 2.1 + OAuth 2.0 + PKCE",
-    scopes: ["usage.read", "models.read"],
+    ingestion: "normalized CSV",
   },
   {
     id: "claude",
     label: "Claude Code",
-    description: "Token and cost analytics from Claude Code usage.",
+    description: "Normalized token and cost analytics imported from Claude Code exports.",
     logoSlug: "anthropic",
-    status: "not_connected",
-    access: "read-only",
-    protocol: "MCP 2.1 + OAuth 2.0 + PKCE",
-    scopes: ["usage.read", "models.read"],
+    ingestion: "normalized CSV",
   },
   {
     id: "cursor",
     label: "Cursor",
-    description: "Token and activity analytics from Cursor usage.",
+    description: "Normalized token and activity analytics imported from Cursor exports.",
     logoSlug: "cursor",
-    status: "not_connected",
-    access: "read-only",
-    protocol: "OAuth 2.0 + PKCE",
-    scopes: ["usage.read"],
+    ingestion: "normalized CSV",
+  },
+  {
+    id: "orca",
+    label: "Orca",
+    description: "Privacy-safe session, event, and token analytics from the local Orca usage index.",
+    logoSlug: "orca",
+    ingestion: "normalized CSV",
   },
 ];

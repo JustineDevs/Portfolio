@@ -1,4 +1,6 @@
 import { and, asc, desc, eq, like } from "drizzle-orm";
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { db } from "@/db/client";
 import { assetRegistry, mediaAssets } from "@/db/schema";
 
@@ -26,6 +28,18 @@ function parseAliases(value: string) {
   }
 }
 
+function hasRenderableSource(asset: typeof mediaAssets.$inferSelect) {
+  if (asset.dataUrl?.startsWith("data:")) return true;
+  if (!asset.sourceUrl) return false;
+  if (!asset.sourceUrl.startsWith("/")) return true;
+
+  try {
+    return existsSync(join(process.cwd(), "public", decodeURIComponent(asset.sourceUrl).replace(/^\/+/, "")));
+  } catch {
+    return false;
+  }
+}
+
 function toPublicAsset(registry: typeof assetRegistry.$inferSelect, asset: typeof mediaAssets.$inferSelect): PublicAsset {
   return {
     id: registry.id,
@@ -50,7 +64,7 @@ export async function listPublishedAssets() {
     .orderBy(asc(assetRegistry.category), asc(assetRegistry.label));
 
   return rows
-    .filter(({ asset }) => asset.status === "published")
+    .filter(({ asset }) => asset.status === "published" && hasRenderableSource(asset))
     .map(({ registry, asset }) => toPublicAsset(registry, asset));
 }
 
@@ -114,7 +128,7 @@ export async function getPublishedAssetBySemanticKey(semanticKey: string) {
     .where(eq(assetRegistry.semanticKey, semanticKey))
     .limit(1);
   const row = rows[0];
-  if (!row || row.registry.status !== "published" || row.asset.status !== "published") return null;
+  if (!row || row.registry.status !== "published" || row.asset.status !== "published" || !hasRenderableSource(row.asset)) return null;
   return { ...toPublicAsset(row.registry, row.asset), aliases: parseAliases(row.registry.aliasesJson), dataUrl: row.asset.dataUrl, sourceUrl: row.asset.sourceUrl };
 }
 
@@ -126,6 +140,6 @@ export async function getAssetPayloadBySemanticKey(semanticKey: string) {
     .where(eq(assetRegistry.semanticKey, semanticKey))
     .limit(1);
   const row = rows[0];
-  if (!row || row.registry.status !== "published" || row.asset.status !== "published") return null;
+  if (!row || row.registry.status !== "published" || row.asset.status !== "published" || !hasRenderableSource(row.asset)) return null;
   return row.asset;
 }

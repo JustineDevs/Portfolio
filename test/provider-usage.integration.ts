@@ -19,8 +19,6 @@ async function main() {
         external_account_id text NOT NULL,
         account_label text NOT NULL,
         account_email text,
-        connection_ref text,
-        scopes_json text DEFAULT '[]' NOT NULL,
         status text DEFAULT 'pending' NOT NULL,
         include_in_rollup integer DEFAULT 1 NOT NULL,
         last_synced_at text,
@@ -31,9 +29,28 @@ async function main() {
     `);
     await sql.execute("CREATE UNIQUE INDEX provider_connections_account_unique ON provider_connections (provider, external_account_id)");
     await sql.execute(`
+      CREATE TABLE provider_usage_sources (
+        id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+        source_key text NOT NULL UNIQUE,
+        provider text NOT NULL,
+        surface text NOT NULL,
+        authority text NOT NULL,
+        schema_version integer DEFAULT 1 NOT NULL,
+        timezone text DEFAULT 'UTC' NOT NULL,
+        coverage_start text,
+        coverage_end text,
+        last_source_hash text,
+        status text DEFAULT 'partial' NOT NULL,
+        last_validated_at text,
+        created_at text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+        updated_at text DEFAULT CURRENT_TIMESTAMP NOT NULL
+      )
+    `);
+    await sql.execute(`
       CREATE TABLE provider_usage_snapshots (
         id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
         connection_id integer NOT NULL,
+        source_id integer,
         period_date text NOT NULL,
         total_tokens integer DEFAULT 0 NOT NULL,
         cached_tokens integer DEFAULT 0 NOT NULL,
@@ -46,29 +63,17 @@ async function main() {
     await sql.execute("CREATE UNIQUE INDEX provider_usage_snapshots_connection_date_unique ON provider_usage_snapshots (connection_id, period_date)");
 
     const usage = await import("../lib/integrations/provider-usage");
-    const first = await usage.createProviderConnection({ provider: "openai", externalAccountId: "acct-1", accountLabel: "Personal", connectionRef: "workos-1" });
-    const second = await usage.createProviderConnection({ provider: "openai", externalAccountId: "acct-2", accountLabel: "Work", connectionRef: "workos-2" });
-    const excluded = await usage.createProviderConnection({ provider: "openai", externalAccountId: "acct-3", accountLabel: "Excluded", connectionRef: "workos-3" });
+    const first = await usage.createProviderConnection({ provider: "openai", externalAccountId: "acct-1", accountLabel: "Personal" });
+    const second = await usage.createProviderConnection({ provider: "openai", externalAccountId: "acct-2", accountLabel: "Work" });
+    const excluded = await usage.createProviderConnection({ provider: "openai", externalAccountId: "acct-3", accountLabel: "Excluded" });
     await usage.setProviderConnectionRollup(excluded[0].id, false);
 
-    await usage.ingestProviderUsageSnapshots({
-      provider: "openai",
-      externalAccountId: "acct-1",
-      snapshots: [{ periodDate: "2026-01-02", totalTokens: 100, cachedTokens: 40, estimatedCost: 1.5, sourceHash: "a" }],
-    });
-    await usage.ingestProviderUsageSnapshots({
-      provider: "openai",
-      externalAccountId: "acct-2",
-      snapshots: [
-        { periodDate: "2026-01-02", totalTokens: 200, cachedTokens: 100, estimatedCost: 2.5, sourceHash: "b" },
-        { periodDate: "2026-02-03", totalTokens: 50, cachedTokens: 0, estimatedCost: 0.5, sourceHash: "c" },
-      ],
-    });
-    await usage.ingestProviderUsageSnapshots({
-      provider: "openai",
-      externalAccountId: "acct-3",
-      snapshots: [{ periodDate: "2026-01-02", totalTokens: 999, cachedTokens: 999, estimatedCost: 99, sourceHash: "excluded" }],
-    });
+    await usage.importProviderUsageCsv([
+      { provider: "openai", externalAccountId: "acct-1", accountLabel: "Personal", periodDate: "2026-01-02", totalTokens: 100, cachedTokens: 40, estimatedCost: 1.5, sourceHash: "a" },
+      { provider: "openai", externalAccountId: "acct-2", accountLabel: "Work", periodDate: "2026-01-02", totalTokens: 200, cachedTokens: 100, estimatedCost: 2.5, sourceHash: "b" },
+      { provider: "openai", externalAccountId: "acct-2", accountLabel: "Work", periodDate: "2026-02-03", totalTokens: 50, cachedTokens: 0, estimatedCost: 0.5, sourceHash: "c" },
+      { provider: "openai", externalAccountId: "acct-3", accountLabel: "Excluded", periodDate: "2026-01-02", totalTokens: 999, cachedTokens: 999, estimatedCost: 99, sourceHash: "excluded" },
+    ]);
 
     const summary = await usage.getProviderUsageSummary("openai", 2026);
     assert.equal(summary.totalTokens, 350);

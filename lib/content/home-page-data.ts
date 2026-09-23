@@ -30,7 +30,7 @@ export type ProfessionalContent = {
 export async function getHomePageData() {
   const [projects, awards, posts, certificates, privacyDb, termsDb, projectOnePercentAsset, jstnAsset, platformAssets, sections] = await Promise.all([
     getPublishedProjects(),
-    getFeaturedAwardCards(2),
+    getFeaturedAwardCards(5),
     getPublishedPosts(),
     getFeaturedCertificateCards(3),
     getSiteSetting<string>("privacyPolicyUrl"),

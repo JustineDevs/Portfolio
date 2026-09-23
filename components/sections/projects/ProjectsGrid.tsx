@@ -11,7 +11,7 @@ export function ProjectCard({ project, index }: { project: PublicProject; index:
   return (
     <li className="group min-w-0">
       <Link href={href} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#383838] focus-visible:ring-offset-4">
-        <div className="relative aspect-[1.4] overflow-hidden rounded-xl bg-[#424242] p-8 sm:p-12" style={{ viewTransitionName: `project-media-${project.slug}` }}>
+          <div className="relative aspect-[1.4] overflow-hidden rounded-xl bg-[#424242] p-8 sm:p-12" style={{ viewTransitionName: `project-media-${project.slug}` }}>
           <Image
             src={getRenderableImageUrl(image)}
             alt={project.title}
@@ -31,9 +31,7 @@ export function ProjectCard({ project, index }: { project: PublicProject; index:
             <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#777777]">
               {String(index + 1).padStart(2, "0")} / {project.category}
             </p>
-            <h2 className="text-lg font-semibold leading-snug tracking-[-0.015em] text-[#383838] transition-colors group-hover:text-[#666666] sm:text-xl">
-              {project.title}
-            </h2>
+            <h2 className="text-lg font-semibold leading-snug tracking-[-0.015em] text-[#383838] transition-colors group-hover:text-[#666666] sm:text-xl">{project.title}</h2>
             <p className="mt-3 max-w-xl text-sm leading-relaxed text-[#666666] line-clamp-2">{project.summary}</p>
           </div>
           <span className="shrink-0 pt-0.5 text-xs text-[#777777]">View</span>

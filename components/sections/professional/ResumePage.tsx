@@ -90,15 +90,14 @@ export default function ResumePage({
                   <NeumorphicSocialButton />
                 </div>
                 <div className="flex items-center gap-3">
-                  <a
-                      href="https://work.jstn.site"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-5 py-2 bg-[#424242] text-white text-[13px] font-medium rounded-lg hover:opacity-90 transition-opacity focus:outline-none focus:ring-2 focus:ring-[#424242] focus:ring-offset-2"
-                      aria-label="Work with me"
+                  <span
+                    className="cursor-not-allowed rounded-lg bg-[#d5d5d5] px-5 py-2 text-[13px] font-medium text-[#777777]"
+                    aria-label="Work with me is under construction"
+                    aria-disabled="true"
+                    title="Work site under construction"
                   >
-                      Work with me
-                  </a>
+                    Work site under construction
+                  </span>
                   <a
                     href="https://drive.google.com/file/d/1LDHKFvVeqEgv2PAI8CeOnnrHabaq3qk-/view?usp=drive_link"
                     target="_blank"
@@ -163,6 +162,15 @@ export default function ResumePage({
                   collaborative teams, with a focus on clean code, best practices, and user experience.
                 </p>
               </div>
+
+              <div className="mt-8 border-t border-[#e0e0e0] pt-6">
+                <div className="mb-6">
+                  <h2 className="text-[clamp(18px,2vw,20px)] font-bold text-[#424242] mb-1 tracking-[-0.01em]">Featured Badge &amp; Certificates</h2>
+                  <p className="text-[clamp(11px,1.2vw,12px)] text-[#666666]">Badges earned from hackathon wins</p>
+                </div>
+                <AwardsList awards={awardsData} compact />
+                {certificatesData.length > 0 ? <CertificatesTable certificates={certificatesData} compact /> : null}
+              </div>
             </div>
           </div>
 
@@ -181,13 +189,13 @@ export default function ResumePage({
         <CornerDot position="bl" />
         <CornerDot position="br" />
         <div className="p-8 lg:p-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Education Section - Left */}
+          <div>
+            {/* Education Section */}
             <div>
               <h2 className="text-[20px] font-bold text-[#424242] mb-6 tracking-[-0.01em]">Education</h2>
-              <div className="space-y-6">
+              <div className="grid grid-cols-1 gap-0 md:grid-cols-2 md:divide-x md:divide-[#e0e0e0]">
                 {education.map((edu, index) => (
-                  <div key={index} className="pb-6 border-b border-[#e0e0e0] last:border-b-0 last:pb-0">
+                  <div key={index} className="border-b border-[#e0e0e0] pb-6 pt-0 first:pt-0 last:border-b-0 md:border-b-0 md:px-6 first:md:pl-0 last:md:pr-0">
                     <h3 className="text-[16px] font-bold text-[#424242] mb-2">{edu.institution}</h3>
                     <p className="text-[13px] font-medium text-[#666666] mb-2">
                       {edu.degree} {edu.specialization && `(${edu.specialization})`}
@@ -226,18 +234,6 @@ export default function ResumePage({
                     </div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Featured Badge & Certificates Section - Right */}
-            <div>
-              <div className="mb-6">
-                <h2 className="text-[clamp(18px,2vw,20px)] font-bold text-[#424242] mb-1 tracking-[-0.01em]">Featured Badge & Certificates</h2>
-                <p className="text-[clamp(11px,1.2vw,12px)] text-[#666666]">Badges earned from hackathon wins</p>
-              </div>
-              <div>
-                <AwardsList awards={awardsData} compact />
-                {certificatesData.length > 0 ? <CertificatesTable certificates={certificatesData} compact /> : null}
               </div>
             </div>
           </div>

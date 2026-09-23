@@ -11,10 +11,12 @@ export interface PublicProject {
   category: string;
   publishedAt?: string | null;
   featured?: boolean;
+  logoUrl?: string | null;
   coverImageUrl?: string | null;
   bannerImageUrl?: string | null;
   authorName: string;
   authorUrl?: string | null;
+  authors: { name: string; url: string }[];
   websiteUrl?: string | null;
   sortOrder?: number;
   tags: string[];

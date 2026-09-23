@@ -36,7 +36,7 @@ export default function BrandBadgeProjectsSection({
           </div>
 
         {/* Content Row */}
-        <div className="relative border-l border-r border-b border-[#d5d5d5] flex flex-col lg:flex-row">
+        <div className="relative border-l border-r border-b border-[#d5d5d5] flex flex-col lg:flex-row lg:items-start">
           
           {/* Left Column: Blog catalog & achievements */}
           <div className="lg:w-1/2 shrink-0 border-b lg:border-b-0 lg:border-r border-[#d5d5d5]">

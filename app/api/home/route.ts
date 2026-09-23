@@ -8,7 +8,7 @@ export async function GET() {
   const data = await getHomePageData();
   return NextResponse.json(data, {
     headers: {
-      "Cache-Control": "private, max-age=60, stale-while-revalidate=300",
+      "Cache-Control": "no-store",
     },
   });
 }

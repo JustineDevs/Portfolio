@@ -12,8 +12,8 @@ function slugifyHeading(value: string) {
 }
 
 export default function DescriptionOtherProjects({ project }: DescriptionOtherProjectsProps) {
-  const headings = (project.bodyMd?.match(/^#{2,3}\s+(.+)$/gm) || []).map((heading) => heading.replace(/^#{2,3}\s+/, '').trim()).filter(Boolean).slice(0, 5)
-  const contents = [{ id: 'overview', label: 'Overview' }, ...headings.map((heading) => ({ id: slugifyHeading(heading), label: heading }))]
+  const headings = (project.bodyMd?.replaceAll('\\n', '\n').match(/^#{2,3}\s+(.+)$/gm) || []).map((heading) => heading.replace(/^#{2,3}\s+/, '').trim()).filter(Boolean).slice(0, 5)
+  const contents = headings.map((heading) => ({ id: slugifyHeading(heading), label: heading }))
 
   return (
     <section className="bg-[#F8FAFC] text-[#383838]">

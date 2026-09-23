@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
@@ -5,6 +6,21 @@ import { notFound, redirect } from "next/navigation";
 import MarkdownContent from "@/components/content/MarkdownContent";
 import PageLayout from "@/components/layouts/PageLayout";
 import { getBlogPostPageData } from "@/lib/content/page-data";
+import JsonLd from "@/components/seo/JsonLd";
+import { absoluteUrl, pageMetadata } from "@/lib/seo";
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const { post } = await getBlogPostPageData(params.slug);
+  if (!post) return {};
+  return pageMetadata({
+    title: post.title,
+    description: post.summary,
+    path: `/blog/${post.slug}`,
+    image: post.coverImageUrl || "/assets/projects/curated/hyperkit-banner-readme.png",
+    type: "article",
+    keywords: ["AI software development", "blockchain engineering", "developer experience"],
+  });
+}
 
 function formatDate(value?: string | null) {
   if (!value) return null;
@@ -58,9 +74,22 @@ export default async function BlogPostPage({
   const markdown = post.bodyMd || "";
   const tableOfContents = getTableOfContents(markdown);
   const publishedDate = formatDate(post.publishedAt);
+  const postUrl = absoluteUrl(`/blog/${post.slug}`);
 
   return (
     <PageLayout legalLinks={legalLinks} fullWidth>
+      <JsonLd data={{
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description: post.summary,
+        url: postUrl,
+        mainEntityOfPage: postUrl,
+        datePublished: post.publishedAt || undefined,
+        image: post.coverImageUrl ? absoluteUrl(post.coverImageUrl) : undefined,
+        author: { "@type": "Person", name: "Justine Lupasi", url: absoluteUrl("/about") },
+        publisher: { "@type": "Person", name: "Justine Lupasi", url: absoluteUrl("/about") },
+      }} />
       <article className="blog-editorial relative overflow-hidden border-x border-b border-[#d5d5d5] bg-white text-[#424242]">
         <nav aria-label="Breadcrumb" className="border-b border-[#d5d5d5] px-5 py-4 text-[11px] uppercase tracking-[0.16em] text-[#6a7280] sm:px-8 lg:px-12">
           <Link href="/blog" className="transition-colors hover:text-[#222]">Writing</Link>

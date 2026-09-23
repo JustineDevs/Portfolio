@@ -280,6 +280,14 @@ export const GoIcon = (props: any) => (
   <BrandIcon slug="go" alt="Go logo" color="424242" className={props.className ?? 'h-7 w-7'} />
 );
 
+export const VueIcon = (props: any) => (
+  <BrandIcon slug="vuedotjs" alt="Vue.js logo" color="424242" className={props.className ?? 'h-7 w-7'} />
+);
+
+export const ViteIcon = (props: any) => (
+  <BrandIcon slug="vite" alt="Vite logo" color="424242" className={props.className ?? 'h-7 w-7'} />
+);
+
 export const BashIcon = (props: any) => (
   <BrandIcon slug="gnubash" alt="Bash logo" color="424242" className={props.className ?? 'h-7 w-7'} />
 );

@@ -46,7 +46,7 @@ function ProofOfWork({ payload }: { payload: ProofData }) {
         <div className="relative min-w-0 pr-10">
           <h2 className="text-2xl font-semibold tracking-[-0.035em] text-[#383838] sm:text-3xl">{item.title}</h2>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-[#666666]">
-            {item.brandLogoUrl ? <Image src={item.brandLogoUrl} alt={item.brandName} width={120} height={24} className="h-5 w-auto object-contain" /> : null}
+            {item.brandLogoUrl ? <Image src={item.brandLogoUrl} alt={item.brandName} width={120} height={24} unoptimized className="h-5 w-auto object-contain" /> : null}
             <span aria-hidden="true">·</span>
             <span>{item.startedAt || "Ongoing"}{item.endedAt ? ` — ${item.endedAt}` : " — Present"}</span>
           </div>
@@ -126,7 +126,7 @@ export function CertificatesTable({ certificates, compact = false }: { certifica
           <a key={certificate.slug} href={certificate.proofUrl || undefined} className="flex min-w-0 items-center gap-3 py-3 transition-opacity hover:opacity-70">
             <span className="shrink-0 text-[11px] text-[#657080]">({String(index + 1).padStart(3, "0")})</span>
             <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#111318] text-white">
-              {certificate.logoUrl ? <Image src={certificate.logoUrl} alt="" width={16} height={16} className="size-4 object-contain" /> : <BadgeCheck aria-hidden="true" className="size-4" />}
+              {certificate.logoUrl ? <Image src={certificate.logoUrl} alt="" width={16} height={16} unoptimized className="size-4 object-contain" /> : <BadgeCheck aria-hidden="true" className="size-4" />}
             </span>
             <span className="min-w-0">
               <span className="block truncate text-sm font-medium text-[#111318]">{certificate.title}</span>
@@ -154,7 +154,7 @@ export function CertificatesTable({ certificates, compact = false }: { certifica
               <span className="text-sm text-[#666666]">({String(index + 1).padStart(3, "0")})</span>
               <span className="flex min-w-0 items-center gap-3 text-base font-medium text-[#424242] sm:text-lg">
                 <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#424242] text-white">
-                  {certificate.logoUrl ? <Image src={certificate.logoUrl} alt="" width={16} height={16} className="size-4 object-contain" /> : <BadgeCheck aria-hidden="true" className="size-4" />}
+                  {certificate.logoUrl ? <Image src={certificate.logoUrl} alt="" width={16} height={16} unoptimized className="size-4 object-contain" /> : <BadgeCheck aria-hidden="true" className="size-4" />}
                 </span>
                 <span className="truncate">{certificate.title}</span>
               </span>

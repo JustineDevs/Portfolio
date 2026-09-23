@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Construction, Menu, X } from 'lucide-react';
 import CornerDot from './ui/CornerDot';
 import { useMode } from '@/components/providers/ModeProvider';
 import { tokens } from '@/lib/design-tokens';
@@ -201,15 +201,24 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null } = {}) {
               <span className="h-1 w-1 rounded-full bg-[#0055FF] sm:h-1.5 sm:w-1.5" />
               <span>Shoot a DM</span>
             </a>
-            <a
-              href="https://work.jstn.site"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden min-h-[36px] items-center justify-center whitespace-nowrap rounded-md bg-[#424242] px-3 py-2 text-[10px] font-medium tracking-[0.04em] text-white shadow-sm transition-colors hover:bg-[#333333] xl:flex xl:min-h-[44px] xl:px-5 xl:py-3 xl:text-xs"
-              aria-label="Work with me"
+            <span
+              className="group relative hidden min-h-[36px] cursor-not-allowed items-center justify-center gap-2 whitespace-nowrap rounded-md bg-[#424242] px-3 py-2 text-[10px] font-medium tracking-[0.04em] text-white shadow-sm transition-colors hover:bg-[#333333] focus-visible:outline-2 focus-visible:outline-[#1342FF] xl:flex xl:min-h-[44px] xl:px-5 xl:py-3 xl:text-xs"
+              role="button"
+              tabIndex={0}
+              aria-label="Work with me is under construction"
+              aria-disabled="true"
+              title="Work site under construction"
             >
-              Work with me
-            </a>
+              <Construction size={14} strokeWidth={1.8} aria-hidden="true" />
+              <span>Work with me</span>
+              <span role="tooltip" className="pointer-events-none absolute left-1/2 top-full z-20 mt-3 flex -translate-x-1/2 items-center gap-2 rounded-md border border-[#d5d5d5] bg-white px-3 py-2 text-left text-[#424242] opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                <Construction size={15} strokeWidth={1.8} aria-hidden="true" />
+                <span className="grid gap-0.5 whitespace-nowrap">
+                  <span className="text-[10px] font-semibold tracking-[0.08em]">Work Site</span>
+                  <span className="text-[10px] font-normal tracking-normal text-[#777777]">Currently under construction</span>
+                </span>
+              </span>
+            </span>
 
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -301,16 +310,24 @@ export default function Navbar({ logoUrl }: { logoUrl?: string | null } = {}) {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <a
-                    href="https://work.jstn.site"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex min-h-[44px] items-center justify-center rounded-md bg-[#424242] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#333333]"
-                    onClick={() => setMobileMenuOpen(false)}
-                    aria-label="Work with me"
+                  <span
+                    className="group relative flex min-h-[44px] cursor-not-allowed items-center justify-center gap-2 rounded-md bg-[#424242] px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-[#333333] focus-visible:outline-2 focus-visible:outline-[#1342FF]"
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Work with me is under construction"
+                    aria-disabled="true"
+                    title="Work site under construction"
                   >
-                    Work with me
-                  </a>
+                    <Construction size={16} strokeWidth={1.8} aria-hidden="true" />
+                    <span>Work with me</span>
+                    <span role="tooltip" className="pointer-events-none absolute left-1/2 top-full z-20 mt-3 flex -translate-x-1/2 items-center gap-2 rounded-md border border-[#d5d5d5] bg-white px-3 py-2 text-left text-[#424242] opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                      <Construction size={16} strokeWidth={1.8} aria-hidden="true" />
+                      <span className="grid gap-0.5 whitespace-nowrap">
+                        <span className="text-[10px] font-semibold tracking-[0.08em]">Work Site</span>
+                        <span className="text-[10px] font-normal tracking-normal text-[#777777]">Currently under construction</span>
+                      </span>
+                    </span>
+                  </span>
                   <a
                     href="https://t.me/TraderGOfficial"
                     target="_blank"

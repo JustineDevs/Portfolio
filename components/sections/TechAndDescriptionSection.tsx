@@ -7,13 +7,18 @@ import CornerDot from '@/components/ui/CornerDot'
 import { ScrambleTextOnHover } from '@/components/ui/scramble-text'
 import { StackedLogos } from '@/components/ui/stacked-logos'
 import { CursorIcon } from '@/components/ui/TechIcons'
+import BrandIcon from '@/components/ui/BrandIcon'
 import {
   TypeScriptIcon, JavaScriptIcon, NextJsIcon, ReactIcon, SolidityIcon, RustIcon, PythonBrandIcon, HTML5Icon,
   TailwindIcon, GrokIcon, ClaudeIcon, OpenAIIcon, PerplexityIcon, VercelIcon, DockerIcon, GitIcon,
-  FirebaseIcon, MoveIcon, LuaIcon, RobloxIcon, VpsIcon, EcsIcon,
+  SupabaseIcon, MoveIcon, LuaIcon, RobloxIcon, VpsIcon,
 } from '@/components/ui/TechIcons'
 
 type IconComponent = React.ComponentType<React.SVGProps<SVGSVGElement>>
+
+const AlibabaCloudIcon: IconComponent = (props) => <BrandIcon slug="alibabacloud" alt="Alibaba Cloud logo" color="424242" className={props.className ?? 'h-7 w-7'} />
+const GoogleCloudIcon: IconComponent = (props) => <BrandIcon slug="googlecloud" alt="Google Cloud logo" color="424242" className={props.className ?? 'h-7 w-7'} />
+const PostgreSQLIcon: IconComponent = (props) => <BrandIcon slug="postgresql" alt="PostgreSQL logo" color="424242" className={props.className ?? 'h-7 w-7'} />
 
 const groups: { title: string; items: { name: string; summary: string; icon: IconComponent }[] }[] = [
   { title: 'Language & Frameworks', items: [
@@ -26,6 +31,7 @@ const groups: { title: string; items: { name: string; summary: string; icon: Ico
     { name: 'Rust', summary: 'Systems language for performance-critical tooling.', icon: RustIcon },
     { name: 'Tailwind CSS', summary: 'Utility-first styling for fast, consistent UI work.', icon: TailwindIcon },
     { name: 'HTML5', summary: 'Semantic structure for accessible web experiences.', icon: HTML5Icon },
+    { name: 'PostgreSQL', summary: 'Relational data infrastructure for products and services.', icon: PostgreSQLIcon },
   ] },
   { title: 'Tools & Agents', items: [
     { name: 'OpenAI', summary: 'Models and APIs for AI-assisted product features.', icon: OpenAIIcon },
@@ -39,9 +45,10 @@ const groups: { title: string; items: { name: string; summary: string; icon: Ico
     { name: 'Vercel', summary: 'Deployment and edge delivery for web products.', icon: VercelIcon },
     { name: 'Docker', summary: 'Reproducible development and deployment environments.', icon: DockerIcon },
     { name: 'Git', summary: 'Version control and collaborative delivery.', icon: GitIcon },
-    { name: 'Firebase', summary: 'Managed services for rapid product prototypes.', icon: FirebaseIcon },
+    { name: 'Supabase', summary: 'Postgres-backed application services, auth, and storage.', icon: SupabaseIcon },
+    { name: 'Google Cloud', summary: 'Cloud infrastructure and managed services for production systems.', icon: GoogleCloudIcon },
     { name: 'VPS', summary: 'Flexible virtual servers for self-managed deployments.', icon: VpsIcon },
-    { name: 'ECS', summary: 'Container orchestration for scalable cloud services.', icon: EcsIcon },
+    { name: 'Alibaba Cloud', summary: 'Cloud infrastructure and ECS services for scalable workloads.', icon: AlibabaCloudIcon },
   ] },
   { title: 'Blockchain & Web3', items: [
     { name: 'Move', summary: 'Resource-oriented smart contract development.', icon: MoveIcon },

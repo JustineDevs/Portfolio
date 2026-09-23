@@ -1,0 +1,14 @@
+-- Move the collaboration list from the archived legacy record to the published HyperKit project.
+DELETE FROM `project_links`
+WHERE `type` = 'author'
+  AND `project_id` IN (SELECT `id` FROM `projects` WHERE `slug` IN ('hyperagent', 'hyperkit', 'mandate402'));
+--> statement-breakpoint
+
+INSERT INTO `project_links` (`project_id`, `type`, `label`, `url`, `sort_order`)
+SELECT `id`, 'author', 'JustineDevs', 'https://github.com/JustineDevs/', 0 FROM `projects` WHERE `slug` = 'hyperkit'
+UNION ALL SELECT `id`, 'author', 'Aaron Sopeña', 'https://github.com/ArhonJay', 1 FROM `projects` WHERE `slug` = 'hyperkit'
+UNION ALL SELECT `id`, 'author', 'Tristan Triñanes', 'https://github.com/Tristan-T-Dev', 2 FROM `projects` WHERE `slug` = 'hyperkit'
+UNION ALL SELECT `id`, 'author', 'JustineDevs', 'https://github.com/JustineDevs/', 0 FROM `projects` WHERE `slug` = 'mandate402'
+UNION ALL SELECT `id`, 'author', 'Sherwin Limosnero', 'https://github.com/owenlim225', 1 FROM `projects` WHERE `slug` = 'mandate402'
+UNION ALL SELECT `id`, 'author', 'John Abrahm Zapico', 'https://github.com/bam841', 2 FROM `projects` WHERE `slug` = 'mandate402'
+UNION ALL SELECT `id`, 'author', 'Jay Parker', 'https://github.com/automatewithedward', 3 FROM `projects` WHERE `slug` = 'mandate402';
