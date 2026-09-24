@@ -308,7 +308,7 @@ export const projects: Record<string, Project> = {
     tags: ['Portfolio', 'Web', 'Tailwind CSS', 'Next.js', 'React'],
     author: 'Justine Lupasi',
     authorWebsite: 'https://github.com/JustineDevs',
-      websiteUrl: 'https://jstn.site',
+      websiteUrl: 'https://www.jstn.site',
       coverImage: '/v2/showcase/portfolio V2.png',
       bannerImage: '/v2/showcase/portfolio V2.png',
     technologies: ['React', 'Next.js', 'Tailwind CSS', 'Node.js', 'TypeScript'],
@@ -320,7 +320,7 @@ export const projects: Record<string, Project> = {
     ],
     socialLinks: {
       github: 'https://github.com/JustineDevs/Portfolio',
-      website: 'https://jstn.site',
+      website: 'https://www.jstn.site',
     },
   },
   'starter-pack': {

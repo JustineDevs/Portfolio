@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { getProviderUsageSummary, importProviderUsageCsvFromSource } from "@/lib/integrations/provider-usage";
 import { MAX_PROVIDER_USAGE_CSV_BYTES, MAX_PROVIDER_USAGE_CSV_ROWS, parseProviderUsageCsv } from "@/lib/integrations/provider-usage-csv";
-import { getArchiveActivitySummary } from "@/lib/usage/archive-activity";
 import { getPublicUsageSummary } from "@/lib/usage/public-ai-usage";
 import { sha256Hex, verifyUsageSignature } from "@/lib/integrations/provider-usage-security";
 
@@ -30,19 +29,6 @@ export async function GET(request: Request) {
   if (provider === "cursor") {
     const cursor = getPublicUsageSummary(year, "Cursor");
     if (cursor.activeDays !== null) return NextResponse.json({ provider, year, ...cursor }, { headers: { "Cache-Control": "no-store" } });
-  }
-  if (provider === "claude" && summary.totalTokens === null) {
-    const archive = getArchiveActivitySummary(year);
-    if (archive) {
-      return NextResponse.json({
-        ...summary,
-        activeDays: archive.activeDays,
-        daily: archive.daily,
-        activityType: "messages",
-        totalMessages: archive.totalMessages,
-        totalConversations: archive.totalConversations,
-      }, { headers: { "Cache-Control": "no-store" } });
-    }
   }
   return NextResponse.json(summary, { headers: { "Cache-Control": "no-store" } });
 }

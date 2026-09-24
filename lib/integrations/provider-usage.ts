@@ -3,7 +3,6 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import { providerConnections, providerUsageSnapshots, providerUsageSources } from "@/db/schema";
 import { db } from "@/db/client";
 import type { AgentProviderId, AgentUsageMetrics } from "@/lib/usage/providers";
-import { getArchiveActivitySummary } from "@/lib/usage/archive-activity";
 
 export type ProviderConnectionRecord = typeof providerConnections.$inferSelect;
 export type ProviderUsageCsvRow = {
@@ -34,27 +33,7 @@ export async function listProviderConnectionsForAdmin() {
 }
 
 export async function listProviderUsageSourcesForAdmin() {
-  const sources = await db.select().from(providerUsageSources).orderBy(asc(providerUsageSources.provider), asc(providerUsageSources.sourceKey));
-  const archiveDates = Object.values([2025, 2026].map((year) => getArchiveActivitySummary(year)?.daily ?? {})).flatMap((daily) => Object.keys(daily)).sort();
-  return [
-    ...sources,
-    {
-      id: -1,
-      sourceKey: "claude-code-archive",
-      provider: "claude" as const,
-      surface: "supplied archive",
-      authority: "privacy-safe aggregate",
-      schemaVersion: 1,
-      timezone: "UTC",
-      coverageStart: archiveDates[0] ?? null,
-      coverageEnd: archiveDates.at(-1) ?? null,
-      lastSourceHash: null,
-      status: "verified" as const,
-      lastValidatedAt: null,
-      createdAt: null,
-      updatedAt: null,
-    },
-  ];
+  return db.select().from(providerUsageSources).orderBy(asc(providerUsageSources.provider), asc(providerUsageSources.sourceKey));
 }
 
 export async function getProviderRollups() {
