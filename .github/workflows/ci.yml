@@ -43,8 +43,9 @@ jobs:
     env:
       # Satisfy Next.js / Auth.js during `next build` without committing secrets.
       AUTH_SECRET: ci-placeholder-auth-secret-must-be-at-least-32-chars
-      # Optional: point CI at Turso by setting repo secrets TURSO_DATABASE_URL / TURSO_AUTH_TOKEN.
-      # If unset, db/client falls back to file:./db/local.db (empty DB is fine; queries return []).
+      # CI builds use the ignored local SQLite database. Production deployments
+      # must provide the real Turso URL/token through the deployment environment.
+      TURSO_DATABASE_URL: file:./db/local.db
       CI: "true"
       # Keep NODE_ENV off the lint/test steps so `next lint` TypeScript setup matches local dev.
       # Production build sets NODE_ENV only for that step (see below).

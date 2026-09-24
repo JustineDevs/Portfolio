@@ -68,6 +68,9 @@ jobs:
       contents: read
     env:
       AUTH_SECRET: ci-placeholder-auth-secret-must-be-at-least-32-chars
+      # Release verification uses the ignored local SQLite database. The
+      # production deployment must provide the real Turso URL/token separately.
+      TURSO_DATABASE_URL: file:./db/local.db
       CI: "true"
 
     steps:
