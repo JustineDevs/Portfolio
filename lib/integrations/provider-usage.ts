@@ -81,7 +81,7 @@ export async function getProviderRollups() {
 export async function getProviderUsageSummary(provider: AgentProviderId, year: number) {
   const connections = await db.select({ id: providerConnections.id }).from(providerConnections).where(and(eq(providerConnections.provider, provider), eq(providerConnections.includeInRollup, true), eq(providerConnections.status, "connected")));
   const ids = connections.map((connection) => connection.id);
-  if (!ids.length) return { provider, year, totalTokens: null, estimatedCost: null, activeDays: null, cacheShare: null, daily: {} as Record<string, number> };
+  if (!ids.length) return { provider, year, source: "database" as const, totalTokens: null, estimatedCost: null, activeDays: null, cacheShare: null, daily: {} as Record<string, number> };
   const rows = await db.select().from(providerUsageSnapshots).where(inArray(providerUsageSnapshots.connectionId, ids));
   const daily: Record<string, number> = {};
   let totalTokens = 0;
@@ -97,7 +97,7 @@ export async function getProviderUsageSummary(provider: AgentProviderId, year: n
     estimatedCost += row.estimatedCost;
   }
   const activeDays = Object.keys(daily).filter((date) => daily[date] > 0).length;
-  return { provider, year, totalTokens, estimatedCost: estimatedCost > 0 ? estimatedCost : null, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, totalEvents: activityCount || null };
+  return { provider, year, source: "database" as const, totalTokens, estimatedCost: estimatedCost > 0 ? estimatedCost : null, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, totalEvents: activityCount || null };
 }
 
 export async function createProviderConnection(input: {

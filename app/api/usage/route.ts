@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 
 import { getProviderUsageSummary, importProviderUsageCsvFromSource } from "@/lib/integrations/provider-usage";
 import { MAX_PROVIDER_USAGE_CSV_BYTES, MAX_PROVIDER_USAGE_CSV_ROWS, parseProviderUsageCsv } from "@/lib/integrations/provider-usage-csv";
-import { getPublicUsageSummary } from "@/lib/usage/public-ai-usage";
 import { sha256Hex, verifyUsageSignature } from "@/lib/integrations/provider-usage-security";
 
 const providerIds = ["openai", "claude", "cursor", "orca"] as const;
@@ -15,21 +14,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid provider or year." }, { status: 400 });
   }
   const summary = await getProviderUsageSummary(provider as "openai" | "claude" | "cursor" | "orca", year);
-  if (summary.activeDays !== null && summary.activeDays > 0) {
-    return NextResponse.json(summary, { headers: { "Cache-Control": "no-store" } });
-  }
-  if (provider === "openai") {
-    const codex = getPublicUsageSummary(year, "Codex");
-    if (codex.activeDays !== null) return NextResponse.json({ provider, year, ...codex }, { headers: { "Cache-Control": "no-store" } });
-  }
-  if (provider === "orca") {
-    const orca = getPublicUsageSummary(year, "Orca");
-    if (orca.activeDays !== null) return NextResponse.json({ provider, year, ...orca }, { headers: { "Cache-Control": "no-store" } });
-  }
-  if (provider === "cursor") {
-    const cursor = getPublicUsageSummary(year, "Cursor");
-    if (cursor.activeDays !== null) return NextResponse.json({ provider, year, ...cursor }, { headers: { "Cache-Control": "no-store" } });
-  }
   return NextResponse.json(summary, { headers: { "Cache-Control": "no-store" } });
 }
 
