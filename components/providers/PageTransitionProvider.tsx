@@ -1,7 +1,5 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { motion } from 'framer-motion'
 import { ReactNode } from 'react'
 
 interface PageTransitionProviderProps {
@@ -14,10 +12,8 @@ interface PageTransitionProviderProps {
  * Background is always visible, only new content fades in
  */
 export default function PageTransitionProvider({ children }: PageTransitionProviderProps) {
-  const pathname = usePathname()
-
   return (
-    <div 
+    <div
       className="min-h-screen bg-[#F8F8F8]"
       style={{ 
         width: '100%',
@@ -26,22 +22,15 @@ export default function PageTransitionProvider({ children }: PageTransitionProvi
         backgroundColor: '#F8F8F8',
       }}
     >
-      <motion.div
-        key={pathname}
-        initial={false}
-        animate={{ opacity: 1 }}
-        transition={{
-          duration: 0.2,
-          ease: 'easeInOut',
-        }}
-        style={{ 
+      <div
+        style={{
           width: '100%',
           minHeight: '100%',
           position: 'relative',
         }}
       >
         {children}
-      </motion.div>
+      </div>
     </div>
   )
 }

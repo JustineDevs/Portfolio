@@ -3,11 +3,11 @@
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import { ONBOARDING_COMPLETED_KEY } from '@/lib/onboarding'
+import HomePageClient, { type HomePageData } from '@/components/HomePageClient'
 
-const HomePageClient = dynamic(() => import('@/components/HomePageClient'))
 const SiteOnboarding = dynamic(() => import('@/components/SiteOnboarding'))
 
-export default function HomeEntry() {
+export default function HomeEntry({ initialData }: { initialData: HomePageData }) {
   const [portfolioSelected, setPortfolioSelected] = useState(false)
   const [onboardingVisible, setOnboardingVisible] = useState(false)
   const [ready, setReady] = useState(false)
@@ -15,6 +15,7 @@ export default function HomeEntry() {
   const [introRequested, setIntroRequested] = useState(false)
 
   useEffect(() => {
+    document.getElementById('home-seo-fallback')?.setAttribute('hidden', '')
     const completed = sessionStorage.getItem(ONBOARDING_COMPLETED_KEY) === '1'
     setPortfolioSelected(completed)
     setOnboardingVisible(!completed)
@@ -42,12 +43,11 @@ export default function HomeEntry() {
 
   return (
     <>
-      {ready && portfolioSelected ? (
-        <HomePageClient
-          showIntro={introRequested}
-          onLoadingComplete={() => setLoadingActive(false)}
-        />
-      ) : null}
+      <HomePageClient
+        initialData={initialData}
+        showIntro={introRequested}
+        onLoadingComplete={() => setLoadingActive(false)}
+      />
       {ready && onboardingVisible && !portfolioSelected ? (
         <SiteOnboarding
           onPortfolioReady={selectPortfolio}

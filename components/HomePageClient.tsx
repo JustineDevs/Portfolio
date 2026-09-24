@@ -73,7 +73,7 @@ const ResumePage = dynamic(
   }
 )
 
-interface HomePageData {
+export interface HomePageData {
   featuredProjects: PublicProject[]
   featuredAwards: PublicAwardCard[]
   featuredPosts: AboutRecentPost[]

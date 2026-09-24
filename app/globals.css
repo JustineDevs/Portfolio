@@ -2,6 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Server-rendered crawl/link-preview fallback; hidden once the interactive home hydrates. */
+.home-seo-fallback { padding: 32px; border: 1px solid #d5d5d5; background: #fff; color: #424242; }
+.home-seo-fallback h1 { max-width: 760px; font-size: clamp(30px, 5vw, 64px); line-height: .98; letter-spacing: -.055em; font-weight: 700; }
+.home-seo-fallback p { max-width: 680px; margin-top: 20px; color: #58606d; line-height: 1.7; }
+.home-seo-fallback nav { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; font-size: 12px; text-transform: uppercase; letter-spacing: .14em; }
+.home-seo-fallback a { color: #1342ff; text-decoration: underline; text-underline-offset: 3px; }
+
+/* The custom pointer is desktop-only; touch devices keep their native cursor behavior. */
+@media (hover: none), (pointer: coarse) {
+  .cursor-none {
+    cursor: auto;
+  }
+}
+
 :root {
   --viewport-gutter: clamp(0.75rem, 3vw, 3rem);
   --content-gutter: clamp(1rem, 4vw, 4rem);

@@ -105,6 +105,10 @@ export default function BlogIndexContent({ posts }: { posts: PublicPost[] }) {
   return (
     <>
       <section className="border-x border-b border-[#d5d5d5] bg-[#f8f8f8] p-3 text-[#424242] sm:p-5 lg:p-6">
+        <header className="mb-6 border border-[#d5d5d5] bg-white p-5 sm:p-8 lg:p-10">
+          <h1>Writing on AI, blockchain, and software development</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-[#58606d]">Field notes from Justine Lupasi on AI-native development, blockchain infrastructure, developer tools, and building practical software.</p>
+        </header>
         <Link href={`/blog/${featured.slug}`} className="group grid overflow-hidden border border-[#d5d5d5] bg-white lg:grid-cols-[1.2fr_0.8fr]">
           <div className="relative min-h-[260px] overflow-hidden bg-[#eef0f2] lg:min-h-[340px]"><PostImage post={featured} featured /></div>
           <div className="flex flex-col justify-between border-t border-[#d5d5d5] p-5 sm:p-8 lg:border-l lg:border-t-0 lg:p-10">

@@ -20,9 +20,20 @@ export function Pointer({
   const x = useMotionValue(0)
   const y = useMotionValue(0)
   const [isActive, setIsActive] = useState(false)
+  const [isFinePointer, setIsFinePointer] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(hover: hover) and (pointer: fine)")
+    setIsFinePointer(mediaQuery.matches)
+    const handleMediaChange = (event: MediaQueryListEvent) => setIsFinePointer(event.matches)
+    mediaQuery.addEventListener("change", handleMediaChange)
+
+    return () => mediaQuery.removeEventListener("change", handleMediaChange)
+  }, [])
+
+  useEffect(() => {
+    if (!isFinePointer) return
     const parentElement = containerRef.current?.parentElement
     if (!parentElement) return
 
@@ -51,7 +62,9 @@ export function Pointer({
       parentElement.removeEventListener("mouseenter", handleMouseEnter)
       parentElement.removeEventListener("mouseleave", handleMouseLeave)
     }
-  }, [x, y])
+  }, [isFinePointer, x, y])
+
+  if (!isFinePointer) return null
 
   return (
     <>

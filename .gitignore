@@ -21,11 +21,14 @@ serviceAccount*.json
 
 # --- Next.js & build output ---
 /.next/
+/.next*/
 /out/
 /build
 dist/
 .vercel
 *.tsbuildinfo
+/storybook-static/
+/artifacts/
 
 # --- Caches & tooling ---
 .cache
@@ -79,6 +82,9 @@ swapfile.sys
 /db/local.db-*
 *.sqlite
 *.sqlite3
+*.db
+*.db-*
+*.dump
 
 # --- Local AI-usage sources and generated exports (never commit) ---
 /.codex/
@@ -88,5 +94,6 @@ swapfile.sys
 **/ai-usage*.csv
 **/usage-export*.csv
 **/private-usage*/
-.vercel
-.internal
+**/*-usage-private*/
+**/OpenAI-export*/
+/.internal/

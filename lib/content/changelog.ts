@@ -14,6 +14,30 @@ export function changelogEntryId(version: string) {
 
 export const changelogEntries: ChangelogEntry[] = [
   {
+    version: 'v0.1.7',
+    date: 'September 25, 2026',
+    title: 'A faster, clearer, and more indexable portfolio',
+    description: 'This release improves first-load continuity, makes the public portfolio easier for search engines and answer engines to understand, and keeps private usage material and build artifacts out of the repository.',
+    highlights: [
+      'Added crawlable server-rendered portfolio introductions and meaningful page headings for the home, Projects, and Writing routes.',
+      'Standardized canonical production URLs on www.jstn.site across metadata, sitemap, robots, answer-engine content, and documentation.',
+      'Kept page transitions, header information, viewer counts, and the mobile pointer from unnecessarily refreshing or animating during navigation.',
+      'Added a validated OpenAI usage import path and strengthened ignore rules for private exports, internal data, databases, build output, and generated artifacts.',
+    ],
+    changed: [
+      'Prepared the release pipeline to publish curated notes together with GitHub-generated changelog entries from the v0.1.7 tag.',
+      'Preserved the existing public visual system while making SEO fallback content disappear after the client experience hydrates.',
+    ],
+    verification: [
+      'pnpm exec tsc --noEmit',
+      'pnpm lint',
+      'pnpm test',
+      'pnpm build',
+      'git diff --check',
+      'Public route and sitemap smoke checks',
+    ],
+  },
+  {
     version: 'v0.1.6',
     date: 'September 23, 2026',
     title: 'A more discoverable, trustworthy portfolio',

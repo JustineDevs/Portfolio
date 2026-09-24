@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
 
-export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://jstn.site").replace(/\/$/, "");
+// Vercel's production hostname is the www variant. Keeping every generated
+// canonical, sitemap, Open Graph, and JSON-LD URL on that origin prevents
+// crawlers from treating the apex redirect as a duplicate URL. Normalize an
+// older apex environment value too, so deployment configuration cannot
+// reintroduce the redirect mismatch.
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.jstn.site";
+const parsedSiteUrl = new URL(configuredSiteUrl);
+if (parsedSiteUrl.hostname === "jstn.site") parsedSiteUrl.hostname = "www.jstn.site";
+export const SITE_URL = parsedSiteUrl.toString().replace(/\/$/, "");
 export const SITE_NAME = "JSTN — Justine Lupasi";
 export const DEFAULT_TITLE = "Justine Lupasi — Software Developer | AI Agents & Blockchain";
 export const DEFAULT_DESCRIPTION =

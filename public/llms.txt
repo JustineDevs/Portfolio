@@ -10,15 +10,15 @@ JSTN is the portfolio of Justine Lupasi, a software developer based in Metro Man
 
 ## Canonical pages
 
-- [Home](https://jstn.site/)
-- [About](https://jstn.site/about)
-- [Projects](https://jstn.site/projects)
-- [Experience](https://jstn.site/experience)
-- [Writing](https://jstn.site/blog)
+- [Home](https://www.jstn.site/)
+- [About](https://www.jstn.site/about)
+- [Projects](https://www.jstn.site/projects)
+- [Experience](https://www.jstn.site/experience)
+- [Writing](https://www.jstn.site/blog)
 
 ## Featured project pages
 
 Project details, technologies, responsibilities, and links are maintained in the portfolio CMS:
 
-- [HyperKit Labs — HyperAgent](https://jstn.site/projects/hyperkit)
-- [Mandate402](https://jstn.site/projects/mandate402)
+- [HyperKit Labs — HyperAgent](https://www.jstn.site/projects/hyperkit)
+- [Mandate402](https://www.jstn.site/projects/mandate402)

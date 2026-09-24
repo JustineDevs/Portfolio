@@ -45,6 +45,11 @@ export default function ProjectsGrid({ projects }: { projects: PublicProject[] }
   return (
     <section id="projects" className="border-x border-b border-[#d5d5d5] bg-[#F8F8F8]">
       <div className="px-4 py-8 xs:px-5 sm:px-8 md:px-12 md:py-10 lg:px-16">
+        <header className="mb-10 max-w-3xl">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[#777777]">Selected work / AI / blockchain / developer tools</p>
+          <h1 className="mt-4 text-[clamp(36px,5vw,68px)] font-bold leading-[0.98] tracking-[-0.055em] text-[#383838]">Projects built for useful, auditable software.</h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-[#666666]">Explore Justine Lupasi&apos;s software projects across AI agents, blockchain infrastructure, smart-contract tooling, and practical web products.</p>
+        </header>
         <ul className="grid grid-cols-1 gap-x-5 gap-y-12 md:grid-cols-2 xl:grid-cols-3 xl:gap-y-16">
           {projects.map((project, index) => <ProjectCard key={project.slug} project={project} index={index} />)}
         </ul>

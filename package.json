@@ -1,6 +1,6 @@
 {
   "name": "portfolio",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "packageManager": "pnpm@9.15.4",
   "description": "Portfolio website project",
   "private": true,
@@ -20,6 +20,7 @@
     "test": "node --import tsx test/admin-users.integration.ts && node --import tsx test/db-client.config.test.ts && node --import tsx test/public-content.failsoft.test.ts && node --import tsx test/provider-usage.integration.ts && node --import tsx test/provider-usage-csv.test.ts && node --import tsx test/provider-usage-security.test.ts && node --import tsx test/change-surfaces.test.ts",
     "usage:export:public": "node scripts/export-public-ai-usage.mjs",
     "usage:import:public": "node scripts/import-public-ai-usage.mjs",
+    "usage:import:openai": "node --import tsx scripts/import-openai-export-usage.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:status": "node scripts/db/status.cjs",
