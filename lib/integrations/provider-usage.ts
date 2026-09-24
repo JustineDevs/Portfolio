@@ -15,6 +15,7 @@ export type ProviderUsageCsvRow = {
   cachedTokens: number;
   activityCount?: number;
   estimatedCost: number;
+  costCurrency?: string;
   sourceHash?: string | null;
 };
 
@@ -81,23 +82,23 @@ export async function getProviderRollups() {
 export async function getProviderUsageSummary(provider: AgentProviderId, year: number) {
   const connections = await db.select({ id: providerConnections.id }).from(providerConnections).where(and(eq(providerConnections.provider, provider), eq(providerConnections.includeInRollup, true), eq(providerConnections.status, "connected")));
   const ids = connections.map((connection) => connection.id);
-  if (!ids.length) return { provider, year, source: "database" as const, totalTokens: null, estimatedCost: null, activeDays: null, cacheShare: null, daily: {} as Record<string, number> };
+  if (!ids.length) return { provider, year, source: "database" as const, totalTokens: null, estimatedCost: null, costsByCurrency: {}, activeDays: null, cacheShare: null, daily: {} as Record<string, number> };
   const rows = await db.select().from(providerUsageSnapshots).where(inArray(providerUsageSnapshots.connectionId, ids));
   const daily: Record<string, number> = {};
   let totalTokens = 0;
   let cachedTokens = 0;
   let activityCount = 0;
-  let estimatedCost = 0;
+  const costsByCurrency: Record<string, number> = {};
   for (const row of rows) {
     if (!row.periodDate.startsWith(`${year}-`)) continue;
     daily[row.periodDate] = (daily[row.periodDate] ?? 0) + (row.totalTokens > 0 ? row.totalTokens : row.activityCount);
     totalTokens += row.totalTokens;
     cachedTokens += row.cachedTokens;
     activityCount += row.activityCount;
-    estimatedCost += row.estimatedCost;
+    if (row.estimatedCost > 0) costsByCurrency[row.costCurrency] = (costsByCurrency[row.costCurrency] ?? 0) + row.estimatedCost;
   }
   const activeDays = Object.keys(daily).filter((date) => daily[date] > 0).length;
-  return { provider, year, source: "database" as const, totalTokens, estimatedCost: estimatedCost > 0 ? estimatedCost : null, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, totalEvents: activityCount || null };
+  return { provider, year, source: "database" as const, totalTokens, estimatedCost: costsByCurrency.USD ? costsByCurrency.USD : null, costsByCurrency, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, totalEvents: activityCount || null };
 }
 
 export async function createProviderConnection(input: {
@@ -153,6 +154,7 @@ export async function writeProviderUsageSnapshot(input: {
   cachedTokens: number;
   activityCount?: number;
   estimatedCost: number;
+  costCurrency?: string;
   sourceHash?: string | null;
 }) {
   const existing = await db.select({ id: providerUsageSnapshots.id }).from(providerUsageSnapshots).where(and(eq(providerUsageSnapshots.connectionId, input.connectionId), eq(providerUsageSnapshots.periodDate, input.periodDate))).limit(1);
@@ -208,6 +210,7 @@ export async function importProviderUsageCsvFromSource(rows: ProviderUsageCsvRow
       cachedTokens: row.cachedTokens,
       activityCount: row.activityCount ?? 0,
       estimatedCost: row.estimatedCost,
+      costCurrency: row.costCurrency ?? "USD",
       sourceHash: row.sourceHash ?? source?.sourceHash,
     });
     snapshotCount += 1;

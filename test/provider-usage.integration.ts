@@ -56,6 +56,7 @@ async function main() {
         cached_tokens integer DEFAULT 0 NOT NULL,
         activity_count integer DEFAULT 0 NOT NULL,
         estimated_cost real DEFAULT 0 NOT NULL,
+        cost_currency text DEFAULT 'USD' NOT NULL,
         source_hash text,
         synced_at text DEFAULT CURRENT_TIMESTAMP NOT NULL,
         FOREIGN KEY (connection_id) REFERENCES provider_connections(id) ON DELETE CASCADE

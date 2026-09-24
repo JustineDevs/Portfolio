@@ -428,6 +428,7 @@ export const providerUsageSnapshots = sqliteTable(
     cachedTokens: integer("cached_tokens").notNull().default(0),
     activityCount: integer("activity_count").notNull().default(0),
     estimatedCost: real("estimated_cost").notNull().default(0),
+    costCurrency: text("cost_currency").notNull().default("USD"),
     sourceHash: text("source_hash"),
     syncedAt: text("synced_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   },
