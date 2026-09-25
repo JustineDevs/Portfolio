@@ -16,7 +16,7 @@ const sourceProviders: AgentProviderId[] = [...providers, "orca"];
 const weeks = Array.from({ length: 52 }, (_, week) => Array.from({ length: 7 }, (_, day) => `${week}-${day}`));
 const monthWeekIndexes = [0, 4, 8, 13, 17, 22, 26, 30, 35, 39, 44, 48];
 const years = [2026, 2025, 2024, 2023];
-type ProviderUsage = { totalTokens: number | null; estimatedCost?: number | null; costsByCurrency?: Record<string, number>; activeDays: number | null; daily: Record<string, number>; totalMessages?: number; totalEvents?: number };
+type ProviderUsage = { totalTokens: number | null; tokenCountKind?: "exact" | "estimated"; estimatedCost?: number | null; costsByCurrency?: Record<string, number>; activeDays: number | null; daily: Record<string, number>; dailyActivity?: Record<string, number>; totalMessages?: number; totalEvents?: number; modelBreakdown?: Record<string, number> };
 type HoveredUsageCell = { date: string; provider: AgentProviderId; value: number; x: number; y: number };
 
 function rgba(hex: string, alpha: number) {
@@ -47,7 +47,7 @@ export default function AgentUsagePanel() {
   }, [selectedYear]);
 
   const summary = useMemo(() => {
-    const dailyByProvider = Object.fromEntries(providers.map((provider) => [provider, Object.fromEntries(Object.entries({ ...(usage?.[provider]?.daily ?? {}), ...(provider === "openai" ? usage?.orca?.daily ?? {} : {}) }).map(([date, value]) => [date, (usage?.[provider]?.daily?.[date] ?? 0) + (provider === "openai" ? usage?.orca?.daily?.[date] ?? 0 : 0)]))])) as Record<AgentProviderId, Record<string, number>>;
+    const dailyByProvider = Object.fromEntries(providers.map((provider) => [provider, Object.fromEntries(Object.entries({ ...(usage?.[provider]?.dailyActivity ?? usage?.[provider]?.daily ?? {}), ...(provider === "openai" ? usage?.orca?.dailyActivity ?? usage?.orca?.daily ?? {} : {}) }).map(([date, value]) => [date, (usage?.[provider]?.dailyActivity?.[date] ?? usage?.[provider]?.daily?.[date] ?? 0) + (provider === "openai" ? usage?.orca?.dailyActivity?.[date] ?? usage?.orca?.daily?.[date] ?? 0 : 0)]))])) as Record<AgentProviderId, Record<string, number>>;
     const maxByProvider = Object.fromEntries(providers.map((provider) => [provider, Math.max(...Object.values(dailyByProvider[provider]), 0)])) as Record<AgentProviderId, number>;
     const dates = new Set(Object.values(dailyByProvider).flatMap((daily) => Object.keys(daily).filter((date) => daily[date] > 0)));
     const indexedProviders = providers.filter((provider) => (usage?.[provider]?.activeDays ?? 0) > 0);
@@ -58,7 +58,9 @@ export default function AgentUsagePanel() {
       return totals;
     }, {});
     const cost = costsByCurrency.USD ?? 0;
-    return { dailyByProvider, maxByProvider, dates, indexedProviders, activity, tokens, cost, costsByCurrency };
+    const modelBreakdown = sourceProviders.reduce<Record<string, number>>((models, provider) => { for (const [model, count] of Object.entries(usage?.[provider]?.modelBreakdown ?? {})) models[model] = (models[model] ?? 0) + count; return models; }, {});
+    const tokenCountKind = sourceProviders.some((provider) => usage?.[provider]?.tokenCountKind === "estimated") ? "estimated" : "exact";
+    return { dailyByProvider, maxByProvider, dates, indexedProviders, activity, tokens, cost, costsByCurrency, modelBreakdown, tokenCountKind };
   }, [usage]);
 
   function cellFor(date: string) {
@@ -74,7 +76,8 @@ export default function AgentUsagePanel() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-px overflow-hidden border border-[#D5D5D5] rounded-none mb-4 xs:mb-5 sm:mb-6 bg-[#D5D5D5]">
         {[["Agent events", summary.activity ? compactNumber(summary.activity) : "—"], ["Indexed tokens", summary.tokens ? compactNumber(summary.tokens) : "—"], ["Active days", summary.dates.size || "—"], ["Est. API cost", summary.cost ? `$${summary.cost.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "—"]].map(([label, value]) => <div key={label} className="bg-[#EEF0F2] p-2.5 xs:p-3 sm:p-3.5 min-h-[62px]"><div className="text-[9px] xs:text-[10px] text-[#666666] font-medium mb-0.5 xs:mb-1">{label}</div><div className="text-[14px] xs:text-[16px] sm:text-[18px] font-bold text-[#424242]">{value}</div></div>)}
       </div>
-      <p className="-mt-2 mb-4 text-[10px] leading-4 text-[#777777]">Combined activity, indexed tokens, and recorded provider charges. Currencies stay separate; exports without token billing do not invent token totals.</p>
+      <p className="-mt-2 mb-4 text-[10px] leading-4 text-[#777777]">Combined activity, indexed tokens, and recorded provider charges. Token totals marked estimated are calculated from exported message content; provider billing tokens are shown exactly when supplied.</p>
+      <p className="-mt-3 mb-4 text-[10px] leading-4 text-[#777777]">Models indexed: {Object.entries(summary.modelBreakdown).sort(([, left], [, right]) => right - left).slice(0, 8).map(([model, count]) => `${model} ${count.toLocaleString()}`).join(" · ") || "No model metadata indexed yet."}</p>
       <p className="-mt-3 mb-4 text-[10px] leading-4 text-[#777777]">{Object.entries(summary.costsByCurrency).map(([currency, amount]) => `${currency === "USD" ? "$" : currency === "PHP" ? "₱" : `${currency} `}${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`).join(" + ") || "No recorded charges indexed yet."}</p>
       <div className="w-full min-w-0 bg-[#EEF0F2] border border-[#D5D5D5] rounded-none p-3 xs:p-4 sm:p-5">
         <div className="flex items-center justify-between gap-2 mb-2"><div><p className="text-[13px] xs:text-[14px] sm:text-[15px] font-semibold text-[#424242]">Daily intensity</p><p className="mt-1 text-[10px] xs:text-[11px] text-[#666666]">Combined provider activity · cell color shows the leading provider</p></div><div className="flex items-center gap-0.5" aria-label="Activity years">{years.map((year) => <button key={year} type="button" onClick={() => setSelectedYear(year)} className={`px-1.5 py-0.5 text-[9px] font-semibold transition-colors ${selectedYear === year ? "bg-[#424242] text-white" : "text-[#666666] hover:text-[#1342FF]"}`}>{year}</button>)}</div></div>

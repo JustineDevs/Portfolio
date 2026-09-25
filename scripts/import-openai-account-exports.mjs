@@ -10,6 +10,7 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { config as loadEnv } from "dotenv";
 import { createClient } from "@libsql/client";
+import { countTokens } from "gpt-tokenizer/model/gpt-5";
 
 loadEnv({ path: path.resolve(process.cwd(), ".env") });
 loadEnv({ path: path.resolve(process.cwd(), ".env.local"), override: true });
@@ -58,18 +59,38 @@ function chargeAmount(row) {
   return Number.isFinite(amount) && amount > 0 ? amount / 100 : null;
 }
 function addDaily(daily, date) {
-  if (date && !daily.has(date)) daily.set(date, { activityCount: 0, costs: {} });
+  if (date && !daily.has(date)) daily.set(date, { activityCount: 0, estimatedTokens: 0, models: {}, costs: {} });
+}
+function messageText(message) {
+  const parts = message?.content?.parts;
+  if (Array.isArray(parts)) return parts.filter((part) => typeof part === "string").join("\n");
+  return typeof message?.content === "string" ? message.content : "";
+}
+function modelFor(message, conversation) {
+  return message?.metadata?.resolved_model_slug || message?.metadata?.model_slug || message?.metadata?.default_model_slug || conversation?.metadata?.model_slug || conversation?.default_model_slug || "unknown";
 }
 function addConversationActivity(daily, conversation) {
-  const dates = [];
+  const messages = [];
   for (const node of Object.values(conversation?.mapping ?? {})) {
     const message = node?.message;
     if (!message || !["user", "assistant", "tool"].includes(message.author?.role)) continue;
     const date = epochToDate(message.create_time) || epochToDate(message.update_time);
-    if (date) dates.push(date);
+    if (date) messages.push({ date, message });
   }
-  if (!dates.length) dates.push(epochToDate(conversation?.create_time) || epochToDate(conversation?.update_time));
-  for (const date of dates) { addDaily(daily, date); if (date) daily.get(date).activityCount += 1; }
+  if (!messages.length) {
+    const date = epochToDate(conversation?.create_time) || epochToDate(conversation?.update_time);
+    if (date) messages.push({ date, message: null });
+  }
+  for (const { date, message } of messages) {
+    addDaily(daily, date);
+    const value = daily.get(date);
+    value.activityCount += 1;
+    const model = modelFor(message, conversation);
+    value.models[model] = (value.models[model] ?? 0) + 1;
+    if (message) {
+      try { value.estimatedTokens += countTokens(messageText(message)); } catch { /* malformed content remains activity-only */ }
+    }
+  }
 }
 
 const database = createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN });
@@ -121,14 +142,14 @@ for (const [index, account] of accounts.entries()) {
     const originalCurrency = currencies[0]?.[0] ?? "USD";
     const originalCost = currencies[0]?.[1] ?? 0;
     const estimatedCost = originalCurrency === "PHP" ? originalCost / phpPerUsd : originalCost;
-    await database.execute({ sql: "INSERT INTO provider_usage_snapshots (connection_id, source_id, period_date, total_tokens, cached_tokens, activity_count, estimated_cost, cost_currency, original_cost, original_currency, exchange_rate_to_usd, source_hash, synced_at) VALUES (?, ?, ?, 0, 0, ?, ?, 'USD', ?, ?, ?, ?, ?) ON CONFLICT(connection_id, period_date) DO UPDATE SET source_id=excluded.source_id, total_tokens=0, cached_tokens=0, activity_count=excluded.activity_count, estimated_cost=excluded.estimated_cost, cost_currency='USD', original_cost=excluded.original_cost, original_currency=excluded.original_currency, exchange_rate_to_usd=excluded.exchange_rate_to_usd, source_hash=excluded.source_hash, synced_at=excluded.synced_at", args: [connection.rows[0].id, source.rows[0].id, periodDate, value.activityCount, estimatedCost, originalCost || null, originalCurrency, originalCurrency === "PHP" ? phpPerUsd : 1, sourceHash, now] });
+    await database.execute({ sql: "INSERT INTO provider_usage_snapshots (connection_id, source_id, period_date, total_tokens, token_count_kind, cached_tokens, activity_count, model_breakdown, estimated_cost, cost_currency, original_cost, original_currency, exchange_rate_to_usd, source_hash, synced_at) VALUES (?, ?, ?, ?, 'estimated', 0, ?, ?, ?, 'USD', ?, ?, ?, ?, ?) ON CONFLICT(connection_id, period_date) DO UPDATE SET source_id=excluded.source_id, total_tokens=excluded.total_tokens, token_count_kind='estimated', cached_tokens=0, activity_count=excluded.activity_count, model_breakdown=excluded.model_breakdown, estimated_cost=excluded.estimated_cost, cost_currency='USD', original_cost=excluded.original_cost, original_currency=excluded.original_currency, exchange_rate_to_usd=excluded.exchange_rate_to_usd, source_hash=excluded.source_hash, synced_at=excluded.synced_at", args: [connection.rows[0].id, source.rows[0].id, periodDate, value.estimatedTokens, value.activityCount, JSON.stringify(value.models), estimatedCost, originalCost || null, originalCurrency, originalCurrency === "PHP" ? phpPerUsd : 1, sourceHash, now] });
   }
   const accountCosts = {};
   for (const [, value] of rows) for (const [currency, amount] of Object.entries(value.costs)) { accountCosts[currency] = (accountCosts[currency] ?? 0) + amount; totals.costs[currency] = (totals.costs[currency] ?? 0) + amount; }
   const activityEvents = rows.reduce((total, [, value]) => total + value.activityCount, 0);
   totals.activityEvents += activityEvents;
-  totals.accounts.push({ account: accountNumber, source: account.name, conversations: conversations.size, activityEvents, activityDays: rows.filter(([, value]) => value.activityCount > 0).length, cost: accountCosts, coverage: rows.length ? rows[0][0] + ".." + rows.at(-1)[0] : null });
+  totals.accounts.push({ account: accountNumber, source: account.name, conversations: conversations.size, activityEvents, estimatedTokens: rows.reduce((total, [, value]) => total + value.estimatedTokens, 0), models: Object.fromEntries(rows.flatMap(([, value]) => Object.entries(value.models)).reduce((counts, [model, count]) => counts.set(model, (counts.get(model) ?? 0) + count), new Map())), activityDays: rows.filter(([, value]) => value.activityCount > 0).length, cost: accountCosts, coverage: rows.length ? rows[0][0] + ".." + rows.at(-1)[0] : null });
 }
 
-console.log(JSON.stringify({ ...totals, convertedUsd: totals.costs.PHP ? totals.costs.PHP / phpPerUsd : totals.costs.USD ?? 0, phpPerUsd, tokenData: "not present in OpenAI export; stored as unavailable" }, null, 2));
+console.log(JSON.stringify({ ...totals, estimatedTokens: totals.accounts.reduce((total, account) => total + account.estimatedTokens, 0), convertedUsd: totals.costs.PHP ? totals.costs.PHP / phpPerUsd : totals.costs.USD ?? 0, phpPerUsd, tokenData: "estimated from visible exported message content with the GPT-5 tokenizer; hidden/system/provider billing tokens are not present" }, null, 2));
 await database.close();

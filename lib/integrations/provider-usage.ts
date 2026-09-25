@@ -12,11 +12,13 @@ export type ProviderUsageCsvRow = {
   accountEmail?: string | null;
   periodDate: string;
   totalTokens: number;
+  tokenCountKind?: "exact" | "estimated";
   cachedTokens: number;
   activityCount?: number;
   estimatedCost: number;
   costCurrency?: string;
   sourceHash?: string | null;
+  modelBreakdown?: Record<string, number>;
 };
 
 export type ProviderUsageSourceInput = {
@@ -82,23 +84,35 @@ export async function getProviderRollups() {
 export async function getProviderUsageSummary(provider: AgentProviderId, year: number) {
   const connections = await db.select({ id: providerConnections.id }).from(providerConnections).where(and(eq(providerConnections.provider, provider), eq(providerConnections.includeInRollup, true), eq(providerConnections.status, "connected")));
   const ids = connections.map((connection) => connection.id);
-  if (!ids.length) return { provider, year, source: "database" as const, totalTokens: null, estimatedCost: null, costsByCurrency: {}, activeDays: null, cacheShare: null, daily: {} as Record<string, number> };
+  if (!ids.length) return { provider, year, source: "database" as const, totalTokens: null, estimatedCost: null, costsByCurrency: {}, activeDays: null, cacheShare: null, daily: {} as Record<string, number>, dailyActivity: {} as Record<string, number>, modelBreakdown: {} };
   const rows = await db.select().from(providerUsageSnapshots).where(inArray(providerUsageSnapshots.connectionId, ids));
   const daily: Record<string, number> = {};
+  const dailyActivity: Record<string, number> = {};
   let totalTokens = 0;
   let cachedTokens = 0;
   let activityCount = 0;
   const costsByCurrency: Record<string, number> = {};
+  const modelBreakdown: Record<string, number> = {};
+  const tokenKinds = new Set<string>();
   for (const row of rows) {
     if (!row.periodDate.startsWith(`${year}-`)) continue;
     daily[row.periodDate] = (daily[row.periodDate] ?? 0) + (row.totalTokens > 0 ? row.totalTokens : row.activityCount);
+    dailyActivity[row.periodDate] = (dailyActivity[row.periodDate] ?? 0) + row.activityCount;
     totalTokens += row.totalTokens;
+    tokenKinds.add(row.tokenCountKind || "exact");
     cachedTokens += row.cachedTokens;
     activityCount += row.activityCount;
+    try {
+      for (const [model, count] of Object.entries(JSON.parse(row.modelBreakdown || "{}"))) {
+        modelBreakdown[model] = (modelBreakdown[model] ?? 0) + Number(count || 0);
+      }
+    } catch {
+      // Older snapshots did not include model metadata.
+    }
     if (row.estimatedCost > 0) costsByCurrency[row.costCurrency] = (costsByCurrency[row.costCurrency] ?? 0) + row.estimatedCost;
   }
   const activeDays = Object.keys(daily).filter((date) => daily[date] > 0).length;
-  return { provider, year, source: "database" as const, totalTokens, estimatedCost: costsByCurrency.USD ? costsByCurrency.USD : null, costsByCurrency, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, totalEvents: activityCount || null };
+  return { provider, year, source: "database" as const, totalTokens, tokenCountKind: tokenKinds.has("estimated") ? "estimated" as const : "exact" as const, costsByCurrency, estimatedCost: costsByCurrency.USD ? costsByCurrency.USD : null, activeDays, cacheShare: totalTokens ? cachedTokens / totalTokens : null, daily, dailyActivity, totalEvents: activityCount || null, modelBreakdown };
 }
 
 export async function createProviderConnection(input: {
@@ -151,17 +165,19 @@ export async function writeProviderUsageSnapshot(input: {
   sourceId?: number | null;
   periodDate: string;
   totalTokens: number;
+  tokenCountKind?: "exact" | "estimated";
   cachedTokens: number;
   activityCount?: number;
   estimatedCost: number;
   costCurrency?: string;
   sourceHash?: string | null;
+  modelBreakdown?: Record<string, number>;
 }) {
   const existing = await db.select({ id: providerUsageSnapshots.id }).from(providerUsageSnapshots).where(and(eq(providerUsageSnapshots.connectionId, input.connectionId), eq(providerUsageSnapshots.periodDate, input.periodDate))).limit(1);
   if (existing[0]) {
-    return db.update(providerUsageSnapshots).set({ ...input, activityCount: input.activityCount ?? 0, syncedAt: new Date().toISOString() }).where(eq(providerUsageSnapshots.id, existing[0].id));
+    return db.update(providerUsageSnapshots).set({ ...input, modelBreakdown: input.modelBreakdown ? JSON.stringify(input.modelBreakdown) : undefined, activityCount: input.activityCount ?? 0, syncedAt: new Date().toISOString() }).where(eq(providerUsageSnapshots.id, existing[0].id));
   }
-  return db.insert(providerUsageSnapshots).values(input);
+  return db.insert(providerUsageSnapshots).values({ ...input, modelBreakdown: input.modelBreakdown ? JSON.stringify(input.modelBreakdown) : undefined });
 }
 
 export async function importProviderUsageCsv(rows: ProviderUsageCsvRow[]) {
@@ -207,10 +223,12 @@ export async function importProviderUsageCsvFromSource(rows: ProviderUsageCsvRow
       sourceId,
       periodDate: row.periodDate,
       totalTokens: row.totalTokens,
+      tokenCountKind: row.tokenCountKind,
       cachedTokens: row.cachedTokens,
       activityCount: row.activityCount ?? 0,
       estimatedCost: row.estimatedCost,
       costCurrency: row.costCurrency ?? "USD",
+      modelBreakdown: row.modelBreakdown,
       sourceHash: row.sourceHash ?? source?.sourceHash,
     });
     snapshotCount += 1;
