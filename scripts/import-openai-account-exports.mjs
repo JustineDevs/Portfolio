@@ -15,6 +15,8 @@ loadEnv({ path: path.resolve(process.cwd(), ".env") });
 loadEnv({ path: path.resolve(process.cwd(), ".env.local"), override: true });
 
 const root = path.resolve(process.env.OPENAI_EXPORT_ROOT || path.join(process.cwd(), ".internal", "openai"));
+const phpPerUsd = Number(process.env.OPENAI_PHP_PER_USD || 62.625);
+if (!Number.isFinite(phpPerUsd) || phpPerUsd <= 0) throw new Error("OPENAI_PHP_PER_USD must be a positive number.");
 const accounts = fs.readdirSync(root, { withFileTypes: true }).filter((entry) => entry.isDirectory() && /^OpenAI-export(?: \(\d+\))?$/.test(entry.name)).sort((a, b) => a.name.localeCompare(b.name));
 if (accounts.length !== 3) throw new Error("Expected 3 OpenAI export directories; found " + accounts.length + ".");
 if (!process.env.TURSO_DATABASE_URL || !process.env.TURSO_AUTH_TOKEN) throw new Error("Turso credentials are required.");
@@ -73,7 +75,7 @@ function addConversationActivity(daily, conversation) {
 const database = createClient({ url: process.env.TURSO_DATABASE_URL, authToken: process.env.TURSO_AUTH_TOKEN });
 const now = new Date().toISOString();
 const totals = { accounts: [], activityEvents: 0, costs: {} };
-await database.execute("UPDATE provider_connections SET include_in_rollup = 0, status = 'paused', updated_at = ? WHERE provider = 'openai'", [now]);
+await database.execute("UPDATE provider_connections SET include_in_rollup = 1, status = 'connected', updated_at = ? WHERE provider = 'openai'", [now]);
 
 for (const [index, account] of accounts.entries()) {
   const accountNumber = index + 1;
@@ -116,9 +118,10 @@ for (const [index, account] of accounts.entries()) {
   for (const [periodDate, value] of rows) {
     const currencies = Object.entries(value.costs);
     if (currencies.length > 1) throw new Error("Multiple billing currencies on " + account.name + " " + periodDate + "; refusing ambiguous rollup.");
-    const costCurrency = currencies[0]?.[0] ?? "USD";
-    const estimatedCost = currencies[0]?.[1] ?? 0;
-    await database.execute({ sql: "INSERT INTO provider_usage_snapshots (connection_id, source_id, period_date, total_tokens, cached_tokens, activity_count, estimated_cost, cost_currency, source_hash, synced_at) VALUES (?, ?, ?, 0, 0, ?, ?, ?, ?, ?) ON CONFLICT(connection_id, period_date) DO UPDATE SET source_id=excluded.source_id, total_tokens=0, cached_tokens=0, activity_count=excluded.activity_count, estimated_cost=excluded.estimated_cost, cost_currency=excluded.cost_currency, source_hash=excluded.source_hash, synced_at=excluded.synced_at", args: [connection.rows[0].id, source.rows[0].id, periodDate, value.activityCount, estimatedCost, costCurrency, sourceHash, now] });
+    const originalCurrency = currencies[0]?.[0] ?? "USD";
+    const originalCost = currencies[0]?.[1] ?? 0;
+    const estimatedCost = originalCurrency === "PHP" ? originalCost / phpPerUsd : originalCost;
+    await database.execute({ sql: "INSERT INTO provider_usage_snapshots (connection_id, source_id, period_date, total_tokens, cached_tokens, activity_count, estimated_cost, cost_currency, original_cost, original_currency, exchange_rate_to_usd, source_hash, synced_at) VALUES (?, ?, ?, 0, 0, ?, ?, 'USD', ?, ?, ?, ?, ?) ON CONFLICT(connection_id, period_date) DO UPDATE SET source_id=excluded.source_id, total_tokens=0, cached_tokens=0, activity_count=excluded.activity_count, estimated_cost=excluded.estimated_cost, cost_currency='USD', original_cost=excluded.original_cost, original_currency=excluded.original_currency, exchange_rate_to_usd=excluded.exchange_rate_to_usd, source_hash=excluded.source_hash, synced_at=excluded.synced_at", args: [connection.rows[0].id, source.rows[0].id, periodDate, value.activityCount, estimatedCost, originalCost || null, originalCurrency, originalCurrency === "PHP" ? phpPerUsd : 1, sourceHash, now] });
   }
   const accountCosts = {};
   for (const [, value] of rows) for (const [currency, amount] of Object.entries(value.costs)) { accountCosts[currency] = (accountCosts[currency] ?? 0) + amount; totals.costs[currency] = (totals.costs[currency] ?? 0) + amount; }
@@ -127,5 +130,5 @@ for (const [index, account] of accounts.entries()) {
   totals.accounts.push({ account: accountNumber, source: account.name, conversations: conversations.size, activityEvents, activityDays: rows.filter(([, value]) => value.activityCount > 0).length, cost: accountCosts, coverage: rows.length ? rows[0][0] + ".." + rows.at(-1)[0] : null });
 }
 
-console.log(JSON.stringify({ ...totals, tokenData: "not present in OpenAI export; stored as unavailable" }, null, 2));
+console.log(JSON.stringify({ ...totals, convertedUsd: totals.costs.PHP ? totals.costs.PHP / phpPerUsd : totals.costs.USD ?? 0, phpPerUsd, tokenData: "not present in OpenAI export; stored as unavailable" }, null, 2));
 await database.close();
